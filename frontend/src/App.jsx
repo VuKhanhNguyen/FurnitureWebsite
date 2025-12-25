@@ -1,19 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import HomePage from './components/pages/HomePage'
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./components/pages/HomePage";
+import Header from "./components/commons/Header";
+import Offcanvas from "./components/commons/OffCanvas";
 
 function App() {
+  const [showOffcanvas, setShowOffcanvas] = useState(false);
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={
+            <HomePage
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
