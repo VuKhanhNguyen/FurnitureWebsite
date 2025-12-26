@@ -8,6 +8,7 @@ import ProductDetailPage from "./components/pages/productDetailPage";
 import WishListPage from "./components/pages/wishListPage";
 import CartPage from "./components/pages/cartPage";
 import CheckoutPage from "./components/pages/checkoutPage";
+import ContactPage from "./components/pages/contactPage";
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
 
@@ -63,6 +64,15 @@ function App() {
           path="/checkout"
           element={
             <CheckoutPage
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <ContactPage
               showOffcanvas={showOffcanvas}
               setShowOffcanvas={setShowOffcanvas}
             />

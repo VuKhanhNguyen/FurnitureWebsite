@@ -35,6 +35,11 @@ export function Header({ onOpenOffcanvas }) {
     navigate("/checkout");
   };
 
+  const handleContactClick = (e) => {
+    e.preventDefault();
+    navigate("/contact");
+  };
+
   return (
     <>
       <header>
@@ -140,7 +145,9 @@ export function Header({ onOpenOffcanvas }) {
                               </ul>
                             </li>
                             <li>
-                              <a href="contact.html">Liên hệ</a>
+                              <a href="#" onClick={handleContactClick}>
+                                Liên hệ
+                              </a>
                             </li>
                           </ul>
                         </nav>
