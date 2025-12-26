@@ -41,7 +41,7 @@ function Offcanvas({ show, onClose }) {
               </div>
               {!isLoggedIn ? (
                 <div className="offcanvas__login-link">
-                  <a href="/login" className="btn btn-outline-primary w-100">
+                  <a href="/login" className="btn btn-primary w-100 py-3 fs-3">
                     Đăng nhập
                   </a>
                 </div>

@@ -1,7 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import logo from "../../assets/imgs/logo.png";
+import { useNavigate } from "react-router-dom";
 
 export function Header({ onOpenOffcanvas }) {
+  const navigate = useNavigate();
+
+  const handleHomeClick = (e) => {
+    e.preventDefault();
+    navigate("/");
+  };
+
+  const handleProductsListClick = (e) => {
+    e.preventDefault();
+    navigate("/productsList");
+  };
+
+  const handleProductDetailClick = (e) => {
+    e.preventDefault();
+    navigate("/productDetail");
+  };
+
+  const handleWishListClick = (e) => {
+    e.preventDefault();
+    navigate("/wishList");
+  };
+
+  const handleCartClick = (e) => {
+    e.preventDefault();
+    navigate("/cart");
+  };
+
+  const handleCheckoutClick = (e) => {
+    e.preventDefault();
+    navigate("/checkout");
+  };
+
   return (
     <>
       <header>
@@ -24,30 +57,43 @@ export function Header({ onOpenOffcanvas }) {
                         <nav id="mobile-menu">
                           <ul>
                             <li className="has-dropdown">
-                              <a href="index.html">Trang chủ</a>
+                              <a href="#" onClick={handleHomeClick}>
+                                Trang chủ
+                              </a>
                             </li>
 
                             <li className="has-dropdown">
-                              <a href="product.html">Cửa hàng</a>
+                              <a href="#" onClick={handleProductsListClick}>
+                                Cửa hàng
+                              </a>
                               <ul className="submenu">
                                 <li>
-                                  <a href="product.html">Sản phẩm</a>
+                                  <a href="#" onClick={handleProductsListClick}>
+                                    Sản phẩm
+                                  </a>
                                 </li>
                                 <li>
-                                  <a href="product-details.html">
+                                  <a
+                                    href="#"
+                                    onClick={handleProductDetailClick}
+                                  >
                                     Chi tiết sản phẩm
                                   </a>
                                 </li>
                                 <li>
-                                  <a href="wishlist.html">
+                                  <a href="#" onClick={handleWishListClick}>
                                     Danh sách yêu thích
                                   </a>
                                 </li>
                                 <li>
-                                  <a href="cart.html">Giỏ hàng</a>
+                                  <a href="#" onClick={handleCartClick}>
+                                    Giỏ hàng
+                                  </a>
                                 </li>
                                 <li>
-                                  <a href="checkout.html">Thanh toán</a>
+                                  <a href="#" onClick={handleCheckoutClick}>
+                                    Thanh toán
+                                  </a>
                                 </li>
                               </ul>
                             </li>
@@ -131,7 +177,11 @@ export function Header({ onOpenOffcanvas }) {
                     </div>
                     <div className="header-action d-flex align-items-center ml-30">
                       <div className="header-action-item">
-                        <a href="wishlist.html" className="header-action-btn">
+                        <a
+                          href="#"
+                          onClick={handleWishListClick}
+                          className="header-action-btn"
+                        >
                           <svg
                             width="23"
                             height="21"
