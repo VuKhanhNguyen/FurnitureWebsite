@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import logo from "../../assets/imgs/logo-light.png";
+import Login from "../login_register/login";
+import { useNavigate } from "react-router-dom";
 
 function Offcanvas({ show, onClose }) {
+  const navigate = useNavigate();
+
   // Giả lập trạng thái đăng nhập, bạn có thể thay bằng context hoặc redux
   const [isLoggedIn] = useState(false);
 
@@ -14,8 +18,7 @@ function Offcanvas({ show, onClose }) {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Xử lý đăng nhập ở đây
-    alert("Đăng nhập chưa được tích hợp!");
+    navigate("/login");
   };
 
   return (
@@ -41,7 +44,11 @@ function Offcanvas({ show, onClose }) {
               </div>
               {!isLoggedIn ? (
                 <div className="offcanvas__login-link">
-                  <a href="/login" className="btn btn-primary w-100 py-3 fs-3">
+                  <a
+                    href="#"
+                    onClick={handleLogin}
+                    className="btn btn-primary w-100 py-3 fs-3"
+                  >
                     Đăng nhập
                   </a>
                 </div>

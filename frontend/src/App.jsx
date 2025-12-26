@@ -11,6 +11,9 @@ import CheckoutPage from "./components/pages/checkoutPage";
 import ContactPage from "./components/pages/contactPage";
 import BlogListPage from "./components/pages/blogListPage";
 import BlogDetailPage from "./components/pages/blogDetailPage";
+import Login from "./components/login_register/login";
+import Register from "./components/login_register/register";
+
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
 
@@ -93,6 +96,24 @@ function App() {
           path="/blogDetail"
           element={
             <BlogDetailPage
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <Login
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <Register
               showOffcanvas={showOffcanvas}
               setShowOffcanvas={setShowOffcanvas}
             />
