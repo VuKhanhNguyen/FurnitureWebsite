@@ -179,7 +179,7 @@ export function Cart() {
                       type="text"
                     />
                     <button
-                      onclick="window.location.reload()"
+                      onClick={() => window.location.reload()}
                       className="fill-btn"
                       type="submit"
                     >
@@ -193,7 +193,7 @@ export function Cart() {
                   </div>
                   <div className="coupon2">
                     <button
-                      onclick="window.location.reload()"
+                      onClick={() => window.location.reload()}
                       className="fill-btn"
                       type="submit"
                     >

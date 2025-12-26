@@ -86,7 +86,7 @@ export function Footer() {
               </div>
               <div className="footer-widget footer-col-4">
                 <div className="footer-widget-title">
-                  <h4>Contact</h4>
+                  <h4>Liên hệ</h4>
                 </div>
                 <div className="footer-info mb-35">
                   <p className="w-75">

@@ -40,6 +40,16 @@ export function Header({ onOpenOffcanvas }) {
     navigate("/contact");
   };
 
+  const handleBlogListClick = (e) => {
+    e.preventDefault();
+    navigate("/blogList");
+  };
+
+  const handleBlogDetailClick = (e) => {
+    e.preventDefault();
+    navigate("/blogDetail");
+  };
+
   return (
     <>
       <header>
@@ -102,45 +112,19 @@ export function Header({ onOpenOffcanvas }) {
                                 </li>
                               </ul>
                             </li>
-                            <li className="has-dropdown">
-                              <a href="about.html">Pages</a>
-                              <ul className="submenu">
-                                <li>
-                                  <a href="about.html">About Us</a>
-                                </li>
-                                <li>
-                                  <a href="store.html">Find a Store</a>
-                                </li>
-                                <li>
-                                  <a href="portfolio.html">Portfolio</a>
-                                </li>
-                                <li>
-                                  <a href="portfolio-details.html">
-                                    Portfolio Details
-                                  </a>
-                                </li>
-                                <li>
-                                  <a href="faq.html">Faq</a>
-                                </li>
-                                <li>
-                                  <a href="coming-soon.html">Coming Soon</a>
-                                </li>
-                                <li>
-                                  <a href="error.html">404</a>
-                                </li>
-                              </ul>
-                            </li>
+
                             <li className="has-dropdown">
                               <a href="blog.html">Blog</a>
                               <ul className="submenu">
                                 <li>
-                                  <a href="blog.html">Blog Default</a>
+                                  <a href="#" onClick={handleBlogListClick}>
+                                    Danh sách Blog
+                                  </a>
                                 </li>
                                 <li>
-                                  <a href="blog-grid.html">Danh sách Blog</a>
-                                </li>
-                                <li>
-                                  <a href="blog-details.html">Chi tiết blog</a>
+                                  <a href="#" onClick={handleBlogDetailClick}>
+                                    Chi tiết blog
+                                  </a>
                                 </li>
                               </ul>
                             </li>
@@ -208,7 +192,8 @@ export function Header({ onOpenOffcanvas }) {
                       </div>
                       <div className="header-action-item">
                         <a
-                          href="cart.html"
+                          href="#"
+                          onClick={handleCartClick}
                           className="header-action-btn cartmini-open-btn"
                         >
                           <svg

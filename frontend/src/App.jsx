@@ -9,6 +9,8 @@ import WishListPage from "./components/pages/wishListPage";
 import CartPage from "./components/pages/cartPage";
 import CheckoutPage from "./components/pages/checkoutPage";
 import ContactPage from "./components/pages/contactPage";
+import BlogListPage from "./components/pages/blogListPage";
+import BlogDetailPage from "./components/pages/blogDetailPage";
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
 
@@ -73,6 +75,24 @@ function App() {
           path="/contact"
           element={
             <ContactPage
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
+        <Route
+          path="/blogList"
+          element={
+            <BlogListPage
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
+        <Route
+          path="/blogDetail"
+          element={
+            <BlogDetailPage
               showOffcanvas={showOffcanvas}
               setShowOffcanvas={setShowOffcanvas}
             />
