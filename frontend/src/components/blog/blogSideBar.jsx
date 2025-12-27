@@ -41,7 +41,7 @@ export function BlogSideBar() {
           </div>
         </div>
         <div className="sidebar__widget mb-45">
-          <h3 className="sidebar__widget-title">Danh mục</h3>
+          <h3 className="sidebar__widget-title">Danh mục blog</h3>
           <div className="sidebar__widget-content">
             <ul>
               <li>

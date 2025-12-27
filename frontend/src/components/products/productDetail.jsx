@@ -124,8 +124,8 @@ export function ProductDetail() {
                 Alexander roll Arm sofa
               </h3>
               <div className="product__details-price">
-                <span className="old-price">$30.35</span>
-                <span className="new-price">$19.25</span>
+                <span className="old-price">30.000₫</span>
+                <span className="new-price">19.000₫</span>
               </div>
               <p>
                 Priyoshop has brought to you the Hijab 3 Pieces Combo Pack PS23.
@@ -151,11 +151,11 @@ export function ProductDetail() {
                   <a href="javascript:void(0)" className="fill-btn cart-btn">
                     <span className="fill-btn-inner">
                       <span className="fill-btn-normal">
-                        Add To Cart
+                        Thêm vào giỏ
                         <i className="fa-solid fa-basket-shopping"></i>
                       </span>
                       <span className="fill-btn-hover">
-                        Add To Cart
+                        Thêm vào giỏ
                         <i className="fa-solid fa-basket-shopping"></i>
                       </span>
                     </span>
@@ -173,7 +173,7 @@ export function ProductDetail() {
                   <a href="#">BO1D0MX8SJ</a>
                 </div>
                 <div className="categories">
-                  <span>Categories:</span> <a href="#">Milk,</a>
+                  <span>Danh mục:</span> <a href="#">Milk,</a>
                   <a href="#">Cream,</a> <a href="#">Fermented.</a>
                 </div>
                 <div className="tag">
@@ -182,7 +182,7 @@ export function ProductDetail() {
                 </div>
               </div>
               <div className="product__details-share">
-                <span>Share:</span>
+                <span>Chia sẻ:</span>
                 <a href="#">
                   <i className="fa-brands fa-facebook-f"></i>
                 </a>
