@@ -11,6 +11,8 @@ Lưu thông tin tài khoản người dùng và khách hàng.
 - **role**: ENUM('customer', 'admin') - Phân quyền
 - **avatar**: VARCHAR(255) - Đường dẫn ảnh đại diện
 - **created_at**: DATETIME - Ngày tạo
+- **updated_at**: DATETIME - Ngày cập nhật cuối
+- **deleted_at**: DATETIME (Nullable) - Ngày xóa mềm (nếu có)
 - **status**: ENUM('active', 'banned') - Trạng thái tài khoản
 
 ### 2. Categories (Danh mục sản phẩm)
@@ -33,6 +35,8 @@ Phân loại sản phẩm (ví dụ: Sofa, Chair, Accessories...).
 - **sku**: VARCHAR(50) - Mã sản phẩm
 - **average_rating**: DECIMAL(3, 2) - Điểm đánh giá trung bình
 - **created_at**: DATETIME
+- **updated_at**: DATETIME - Ngày cập nhật cuối
+- **deleted_at**: DATETIME (Nullable) - Ngày xóa mềm (nếu có)
 - **tags**: VARCHAR(255) - Thẻ sản phẩm (e.g., "Trending", "New")
 
 ### 4. Product_Images (Ảnh sản phẩm)
@@ -102,7 +106,20 @@ Dùng để lưu giỏ hàng của user đã đăng nhập (nếu không dùng L
 - **thumbnail**: VARCHAR(255)
 - **user_id** (FK): INT (Admin)
 - **created_at**: DATETIME
+- **updated_at**: DATETIME - Ngày cập nhật cuối
+- **deleted_at**: DATETIME (Nullable) - Ngày xóa mềm (nếu có)
 - **blog_category_id** (FK): INT - Liên kết bảng Blog_Categories
+
+# 15. Blog_Tags (Thẻ bài viết)
+Dùng để gắn nhiều tag cho 1 bài viết (nhiều-nhiều).
+- **tag_id** (PK): INT, Auto Increment
+- **name**: VARCHAR(50) - Tên tag (e.g., "Design", "Tips")
+- **slug**: VARCHAR(50) - URL thân thiện
+
+# 16. Blog_Tag_Map (Liên kết Blog và Tag)
+Bảng trung gian để liên kết nhiều-nhiều giữa Blogs và Blog_Tags.
+- **blog_id** (FK): INT
+- **tag_id** (FK): INT
 
 ### 13. Product_Attributes (Thông tin bổ sung) - Từ Product Tab
 Lưu các thông tin động như Weight, Dimensions, Brand, Color, Size,...
@@ -125,3 +142,5 @@ Lưu các thông tin động như Weight, Dimensions, Brand, Color, Size,...
 - 1 Product thuộc 1 Category, có nhiều Images, Reviews, Product Attributes, OrderDetails.
 - 1 Order có nhiều OrderDetails.
 - 1 Blog thuộc 1 Blog Category.
+- 1 Blog có nhiều Tags (nhiều-nhiều qua Blog_Tag_Map).
+- 1 Tag có thể gắn cho nhiều Blog.
