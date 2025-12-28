@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../../assets/imgs/logo-light.png";
 import Login from "../login_register/login";
 import { useNavigate } from "react-router-dom";
@@ -6,8 +6,17 @@ import { useNavigate } from "react-router-dom";
 function Offcanvas({ show, onClose }) {
   const navigate = useNavigate();
 
-  // Giả lập trạng thái đăng nhập, bạn có thể thay bằng context hoặc redux
-  const [isLoggedIn] = useState(false);
+  // Kiểm tra trạng thái đăng nhập từ localStorage
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    } else {
+      setUser(null);
+    }
+  }, [show]);
 
   // State cho form đăng nhập
   const [loginData, setLoginData] = useState({ username: "", password: "" });
@@ -19,6 +28,18 @@ function Offcanvas({ show, onClose }) {
   const handleLogin = (e) => {
     e.preventDefault();
     navigate("/login");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/");
+    if (onClose) onClose();
+  };
+
+  const handleProfile = () => {
+    navigate("/profile");
+    if (onClose) onClose();
   };
 
   return (
@@ -42,7 +63,7 @@ function Offcanvas({ show, onClose }) {
                   </button>
                 </div>
               </div>
-              {!isLoggedIn ? (
+              {!user ? (
                 <div className="offcanvas__login-link">
                   <a
                     href="#"
@@ -53,9 +74,25 @@ function Offcanvas({ show, onClose }) {
                   </a>
                 </div>
               ) : (
-                <div className="offcanvas__user">
-                  {/* Nội dung khi đã đăng nhập */}
-                  <p>Xin chào, User!</p>
+                <div
+                  className="offcanvas__user"
+                  style={{ textAlign: "center" }}
+                >
+                  <p>
+                    Xin chào, <b>{user.username}</b>!
+                  </p>
+                  <button
+                    className="btn btn-primary w-100 py-3 fs-3 mb-10"
+                    onClick={handleProfile}
+                  >
+                    Xem profile
+                  </button>
+                  <button
+                    className="btn btn-danger w-100 py-3 fs-3"
+                    onClick={handleLogout}
+                  >
+                    Đăng xuất
+                  </button>
                 </div>
               )}
             </div>

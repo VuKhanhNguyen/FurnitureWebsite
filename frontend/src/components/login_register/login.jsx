@@ -8,10 +8,51 @@ import bg from "../../assets/imgs/bg.jpg";
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [form, setForm] = useState({ username: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleRegisterClick = (e) => {
     e.preventDefault();
     navigate("/register");
+  };
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: form.username,
+          password: form.password,
+        }),
+      });
+      const data = await res.json();
+      if (data.code === "200" && data.data && data.data.access_token) {
+        // Lưu user vào localStorage
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            username: form.username,
+            token: data.data.access_token,
+          })
+        );
+        navigate("/");
+      } else {
+        setError(data.message || "Đăng nhập thất bại");
+      }
+    } catch (err) {
+      setError("Lỗi kết nối máy chủ");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,18 +76,20 @@ const Login = () => {
           </p>
         </div>
 
-        <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
+        <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="userName">
+            <label className="form-label" htmlFor="username">
               Tên đăng nhập
             </label>
             <input
               type="text"
-              id="userName"
-              name="userName"
+              id="username"
+              name="username"
               className="form-input"
               placeholder="Enter your username"
               required
+              value={form.username}
+              onChange={handleChange}
             />
           </div>
 
@@ -63,6 +106,8 @@ const Login = () => {
                 style={{ width: "100%" }}
                 placeholder="••••••••"
                 required
+                value={form.password}
+                onChange={handleChange}
               />
               <button
                 type="button"
@@ -104,6 +149,12 @@ const Login = () => {
               </button>
             </div>
           </div>
+          {error && (
+            <div style={{ color: "red", marginBottom: 8 }}>{error}</div>
+          )}
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+          </button>
 
           <div
             style={{
