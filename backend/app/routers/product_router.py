@@ -50,6 +50,7 @@ def update_product(product_id: int, data: UpdateProductSchema, db: Session = Dep
     update_data = data.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(product, key, value)
+    product.updated_at = datetime.now()
     db.commit()
     db.refresh(product)
     return DataResponse.custom_response(code="200", message="Update product by id", data=product)

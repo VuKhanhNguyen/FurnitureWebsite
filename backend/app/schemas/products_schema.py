@@ -13,6 +13,7 @@ class ProductSchema(BaseModel):
     average_rating: float
     tags: str
     created_at: datetime
+    updated_at: Optional[datetime] = None
     deleted_at: Optional[datetime]
     category_id: Optional[int]
 
