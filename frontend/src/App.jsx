@@ -13,6 +13,7 @@ import BlogListPage from "./components/pages/blogListPage";
 import BlogDetailPage from "./components/pages/blogDetailPage";
 import Login from "./components/login_register/login";
 import Register from "./components/login_register/register";
+import ForgotPassword from "./components/login_register/ForgotPassword";
 import ProductCardQuickView from "./components/products/productCardQuickView";
 
 function App() {
@@ -120,6 +121,7 @@ function App() {
             />
           }
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
           path="/productQuickView"
           element={

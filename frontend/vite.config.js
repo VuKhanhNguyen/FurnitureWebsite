@@ -8,6 +8,8 @@ export default defineConfig({
     proxy: {
       "/register": "http://localhost:8000",
       "/login": "http://localhost:8000",
+      "/forgot-password": "http://localhost:8000",
+      "/reset-password": "http://localhost:8000",
       // hoặc dùng '/api': 'http://localhost:8000' nếu backend có prefix /api
     },
   },
