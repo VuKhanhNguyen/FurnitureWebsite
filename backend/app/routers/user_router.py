@@ -55,27 +55,27 @@ async def register_user(data: RegisterUserSchema, db: Session = Depends(get_db))
         db.add(user)
         db.commit()
         db.refresh(user)
-        return DataResponse.custom_response(code="201", message="Register user success", data=user)
+        return DataResponse.custom_response(code="201", message="Đăng ký người dùng thành công", data=user)
     except IntegrityError:
         db.rollback()
-        return DataResponse.custom_response(code="409", message="Email or username already exists", data=None)
+        return DataResponse.custom_response(code="409", message="Email hoặc tên đăng nhập đã tồn tại", data=None)
     except Exception as e:
         db.rollback()
-        return DataResponse.custom_response(code="500", message="Register user failed", data=None)
+        return DataResponse.custom_response(code="500", message="Đăng ký người dùng thất bại", data=None)
 
 
-@router.post("/login", tags=["users"], description="Login a user", response_model=DataResponse[LoginUserResponseSchema])
+@router.post("/login", tags=["users"], description="Đăng nhập người dùng", response_model=DataResponse[LoginUserResponseSchema])
 async def login_user(data: LoginUserSchema, db: Session = Depends(get_db)):
-    # Đăng nhập bằng username thay vì email
+   
     user = db.query(User).filter(User.username == data.username).first()
     if not user:
-        return DataResponse.custom_response(code="401", message="Invalid username or password", data=None)
-    # Lưu ý: trường password_hash thay vì password
+        return DataResponse.custom_response(code="401", message="Tên đăng nhập hoặc mật khẩu không đúng", data=None)
+    
     if not verify_password(data.password, user.password_hash):
-        return DataResponse.custom_response(code="401", message="Invalid username or password", data=None)
+        return DataResponse.custom_response(code="401", message="Tên đăng nhập hoặc mật khẩu không đúng", data=None)
     token = create_access_token(user.id)
-    return DataResponse.custom_response(code="200", message="Login user success", data=LoginUserResponseSchema(access_token=token, token_type="Bearer"))
+    return DataResponse.custom_response(code="200", message="Đăng nhập thành công", data=LoginUserResponseSchema(access_token=token, token_type="Bearer"))
 
-@router.get("/me", tags=["users"], description="Get current user", response_model=DataResponse[UserSchema], dependencies=[Depends(authenticate)])
+@router.get("/me", tags=["users"], description="Lấy thông tin người dùng hiện tại", response_model=DataResponse[UserSchema], dependencies=[Depends(authenticate)])
 async def get_current_user(current_user: User = Depends(authenticate)):
-    return DataResponse.custom_response(code="200", message="Get current user success", data=current_user)
+    return DataResponse.custom_response(code="200", message="Lấy thông tin người dùng thành công", data=current_user)

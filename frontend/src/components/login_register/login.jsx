@@ -152,9 +152,6 @@ const Login = () => {
           {error && (
             <div style={{ color: "red", marginBottom: 8 }}>{error}</div>
           )}
-          <button type="submit" className="auth-button" disabled={loading}>
-            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
-          </button>
 
           <div
             style={{
@@ -190,8 +187,8 @@ const Login = () => {
             </Link>
           </div>
 
-          <button type="submit" className="auth-button">
-            Đăng nhập
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
         </form>
 
