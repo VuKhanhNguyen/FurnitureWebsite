@@ -15,6 +15,7 @@ import Login from "./components/login_register/login";
 import Register from "./components/login_register/register";
 import ForgotPassword from "./components/login_register/ForgotPassword";
 import ProductCardQuickView from "./components/products/productCardQuickView";
+import Profile from "./components/pages/Profile/Profile";
 
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
@@ -126,6 +127,15 @@ function App() {
           path="/productQuickView"
           element={
             <ProductCardQuickView
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <Profile
               showOffcanvas={showOffcanvas}
               setShowOffcanvas={setShowOffcanvas}
             />

@@ -28,6 +28,7 @@ async def delete_user():
 
 
 from datetime import datetime
+import pytz
 from sqlalchemy.exc import IntegrityError
 
 @router.post("/register", tags=["users"], description="Register a new user", response_model=DataResponse[UserSchema])
@@ -38,7 +39,8 @@ async def register_user(data: RegisterUserSchema, db: Session = Depends(get_db))
         return DataResponse.custom_response(code="409", message="Email hoặc username đã tồn tại", data=None)
 
     password_hash = hash_password(data.password)
-    now = datetime.utcnow()
+    vn_tz = pytz.timezone('Asia/Ho_Chi_Minh')
+    now = datetime.now(vn_tz)
     user = User(
         username=data.username,
         password_hash=password_hash,
@@ -79,3 +81,51 @@ async def login_user(data: LoginUserSchema, db: Session = Depends(get_db)):
 @router.get("/me", tags=["users"], description="Lấy thông tin người dùng hiện tại", response_model=DataResponse[UserSchema], dependencies=[Depends(authenticate)])
 async def get_current_user(current_user: User = Depends(authenticate)):
     return DataResponse.custom_response(code="200", message="Lấy thông tin người dùng thành công", data=current_user)
+
+import shutil
+import os
+from fastapi import File, UploadFile, Form
+
+@router.put("/me", tags=["users"], description="Cập nhật thông tin người dùng", response_model=DataResponse[UserSchema])
+async def update_user_profile(
+    phone: str = Form(None),
+    avatar: UploadFile = File(None),
+    current_user: User = Depends(authenticate),
+    db: Session = Depends(get_db)
+):
+    if phone:
+        current_user.phone = phone
+    
+    if avatar:
+        # Construct path to frontend/src/assets/imgs/avatar
+        # current file is backend/app/routers/user_router.py
+        # root is .../FurnitureWebsite
+        
+        current_file_path = os.path.abspath(__file__)
+        # backend/app/routers/user_router.py -> backend/app/routers -> backend/app -> backend -> FurnitureWebsite
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_file_path))))
+        upload_dir = os.path.join(base_dir, "frontend", "public", "uploads", "avatars")
+        
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Generates a unique filename or use original? Using original for now as per simple requirement, but maybe prefix with user_id to avoid collision? 
+        # User asked for "folder avatar", allowing edit.
+        # Let's clean the filename
+        filename = f"{current_user.id}_{avatar.filename}"
+        file_path = os.path.join(upload_dir, filename)
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(avatar.file, buffer)
+            
+        # Update avatar path in DB. 
+        # Assuming frontend will try to load this. 
+        # If it's src/assets, frontend import might be tricky for new files.
+        # Storing just filename or relative path.
+        current_user.avatar = filename
+        
+    vn_tz = pytz.timezone('Asia/Ho_Chi_Minh')
+    current_user.updated_at = datetime.now(vn_tz)
+    db.commit()
+    db.refresh(current_user)
+    
+    return DataResponse.custom_response(code="200", message="Cập nhật thông tin thành công", data=current_user)

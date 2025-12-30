@@ -61,3 +61,7 @@ class LoginUserResponseSchema(BaseModel):
 class TokenPayload(BaseModel):
     user_id: int
     exp: int
+
+class UserUpdateSchema(BaseModel):
+    phone: Optional[str] = None
+    avatar: Optional[str] = None
