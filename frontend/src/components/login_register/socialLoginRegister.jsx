@@ -29,7 +29,11 @@ const SocialLoginRegister = () => {
         </svg>
       </button>
 
-      <button className="social-btn" aria-label="Login with Facebook">
+      <button
+        className="social-btn"
+        aria-label="Login with Facebook"
+        onClick={() => (window.location.href = "/api/auth/facebook/login")}
+      >
         <svg
           className="social-icon"
           viewBox="0 0 24 24"
@@ -42,7 +46,11 @@ const SocialLoginRegister = () => {
         </svg>
       </button>
 
-      <button className="social-btn" aria-label="Login with GitHub">
+      <button
+        className="social-btn"
+        aria-label="Login with GitHub"
+        onClick={() => (window.location.href = "/api/auth/github/login")}
+      >
         <svg
           className="social-icon"
           viewBox="0 0 24 24"

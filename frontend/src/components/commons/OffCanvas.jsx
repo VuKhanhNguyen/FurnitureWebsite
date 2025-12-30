@@ -31,10 +31,16 @@ function Offcanvas({ show, onClose }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-    navigate("/");
-    if (onClose) onClose();
+    const confirmLogout = window.confirm(
+      "Bạn có chắc chắn muốn đăng xuất không?"
+    );
+    if (confirmLogout) {
+      localStorage.removeItem("user");
+      setUser(null);
+      navigate("/");
+      if (onClose) onClose();
+    }
+    // Nếu chọn Cancel thì không làm gì
   };
 
   const handleProfile = () => {

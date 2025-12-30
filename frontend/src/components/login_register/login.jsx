@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import SocialLoginRegister from "./socialLoginRegister";
 import "../../assets/css/auth.css";
 import { useNavigate } from "react-router-dom";
@@ -7,10 +7,41 @@ import bg from "../../assets/imgs/bg.jpg";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    if (token) {
+      // Fetch user info with token
+      fetch("/api/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.code === "200") {
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                username: data.data.username,
+                token: token,
+                ...data.data,
+              })
+            );
+            navigate("/");
+          } else {
+            setError("Lỗi đăng nhập social");
+          }
+        })
+        .catch(() => setError("Lỗi kết nối máy chủ"));
+    }
+  }, [location, navigate]);
 
   const handleRegisterClick = (e) => {
     e.preventDefault();
@@ -26,7 +57,7 @@ const Login = () => {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/login", {
+      const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

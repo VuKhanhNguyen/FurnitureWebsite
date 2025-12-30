@@ -14,6 +14,9 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   const handleSendCode = async (e) => {
     e.preventDefault();
@@ -21,7 +24,7 @@ const ForgotPassword = () => {
     setError("");
     setMessage("");
     try {
-      const res = await fetch("/forgot-password", {
+      const res = await fetch("/api/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -42,15 +45,21 @@ const ForgotPassword = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
+    setPasswordError("");
+    setConfirmPasswordError("");
+    if (newPassword.length < 8) {
+      setPasswordError("Mật khẩu phải có ít nhất 8 ký tự");
+      return;
+    }
     if (newPassword !== confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp.");
+      setConfirmPasswordError("Mật khẩu xác nhận không khớp");
       return;
     }
     setLoading(true);
     setError("");
     setMessage("");
     try {
-      const res = await fetch("/reset-password", {
+      const res = await fetch("/api/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -136,21 +145,40 @@ const ForgotPassword = () => {
             {showPassword ? "👁️" : "👁️‍🗨️"}
           </button>
         </div>
+        {passwordError && (
+          <div style={{ color: "red", fontSize: 14, marginTop: 4 }}>
+            {passwordError}
+          </div>
+        )}
       </div>
 
       <div className="form-group">
         <label className="form-label" htmlFor="confirmPassword">
           Xác nhận mật khẩu
         </label>
-        <input
-          type="password"
-          id="confirmPassword"
-          className="form-input"
-          placeholder="••••••••"
-          required
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
+        <div className="password-input-wrapper">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            id="confirmPassword"
+            className="form-input"
+            placeholder="••••••••"
+            required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            className="password-toggle-icon"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+          </button>
+        </div>
+        {confirmPasswordError && (
+          <div style={{ color: "red", fontSize: 14, marginTop: 4 }}>
+            {confirmPasswordError}
+          </div>
+        )}
       </div>
 
       <button type="submit" className="auth-button" disabled={loading}>

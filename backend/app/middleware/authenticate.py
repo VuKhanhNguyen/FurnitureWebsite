@@ -16,11 +16,12 @@ def authenticate(http_authorization_credentials=Depends(reusable_oauth), db: Ses
     try:
         payload = jwt.decode(
             http_authorization_credentials.credentials, settings.SECRET_KEY,
-            algorithms=settings.ALGORITHM
+            algorithms=[settings.ALGORITHM]
         )
         token_data = TokenPayload(**payload)
 
-    except (jwt.PyJWTError, ValidationError):
+    except (jwt.PyJWTError, ValidationError) as e:
+        print(f"AUTHENTICATION ERROR: {str(e)}")
         raise HTTPException(
             status_code=403,
             detail="credentials"
