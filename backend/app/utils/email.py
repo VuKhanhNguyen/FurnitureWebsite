@@ -3,7 +3,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.core.config import settings
 
-def send_email(to_email: str, subject: str, html_content: str):
+def send_email(to_email: str, subject: str, html_content: str, reply_to: str = None):
     try:
         if not settings.MAIL_USERNAME or not settings.MAIL_PASSWORD:
             print("Mailtrap credentials not set. Skipping email send.")
@@ -13,6 +13,8 @@ def send_email(to_email: str, subject: str, html_content: str):
         message["Subject"] = subject
         message["From"] = settings.MAIL_FROM
         message["To"] = to_email
+        if reply_to:
+            message["Reply-To"] = reply_to
 
         part = MIMEText(html_content, "html")
         message.attach(part)

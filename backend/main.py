@@ -6,6 +6,8 @@ from app.routers.product_router import router as product_router
 from app.routers.user_router import router as user_router_router
 from app.routers.password_router import router as password_router
 from app.routers.auth_router import router as auth_router
+from app.routers.contact_router import router as contact_router
+from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
 
@@ -14,10 +16,19 @@ app = FastAPI(
     description="UTE",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # hoặc ["*"] để cho phép tất cả
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(product_router, prefix="/api")
 app.include_router(user_router_router, prefix="/api")
 app.include_router(password_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
+app.include_router(contact_router, prefix="/api")
 
 @app.get("/home")
 async def root():

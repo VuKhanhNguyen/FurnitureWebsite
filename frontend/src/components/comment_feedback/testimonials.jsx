@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import bg from "../../assets/imgs/bg.jpg";
-// Import Swiper styles (nếu có file css, bạn nên import vào App.css hoặc file global)
+
 // import "../../assets/css/swiper.min.css";
 
 // Import Swiper JS
