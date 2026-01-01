@@ -47,8 +47,7 @@ async def send_contact_form(form: ContactForm):
     user_html = f"""
     <div style="font-family: Arial, sans-serif; padding: 20px;">
         <h2>Xin chào {form.name},</h2>
-        <p>Cảm ơn bạn đã liên hệ với FurnitureWebsite.</p>
-        <p>Chúng tôi đã nhận được thông tin của bạn và sẽ phản hồi sớm nhất có thể.</p>
+        <p>Cảm ơn bạn đã liên hệ FurnitureWebsite. Chúng tôi đã nhận được thông tin của bạn và sẽ phản hồi sớm nhất có thể.</p>
         <hr>
         <b>Nội dung bạn đã gửi:</b>
         <p>{form.message}</p>
