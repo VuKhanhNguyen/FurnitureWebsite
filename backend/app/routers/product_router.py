@@ -8,6 +8,7 @@ from datetime import datetime
 import os
 import shutil
 from typing import Optional
+from pathlib import Path
 
 
 router = APIRouter(
@@ -15,8 +16,10 @@ router = APIRouter(
     tags=["products"]
 )
 
-UPLOAD_DIR = "uploads/products"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+# Lưu ảnh vào thư mục static của frontend để có thể serve trực tiếp
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+UPLOAD_DIR = PROJECT_ROOT / "frontend" / "public" / "uploads" / "products"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 @router.get("/", description="Get all products", response_model=DataResponse[list[ProductSchema]])
 async def get_products(db: Session = Depends(get_db)):
@@ -44,10 +47,12 @@ async def create_product(
         image_path = None
         if file and file.filename:
             filename = f"{datetime.now().timestamp()}_{file.filename}"
-            filepath = os.path.join(UPLOAD_DIR, filename)
+            # filepath = os.path.join(UPLOAD_DIR, filename)
+            filepath = UPLOAD_DIR / filename
             with open(filepath, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
-            image_path = f"uploads/products/{filename}"
+#  image_path = f"uploads/products/{filename}"
+            image_path = filename
         
         db_product = Product(
             name=name,

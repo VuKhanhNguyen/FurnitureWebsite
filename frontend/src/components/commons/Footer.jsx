@@ -40,7 +40,7 @@ export function Footer() {
                 <div className="footer-widget-title">
                   <h4>Dịch vụ</h4>
                 </div>
-                <div className="footer-link">
+                <div className="footer-link" style={{ fontSize: "16px" }}>
                   <ul>
                     <li>
                       <a href="error.html">Đăng nhập</a>
@@ -64,7 +64,7 @@ export function Footer() {
                 <div className="footer-widget-title">
                   <h4>Công ty</h4>
                 </div>
-                <div className="footer-link">
+                <div className="footer-link" style={{ fontSize: "16px" }}>
                   <ul>
                     <li>
                       <a href="index.html">Trang chủ</a>
@@ -89,7 +89,7 @@ export function Footer() {
                   <h4>Liên hệ</h4>
                 </div>
                 <div className="footer-info mb-35">
-                  <p className="w-75">
+                  <p className="w-100">
                     48 Cao Thắng, Hải Châu, Đà Nẵng, Việt Nam
                   </p>
                   <div className="footer-info-item d-flex align-items-start pb-15 pt-15">

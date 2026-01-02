@@ -2,11 +2,11 @@ import React from "react";
 
 export function Pagination() {
   return (
-    <div class="bd-basic__pagination  mb-50 d-flex align-items-center justify-content-center">
+    <div className="bd-basic__pagination  mb-50 d-flex align-items-center justify-content-center">
       <nav>
         <ul>
           <li>
-            <span class="current">1</span>
+            <span className="current">1</span>
           </li>
           <li>
             <a href="#">2</a>
@@ -16,7 +16,7 @@ export function Pagination() {
           </li>
           <li>
             <a href="#">
-              <i class="fa-regular fa-angle-right"></i>
+              <i className="fa-regular fa-angle-right"></i>
             </a>
           </li>
         </ul>

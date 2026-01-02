@@ -3,9 +3,9 @@ import BlogCard from "./blogCard.jsx";
 
 export function BlogList() {
   return (
-    <section class="postbox__grid-area section-space">
-      <div class="container">
-        <div class="row g-4">
+    <section className="postbox__grid-area section-space">
+      <div className="container">
+        <div className="row g-4">
           <BlogCard />
           <BlogCard />
           <BlogCard />
