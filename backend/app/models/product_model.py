@@ -14,8 +14,8 @@ class Product(BaseModel):
     quantity: int = Column(Integer, index=True, default=0)
     average_rating:float = Column(Float, index=True, default=0.0)
     tags: str = Column(String(500), index=False)
+    image: str = Column(String(500), index=False, nullable=True)
     created_at: datetime = Column(DateTime, index=True, default=datetime.now)
     deleted_at: datetime = Column(DateTime, index=True, nullable=True)
     category_id = Column(Integer, ForeignKey("categories.id"))
     category = relationship("Category", back_populates="products")
-    
