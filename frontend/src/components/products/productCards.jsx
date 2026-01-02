@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import product1 from "../../assets/imgs/product1.png";
 import ProductCardQuickView from "./productCardQuickView";
 
-export function ProductCards() {
+export function ProductCards({ product }) {
   const [showQuickView, setShowQuickView] = useState(false);
 
   const handleQuickView = () => {
@@ -16,12 +16,19 @@ export function ProductCards() {
   return (
     <>
       <div className="product-item">
-        <div className="product-badge">
-          <span className="product-trending">Giảm 10%</span>
-        </div>
+        {product?.sale_price > 0 && product?.price > 0 && (
+          <div className="product-badge">
+            <span className="product-trending">Sale</span>
+          </div>
+        )}
         <div className="product-thumb">
           <a href="product-details.html">
-            <img src={product1} alt="" />
+            <img
+              src={
+                product?.image ? `/uploads/products/${product.image}` : product1
+              }
+              alt={product?.name || "product"}
+            />
           </a>
         </div>
         <div className="product-action-item">
@@ -80,10 +87,10 @@ export function ProductCards() {
         </div>
         <div className="product-content">
           <div className="product-tag">
-            <span>ACCESSORIES</span>
+            <span>{product?.tags || ""}</span>
           </div>
           <h4 className="product-title">
-            <a href="product-details.html">Alexander sofa</a>
+            <a href="product-details.html">{product?.name || ""}</a>
           </h4>
           <div
             className="user-rating"
@@ -96,15 +103,27 @@ export function ProductCards() {
             <i className="fal fa-star"></i>
           </div>
           <div className="product-price">
-            <span className="product-old-price">
-              <del>15.000₫</del>
+            {product?.sale_price > 0 && (
+              <span className="product-old-price">
+                <del>{Number(product?.price || 0).toLocaleString()}₫</del>
+              </span>
+            )}
+            <span className="product-new-price">
+              {Number(
+                (product?.sale_price > 0
+                  ? product?.sale_price
+                  : product?.price) || 0
+              ).toLocaleString()}
+              ₫
             </span>
-            <span className="product-new-price">12.000₫</span>
           </div>
         </div>
       </div>
       {showQuickView && (
-        <ProductCardQuickView product={{}} onClose={handleCloseQuickView} />
+        <ProductCardQuickView
+          product={product || {}}
+          onClose={handleCloseQuickView}
+        />
       )}
     </>
   );
