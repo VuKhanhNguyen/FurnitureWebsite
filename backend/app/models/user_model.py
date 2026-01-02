@@ -4,20 +4,24 @@ from datetime import datetime
 import pytz
 
 from sqlalchemy import Enum
+from sqlalchemy.orm import relationship
 
 vn_tz = pytz.timezone('Asia/Ho_Chi_Minh')
 now_vn = datetime.now(vn_tz)
 class User(BaseModel):
     __tablename__ = "users"
-    id: int = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    username: str = Column(String(50), unique=True, nullable=False, index=True)
-    password_hash: str = Column(String(255), nullable=False)
-    email: str = Column(String(100), unique=True, nullable=False, index=True)
-    full_name: str = Column(String(100), nullable=True)
-    phone: str = Column(String(20), nullable=True)
-    role: str = Column(Enum('customer', 'admin', name='user_roles'), default='customer', nullable=False)
-    avatar: str = Column(String(255), nullable=True)
-    created_at: datetime = Column(DateTime, default=now_vn, nullable=False)
-    updated_at: datetime = Column(DateTime, default=now_vn, onupdate=now_vn, nullable=False)
-    deleted_at: datetime = Column(DateTime, nullable=True)
-    status: str = Column(Enum('active', 'banned', name='user_status'), default='active', nullable=False)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)
+    email = Column(String(100), unique=True, nullable=False, index=True)
+    full_name = Column(String(100), nullable=True)
+    phone = Column(String(20), nullable=True)
+    role = Column(Enum('customer', 'admin', name='user_roles'), default='customer', nullable=False)
+    avatar = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=now_vn, nullable=False)
+    updated_at = Column(DateTime, default=now_vn, onupdate=now_vn, nullable=False)
+    deleted_at = Column(DateTime, nullable=True)
+    status = Column(Enum('active', 'banned', name='user_status'), default='active', nullable=False)
+    
+    reviews = relationship("Review", back_populates="user")
+    wishlist = relationship("Wishlist", back_populates="user")

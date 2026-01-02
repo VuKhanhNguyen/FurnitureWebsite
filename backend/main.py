@@ -5,7 +5,7 @@ from app.db.base import get_db
 from app.db.base import engine
 from app.models import Base
 from app.routers.product_router import router as product_router
-from app.routers.user_router import router as user_router_router
+from app.routers.user_router import router as user_router
 
 from app.routers.password_router import router as password_router
 from app.routers.auth_router import router as auth_router
@@ -13,6 +13,8 @@ from app.routers.contact_router import router as contact_router
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers.category_router import router as category_router
+from app.routers.review_router import router as review_router
+from app.routers.wishlist_router import router as wishlist_router
 import os
 
 
@@ -34,14 +36,13 @@ app.add_middleware(
 
 
 app.include_router(product_router, prefix="/api")
-app.include_router(user_router_router, prefix="/api")
+app.include_router(user_router, prefix="/api")
 app.include_router(password_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
-app.include_router(contact_router, prefix="/api")
-
-app.include_router(product_router, prefix="/api")
-app.include_router(user_router_router, prefix="/api")
 app.include_router(category_router, prefix="/api")
+app.include_router(contact_router, prefix="/api")
+app.include_router(review_router, prefix="/api")
+app.include_router(wishlist_router, prefix="/api")
 
 # Phục vụ file tĩnh
 if not os.path.exists("uploads"):
