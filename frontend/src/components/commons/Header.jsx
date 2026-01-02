@@ -1,9 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../assets/imgs/logo.png";
 import { useNavigate } from "react-router-dom";
+import wishlistService from "../../services/wishlistService";
 
 export function Header({ onOpenOffcanvas }) {
   const navigate = useNavigate();
+  const [wishlistCount, setWishlistCount] = useState(
+    wishlistService.getWishlistCount()
+  );
+
+  useEffect(() => {
+    const refresh = () => setWishlistCount(wishlistService.getWishlistCount());
+    refresh();
+
+    window.addEventListener("wishlist:updated", refresh);
+    window.addEventListener("auth:changed", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("wishlist:updated", refresh);
+      window.removeEventListener("auth:changed", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
 
   const handleHomeClick = (e) => {
     e.preventDefault();
@@ -186,7 +204,7 @@ export function Header({ onOpenOffcanvas }) {
                             />
                           </svg>
                           <span className="header-action-badge bg-furniture">
-                            3
+                            {wishlistCount}
                           </span>
                         </a>
                       </div>

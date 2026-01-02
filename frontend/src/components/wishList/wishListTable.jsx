@@ -1,9 +1,13 @@
-import React, { useEffect } from "react";
-import detail1 from "../../assets/imgs/details-04.png";
-import detail2 from "../../assets/imgs/details-05.png";
-import detail3 from "../../assets/imgs/details-06.png";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import wishlistService from "../../services/wishlistService";
+import productService from "../../services/productService";
 export function WishListTable() {
+  const navigate = useNavigate();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     // Gắn lại sự kiện jQuery cho nút tăng/giảm số lượng
     if (window.$) {
@@ -28,6 +32,84 @@ export function WishListTable() {
     }
   });
 
+  useEffect(() => {
+    let isActive = true;
+
+    const fetchWishlist = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await wishlistService.getWishlist();
+        const wishlistItems = res?.data || [];
+
+        const products = await Promise.all(
+          (wishlistItems || []).map(async (w) => {
+            try {
+              const p = await productService.getProductById(w.product_id);
+              return { wishlist: w, product: p };
+            } catch {
+              return { wishlist: w, product: null };
+            }
+          })
+        );
+
+        if (isActive) {
+          setItems(products.filter((x) => x.product));
+        }
+      } catch (err) {
+        if (err?.code === "NOT_AUTHENTICATED") {
+          navigate("/login");
+          return;
+        }
+        console.error("Failed to fetch wishlist", err);
+        if (isActive) {
+          setError("Không thể tải danh sách yêu thích");
+        }
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchWishlist();
+    return () => {
+      isActive = false;
+    };
+  }, [navigate]);
+
+  const handleRemove = async (e, productId) => {
+    e.preventDefault();
+    try {
+      await wishlistService.removeFromWishlistByProductId(productId);
+      setItems((prev) => prev.filter((x) => x?.product?.id !== productId));
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      console.error("Failed to remove from wishlist", err);
+    }
+  };
+
+  const rows = useMemo(() => {
+    return items.map(({ wishlist, product }) => {
+      const hasDiscount =
+        product?.sale_price > 0 && product?.sale_price < product?.price;
+      const unitPrice = hasDiscount ? product.sale_price : product.price;
+      const imageUrl = product?.image
+        ? `/uploads/products/${product.image}`
+        : "assets/imgs/product1.png";
+      return {
+        wishlistId: wishlist?.id,
+        productId: product?.id,
+        name: product?.name,
+        imageUrl,
+        unitPrice,
+      };
+    });
+  }, [items]);
+
   return (
     <div className="cart-area section-space">
       <div className="container">
@@ -46,126 +128,75 @@ export function WishListTable() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td className="product-thumbnail">
-                      <a href="product-details.html">
-                        <img src={detail1} alt="img" />
-                      </a>
-                    </td>
-                    <td className="product-name">
-                      <a href="product-details.html">Alexander Sofa</a>
-                    </td>
-                    <td className="product-price">
-                      <span className="amount">24.000₫</span>
-                    </td>
-                    <td className="product-quantity text-center">
-                      <div className="product-quantity mt-10 mb-10">
-                        <div className="product-quantity-form">
-                          <form action="#">
-                            <button className="cart-minus">
-                              <i className="far fa-minus"></i>
-                            </button>
-                            <input
-                              className="cart-input"
-                              type="text"
-                              defaultValue="1"
-                            />
-                            <button className="cart-plus">
-                              <i className="far fa-plus"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="product-subtotal">
-                      <span className="amount">24.000₫</span>
-                    </td>
-                    <td className="product-remove">
-                      <a href="#">
-                        <i className="fa fa-times"></i>
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="product-thumbnail">
-                      <a href="product-details.html">
-                        <img src={detail2} alt="img" />
-                      </a>
-                    </td>
-                    <td className="product-name">
-                      <a href="product-details.html">Curaskin Lipgel</a>
-                    </td>
-                    <td className="product-price">
-                      <span className="amount">12.000₫</span>
-                    </td>
-                    <td className="product-quantity text-center">
-                      <div className="product-quantity mt-10 mb-10">
-                        <div className="product-quantity-form">
-                          <form action="#">
-                            <button className="cart-minus">
-                              <i className="far fa-minus"></i>
-                            </button>
-                            <input
-                              className="cart-input"
-                              type="text"
-                              defaultValue="1"
-                            />
-                            <button className="cart-plus">
-                              <i className="far fa-plus"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="product-subtotal">
-                      <span className="amount">12.000₫</span>
-                    </td>
-                    <td className="product-remove">
-                      <a href="#">
-                        <i className="fa fa-times"></i>
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="product-thumbnail">
-                      <a href="product-details.html">
-                        <img src={detail3} alt="img" />
-                      </a>
-                    </td>
-                    <td className="product-name">
-                      <a href="product-details.html">Leather Chair</a>
-                    </td>
-                    <td className="product-price">
-                      <span className="amount">42.000₫</span>
-                    </td>
-                    <td className="product-quantity text-center">
-                      <div className="product-quantity mt-10 mb-10">
-                        <div className="product-quantity-form">
-                          <form action="#">
-                            <button className="cart-minus">
-                              <i className="far fa-minus"></i>
-                            </button>
-                            <input
-                              className="cart-input"
-                              type="text"
-                              defaultValue="1"
-                            />
-                            <button className="cart-plus">
-                              <i className="far fa-plus"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="product-subtotal">
-                      <span className="amount">42.000₫</span>
-                    </td>
-                    <td className="product-remove">
-                      <a href="#">
-                        <i className="fa fa-times"></i>
-                      </a>
-                    </td>
-                  </tr>
+                  {loading ? (
+                    <tr>
+                      <td colSpan="6" className="text-center">
+                        Loading...
+                      </td>
+                    </tr>
+                  ) : error ? (
+                    <tr>
+                      <td colSpan="6" className="text-center">
+                        {error}
+                      </td>
+                    </tr>
+                  ) : rows.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" className="text-center">
+                        Chưa có sản phẩm yêu thích
+                      </td>
+                    </tr>
+                  ) : (
+                    rows.map((r) => (
+                      <tr key={r.wishlistId || r.productId}>
+                        <td className="product-thumbnail">
+                          <a href={`/productDetail/${r.productId}`}>
+                            <img src={r.imageUrl} alt={r.name || "img"} />
+                          </a>
+                        </td>
+                        <td className="product-name">
+                          <a href={`/productDetail/${r.productId}`}>{r.name}</a>
+                        </td>
+                        <td className="product-price">
+                          <span className="amount">
+                            {Number(r.unitPrice || 0).toLocaleString("vi-VN")}₫
+                          </span>
+                        </td>
+                        <td className="product-quantity text-center">
+                          <div className="product-quantity mt-10 mb-10">
+                            <div className="product-quantity-form">
+                              <form action="#">
+                                <button className="cart-minus">
+                                  <i className="far fa-minus"></i>
+                                </button>
+                                <input
+                                  className="cart-input"
+                                  type="text"
+                                  defaultValue="1"
+                                />
+                                <button className="cart-plus">
+                                  <i className="far fa-plus"></i>
+                                </button>
+                              </form>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="product-subtotal">
+                          <span className="amount">
+                            {Number(r.unitPrice || 0).toLocaleString("vi-VN")}₫
+                          </span>
+                        </td>
+                        <td className="product-remove">
+                          <a
+                            href="#"
+                            onClick={(e) => handleRemove(e, r.productId)}
+                          >
+                            <i className="fa fa-times"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

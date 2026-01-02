@@ -1,13 +1,61 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
+import wishlistService from "../../services/wishlistService";
 
 export const ProductCardQuickView = ({ product, onClose }) => {
   const [quantity, setQuantity] = useState(1);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Reset quantity when product changes
   useEffect(() => {
     setQuantity(1);
+    setWishlisted(
+      product?.id ? wishlistService.isWishlisted(product.id) : false
+    );
+    setWishlistLoading(false);
   }, [product]);
+
+  useEffect(() => {
+    const refresh = () => {
+      setWishlisted(
+        product?.id ? wishlistService.isWishlisted(product.id) : false
+      );
+    };
+
+    window.addEventListener("wishlist:updated", refresh);
+    window.addEventListener("auth:changed", refresh);
+    return () => {
+      window.removeEventListener("wishlist:updated", refresh);
+      window.removeEventListener("auth:changed", refresh);
+    };
+  }, [product?.id]);
+
+  const handleAddToWishlist = async (e) => {
+    e.preventDefault();
+    if (!product?.id || wishlistLoading || wishlisted) return;
+
+    setWishlistLoading(true);
+    try {
+      await wishlistService.addToWishlist(product.id);
+      setWishlisted(true);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      if (err?.response?.data?.message === "Product already in wishlist") {
+        wishlistService.markWishlisted(product.id);
+        setWishlisted(true);
+        return;
+      }
+      console.error("Failed to add to wishlist", err);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   const handleQuantityChange = (e) => {
     const val = e.target.value.replace(/\D/g, "");
@@ -196,8 +244,26 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                             </a>
                           </div>
                           <div className="product__add-wish">
-                            <a href="#" className="product__add-wish-btn">
-                              <i className="fa-solid fa-heart"></i>
+                            <a
+                              href="#"
+                              className="product__add-wish-btn"
+                              onClick={handleAddToWishlist}
+                              aria-disabled={wishlistLoading}
+                              title={
+                                wishlisted
+                                  ? "Đã thêm yêu thích"
+                                  : wishlistLoading
+                                  ? "Đang thêm..."
+                                  : "Thêm vào yêu thích"
+                              }
+                            >
+                              <i
+                                className={
+                                  wishlisted
+                                    ? "fa-solid fa-heart"
+                                    : "fa-regular fa-heart"
+                                }
+                              ></i>
                             </a>
                           </div>
                         </div>

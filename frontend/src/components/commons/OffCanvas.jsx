@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import logo from "../../assets/imgs/logo-light.png";
 import Login from "../login_register/login";
 import { useNavigate } from "react-router-dom";
+import wishlistService from "../../services/wishlistService";
 
 function Offcanvas({ show, onClose }) {
   const navigate = useNavigate();
@@ -36,6 +37,8 @@ function Offcanvas({ show, onClose }) {
     );
     if (confirmLogout) {
       localStorage.removeItem("user");
+      wishlistService.clearLocalWishlist();
+      wishlistService.notifyAuthChanged();
       setUser(null);
       navigate("/");
       if (onClose) onClose();

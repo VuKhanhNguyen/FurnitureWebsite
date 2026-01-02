@@ -1,6 +1,121 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import reviewService from "../../services/reviewService";
 
-export function ProductTab() {
+export function ProductTab({ description, productId, productName }) {
+  const navigate = useNavigate();
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [submitLoading, setSubmitLoading] = useState(false);
+
+  const reviewCount = reviews.length;
+  const averageRating = useMemo(() => {
+    if (!reviews.length) return 0;
+    const sum = reviews.reduce((acc, r) => acc + (Number(r.rating) || 0), 0);
+    return sum / reviews.length;
+  }, [reviews]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const fetchReviews = async () => {
+      if (!productId) return;
+      setReviewsLoading(true);
+      try {
+        const res = await reviewService.getProductReviews(productId);
+        if (isActive) {
+          setReviews(res?.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch reviews", err);
+        if (isActive) {
+          setReviews([]);
+        }
+      } finally {
+        if (isActive) setReviewsLoading(false);
+      }
+    };
+
+    fetchReviews();
+    return () => {
+      isActive = false;
+    };
+  }, [productId]);
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!productId || submitLoading) return;
+
+    setSubmitLoading(true);
+    try {
+      await reviewService.createReview({
+        productId,
+        rating,
+        comment,
+      });
+      const res = await reviewService.getProductReviews(productId);
+      setReviews(res?.data || []);
+      setComment("");
+      setRating(5);
+    } catch (err) {
+      if (
+        err?.code === "NOT_AUTHENTICATED" ||
+        err?.response?.status === 401 ||
+        err?.response?.status === 403
+      ) {
+        navigate("/login");
+        return;
+      }
+      console.error("Failed to submit review", err);
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  const renderStars = (value) => {
+    const v = Number(value) || 0;
+    return (
+      <ul>
+        {Array.from({ length: 5 }).map((_, i) => {
+          const idx = i + 1;
+          return (
+            <li key={idx}>
+              <a href="#" onClick={(e) => e.preventDefault()}>
+                <i className={idx <= v ? "fas fa-star" : "fal fa-star"}></i>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
+  const renderSelectableStars = () => {
+    return (
+      <ul>
+        {Array.from({ length: 5 }).map((_, i) => {
+          const idx = i + 1;
+          const filled = idx <= rating;
+          return (
+            <li key={idx}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setRating(idx);
+                }}
+              >
+                <i className={filled ? "fas fa-star" : "fal fa-star"}></i>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
   return (
     <div className="product__details-additional-info section-space-medium-top">
       <div className="row">
@@ -46,7 +161,7 @@ export function ProductTab() {
                   aria-controls="nav-review"
                   aria-selected="false"
                 >
-                  Đánh giá (3)
+                  Đánh giá ({reviewsLoading ? "..." : reviewCount})
                 </button>
               </div>
             </nav>
@@ -62,29 +177,11 @@ export function ProductTab() {
                 aria-labelledby="nav-description-tab"
               >
                 <div className="product__details-des">
-                  <p>
-                    In marketing a product is an object or system made available
-                    for consumer use it is anything that can be offered to a
-                    market to the desire or need of a retailing, products are
-                    often referred to as merchandise, and in manufacturing,
-                    products are bought as materials and then sold as finished
-                    goods. A service regarded to as a type of product.
-                    Commodities are usually raw materials metals and
-                    agricultural products, but a commodity can also be anything
-                    wide the open market. In project management, the formal
-                    definition of the project deliverables
-                  </p>
-                  <p>
-                    A product can be classNameified as tangible or intangible. A
-                    tangible product is a physical object that can be perceived
-                    by touch building, vehicle, gadget, An intangible product is
-                    a product that can only be perceived indirectly such as an
-                    insurance policy. can be broadly classNameified under
-                    intangible be durable or non durable. A product line is "a
-                    group of products that are closely either because they
-                    function in a similar manner, are sold to the same
-                    customergroups.
-                  </p>
+                  {description ? (
+                    <p>{description}</p>
+                  ) : (
+                    <p>Chưa có mô tả cho sản phẩm này.</p>
+                  )}
                 </div>
               </div>
               <div
@@ -142,247 +239,104 @@ export function ProductTab() {
               >
                 <div className="product__details-review">
                   <h3 className="comments-title">
-                    03 reviews for “Wide Cotton Tunic extreme hammer”
+                    {reviewCount} đánh giá cho “{productName || "Sản phẩm"}”
                   </h3>
+                  <div className="comments-top d-sm-flex align-items-start justify-content-between mb-20">
+                    <div>
+                      <div className="user-rating">
+                        {renderStars(Math.round(averageRating))}
+                      </div>
+                      <div className="comments-date">
+                        <span>
+                          Trung bình:{" "}
+                          {averageRating ? averageRating.toFixed(1) : "0.0"}/5
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                   <div className="latest-comments mb-50">
                     <ul>
-                      <li>
-                        <div className="comments-box d-flex">
-                          <div className="comments-avatar mr-10">
-                            <img src="assets/imgs/user/user-01.png" alt="" />
-                          </div>
+                      {reviewsLoading ? (
+                        <li>
                           <div className="comments-text">
-                            <div className="comments-top d-sm-flex align-items-start justify-content-between mb-5">
-                              <div className="avatar-name">
-                                <h5>Siarhei Dzenisenka</h5>
-                                <div className="comments-date">
-                                  <span>March 27, 2018 9:51 am</span>
+                            <p>Loading...</p>
+                          </div>
+                        </li>
+                      ) : reviews.length === 0 ? (
+                        <li>
+                          <div className="comments-text">
+                            <p>Chưa có đánh giá nào.</p>
+                          </div>
+                        </li>
+                      ) : (
+                        reviews.map((r) => (
+                          <li key={r.id}>
+                            <div className="comments-box d-flex">
+                              <div className="comments-text">
+                                <div className="comments-top d-sm-flex align-items-start justify-content-between mb-5">
+                                  <div className="avatar-name">
+                                    <h5>
+                                      {r.username || `User #${r.user_id}`}
+                                    </h5>
+                                    <div className="comments-date">
+                                      <span>
+                                        {r.created_at
+                                          ? new Date(
+                                              r.created_at
+                                            ).toLocaleString()
+                                          : ""}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="user-rating">
+                                    {renderStars(r.rating)}
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="user-rating">
-                                <ul>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fal fa-star"></i>
-                                    </a>
-                                  </li>
-                                </ul>
+                                <p>{r.comment || ""}</p>
                               </div>
                             </div>
-                            <p>
-                              This is cardigan is a comfortable warm classNameic
-                              piece. Great to layer with a light top and you can
-                              dress up or down given the jewel buttons. I’m 5’8”
-                              128lbs a 34A and the Small fit fine.
-                            </p>
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="comments-box d-flex">
-                          <div className="comments-avatar mr-10">
-                            <img src="assets/imgs/user/user-02.png" alt="" />
-                          </div>
-                          <div className="comments-text">
-                            <div className="comments-top d-sm-flex align-items-start justify-content-between mb-5">
-                              <div className="avatar-name">
-                                <h5>Siarhei Dzenisenka</h5>
-                                <div className="comments-date">
-                                  <span>March 27, 2018 9:51 am</span>
-                                </div>
-                              </div>
-                              <div className="user-rating">
-                                <ul>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                            <p>
-                              I bought this beautiful pale gray cashmere sweater
-                              for my daughter-in-law for her birthday. She loves
-                              it and can wear it with almost anything!
-                            </p>
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div className="comments-box d-flex">
-                          <div className="comments-avatar mr-10">
-                            <img src="assets/imgs/user/user-03.png" alt="" />
-                          </div>
-                          <div className="comments-text">
-                            <div className="comments-top d-sm-flex align-items-start justify-content-between mb-5">
-                              <div className="avatar-name">
-                                <h5>Siarhei Dzenisenka</h5>
-                                <div className="comments-date">
-                                  <span>March 27, 2018 9:51 am</span>
-                                </div>
-                              </div>
-                              <div className="user-rating">
-                                <ul>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fas fa-star"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a href="#">
-                                      <i className="fal fa-star"></i>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </div>
-                            </div>
-                            <p>
-                              Amazing club. Sure the secruity is very tight but
-                              actually made me and my friends feel secure. You
-                              just have to go along with the secruity. Bar staff
-                              and cloakroom staff really friendly. Coming out at
-                              7am into bright London sunshine in Smithfields is
-                              an amazing London experience
-                            </p>
-                          </div>
-                        </div>
-                      </li>
+                          </li>
+                        ))
+                      )}
                     </ul>
                   </div>
                   <div className="product__details-comment section-space-medium-bottom">
                     <div className="comment-title mb-20">
-                      <h3>Add a review</h3>
-                      <p>
-                        Your email address will not be published. Required
-                        fields are marked *
-                      </p>
+                      <h3>Thêm đánh giá</h3>
                     </div>
                     <div className="comment-rating mb-20">
-                      <span>Overall ratings</span>
-                      <ul>
-                        <li>
-                          <a href="#">
-                            <i className="fas fa-star"></i>
-                          </a>
-                        </li>
-                        <li>
-                          <a href="#">
-                            <i className="fas fa-star"></i>
-                          </a>
-                        </li>
-                        <li>
-                          <a href="#">
-                            <i className="fas fa-star"></i>
-                          </a>
-                        </li>
-                        <li>
-                          <a href="#">
-                            <i className="fas fa-star"></i>
-                          </a>
-                        </li>
-                        <li>
-                          <a href="#">
-                            <i className="fal fa-star"></i>
-                          </a>
-                        </li>
-                      </ul>
+                      <span>Đánh giá tổng thể</span>
+                      {renderSelectableStars()}
                     </div>
                     <div className="comment-input-box">
-                      <form action="#">
+                      <form action="#" onSubmit={handleSubmitReview}>
                         <div className="row">
                           <div className="col-xxl-12">
                             <div className="comment-input">
-                              <textarea placeholder="Your review"></textarea>
-                            </div>
-                          </div>
-                          <div className="col-xxl-6">
-                            <div className="comment-input">
-                              <input type="text" placeholder="Your Name*" />
-                            </div>
-                          </div>
-                          <div className="col-xxl-6">
-                            <div className="comment-input">
-                              <input type="email" placeholder="Your Email*" />
-                            </div>
-                          </div>
-                          <div className="col-xxl-12">
-                            <div className="comment-agree d-flex align-items-center mb-25">
-                              <input
-                                className="z-check-input"
-                                type="checkbox"
-                                id="z-agree"
-                              />
-                              <label className="z-check-label" for="z-agree">
-                                Save my name, email, and website in this browser
-                                for the next time I comment.
-                              </label>
+                              <textarea
+                                placeholder="Nhập đánh giá của bạn"
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                              ></textarea>
                             </div>
                           </div>
                           <div className="col-xxl-12">
                             <div className="comment-submit">
-                              <button type="submit" className="fill-btn">
+                              <button
+                                type="submit"
+                                className="fill-btn"
+                                disabled={submitLoading || !productId}
+                              >
                                 <span className="fill-btn-inner">
                                   <span className="fill-btn-normal">
-                                    submit now
+                                    {submitLoading
+                                      ? "Đang gửi..."
+                                      : "Gửi đánh giá"}
                                   </span>
                                   <span className="fill-btn-hover">
-                                    submit now
+                                    {submitLoading
+                                      ? "Đang gửi..."
+                                      : "Gửi đánh giá"}
                                   </span>
                                 </span>
                               </button>

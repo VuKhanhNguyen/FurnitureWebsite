@@ -46,7 +46,7 @@ function App() {
           }
         />
         <Route
-          path="/productDetail"
+          path="/productDetail/:id"
           element={
             <ProductDetailPage
               showOffcanvas={showOffcanvas}

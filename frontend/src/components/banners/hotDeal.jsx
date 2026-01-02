@@ -20,7 +20,7 @@ export function HotDeal() {
                   Ưu đãi có giới hạn <br />
                   Giảm 30%
                 </h2>
-                <a className="border__btn-f mt-35" href="product-details.html">
+                <a className="border__btn-f mt-35" href="/productsList">
                   Mua ngay
                   <span>
                     <i className="fa-regular fa-angle-right"></i>
@@ -57,7 +57,7 @@ export function HotDeal() {
                     </li>
                   </ul>
                 </div>
-                <a className="border__btn-f mt-40" href="product-details.html">
+                <a className="border__btn-f mt-40" href="/productsList">
                   Mua ngay
                   <span>
                     <i className="fa-regular fa-angle-right"></i>

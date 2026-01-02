@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, conint
 from typing import Optional
 from datetime import datetime
 
 class ReviewBase(BaseModel):
-    rating: int
+    rating: conint(ge=1, le=5)
     comment: Optional[str] = None
 
 class ReviewCreate(ReviewBase):
@@ -16,6 +16,7 @@ class ReviewUpdate(BaseModel):
 class ReviewResponse(ReviewBase):
     id: int
     user_id: int
+    username: Optional[str] = None
     product_id: int
     created_at: datetime
     

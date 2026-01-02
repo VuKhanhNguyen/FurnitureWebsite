@@ -6,6 +6,11 @@ const categoryService = {
     const response = await axiosInstance.get("/api/categories/");
     return response.data.data;
   },
+  // Lấy danh mục theo ID
+  getCategoryById: async (id) => {
+    const response = await axiosInstance.get(`/api/categories/${id}`);
+    return response.data.data;
+  },
 };
 
 export default categoryService;

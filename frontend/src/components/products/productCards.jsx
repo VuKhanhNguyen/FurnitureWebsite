@@ -1,9 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import product1 from "../../assets/imgs/product1.png";
 import ProductCardQuickView from "./productCardQuickView";
+import wishlistService from "../../services/wishlistService";
 
 export function ProductCards({ product }) {
   const [showQuickView, setShowQuickView] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const ratingValue = Number(product?.average_rating ?? 0);
+  const ratingRounded = Math.round(
+    Number.isFinite(ratingValue) ? Math.min(5, Math.max(0, ratingValue)) : 0
+  );
+
+  useEffect(() => {
+    if (product?.id) {
+      setWishlisted(wishlistService.isWishlisted(product.id));
+    } else {
+      setWishlisted(false);
+    }
+  }, [product?.id]);
+
+  useEffect(() => {
+    const refresh = () => {
+      if (product?.id) {
+        setWishlisted(wishlistService.isWishlisted(product.id));
+      } else {
+        setWishlisted(false);
+      }
+    };
+
+    window.addEventListener("wishlist:updated", refresh);
+    window.addEventListener("auth:changed", refresh);
+    return () => {
+      window.removeEventListener("wishlist:updated", refresh);
+      window.removeEventListener("auth:changed", refresh);
+    };
+  }, [product?.id]);
 
   const handleQuickView = () => {
     setShowQuickView(true);
@@ -12,6 +47,33 @@ export function ProductCards({ product }) {
   const handleCloseQuickView = () => {
     setShowQuickView(false);
   };
+
+  const handleAddToWishlist = async (e) => {
+    e.preventDefault();
+    if (!product?.id || wishlistLoading || wishlisted) return;
+
+    setWishlistLoading(true);
+    try {
+      await wishlistService.addToWishlist(product.id);
+      setWishlisted(true);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      // Backend may return 400 when item already exists; treat as wishlisted
+      if (err?.response?.data?.message === "Product already in wishlist") {
+        wishlistService.markWishlisted(product.id);
+        setWishlisted(true);
+        return;
+      }
+      console.error("Failed to add to wishlist", err);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
+  if (!product) return null;
 
   return (
     <>
@@ -22,14 +84,14 @@ export function ProductCards({ product }) {
           </div>
         )}
         <div className="product-thumb">
-          <a href="product-details.html">
+          <Link to={`/productDetail/${product.id}`}>
             <img
               src={
                 product?.image ? `/uploads/products/${product.image}` : product1
               }
               alt={product?.name || "product"}
             />
-          </a>
+          </Link>
         </div>
         <div className="product-action-item">
           <button type="button" className="product-action-btn">
@@ -69,7 +131,12 @@ export function ProductCards({ product }) {
             </svg>
             <span className="product-tooltip">Xem nhanh</span>
           </button>
-          <button type="button" className="product-action-btn">
+          <button
+            type="button"
+            className="product-action-btn"
+            onClick={handleAddToWishlist}
+            disabled={wishlistLoading}
+          >
             <svg
               width="21"
               height="20"
@@ -82,7 +149,13 @@ export function ProductCards({ product }) {
                 fill="white"
               />
             </svg>
-            <span className="product-tooltip">Thêm vào yêu thích</span>
+            <span className="product-tooltip">
+              {wishlisted
+                ? "Đã thêm yêu thích"
+                : wishlistLoading
+                ? "Đang thêm..."
+                : "Thêm vào yêu thích"}
+            </span>
           </button>
         </div>
         <div className="product-content">
@@ -90,17 +163,24 @@ export function ProductCards({ product }) {
             <span>{product?.tags || ""}</span>
           </div>
           <h4 className="product-title">
-            <a href="product-details.html">{product?.name || ""}</a>
+            <Link to={`/productDetail/${product.id}`}>
+              {product?.name || ""}
+            </Link>
           </h4>
           <div
             className="user-rating"
             style={{ color: "rgba(255, 215, 0, 0.9)" }}
           >
-            <i className="fal fa-star"></i>
-            <i className="fal fa-star"></i>
-            <i className="fal fa-star"></i>
-            <i className="fal fa-star"></i>
-            <i className="fal fa-star"></i>
+            {Array.from({ length: 5 }).map((_, i) => {
+              const idx = i + 1;
+              const filled = idx <= ratingRounded;
+              return (
+                <i
+                  key={idx}
+                  className={filled ? "fas fa-star" : "fal fa-star"}
+                ></i>
+              );
+            })}
           </div>
           <div className="product-price">
             {product?.sale_price > 0 && (

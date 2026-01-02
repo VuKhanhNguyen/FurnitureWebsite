@@ -29,16 +29,13 @@ export function HomeBanner() {
                         quay về.
                       </p>
                       <div className="banner-btn-wrapper furniture__btn-group">
-                        <a className="solid-btn" href="product-details.html">
+                        <a className="solid-btn" href="/productsList">
                           Mua ngay
                           <span>
                             <i className="fa-regular fa-angle-right"></i>
                           </span>
                         </a>
-                        <a
-                          className="border__btn-banner"
-                          href="product-details.html"
-                        >
+                        <a className="border__btn-banner" href="/productsList">
                           Xem chi tiết
                           <span>
                             <i className="fa-regular fa-angle-right"></i>
@@ -77,16 +74,13 @@ export function HomeBanner() {
                         sale through an online platform.
                       </p>
                       <div className="banner-btn-wrapper furniture__btn-group">
-                        <a className="solid-btn" href="product-details.html">
+                        <a className="solid-btn" href="/productsList">
                           Mua ngay
                           <span>
                             <i className="fa-regular fa-angle-right"></i>
                           </span>
                         </a>
-                        <a
-                          className="border__btn-banner"
-                          href="product-details.html"
-                        >
+                        <a className="border__btn-banner" href="/productsList">
                           Xem chi tiết
                           <span>
                             <i className="fa-regular fa-angle-right"></i>
@@ -125,16 +119,13 @@ export function HomeBanner() {
                         sale through an online platform.
                       </p>
                       <div className="banner-btn-wrapper furniture__btn-group">
-                        <a className="solid-btn" href="product-details.html">
+                        <a className="solid-btn" href="/productsList">
                           Mua ngay
                           <span>
                             <i className="fa-regular fa-angle-right"></i>
                           </span>
                         </a>
-                        <a
-                          className="border__btn-banner"
-                          href="product-details.html"
-                        >
+                        <a className="border__btn-banner" href="/productsList">
                           Xem chi tiết
                           <span>
                             <i className="fa-regular fa-angle-right"></i>
