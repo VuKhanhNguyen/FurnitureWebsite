@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import UserLayout from "./components/layouts/UserLayout";
 import HomePage from "./components/pages/HomePage";
-import Header from "./components/commons/Header";
-import Offcanvas from "./components/commons/OffCanvas";
 import ProductsListPage from "./components/pages/productListPage";
 import ProductDetailPage from "./components/pages/productDetailPage";
 import WishListPage from "./components/pages/wishListPage";
@@ -13,9 +12,14 @@ import BlogListPage from "./components/pages/blogListPage";
 import BlogDetailPage from "./components/pages/blogDetailPage";
 import Login from "./components/login_register/login";
 import Register from "./components/login_register/register";
+
 import ForgotPassword from "./components/login_register/ForgotPassword";
 import ProductCardQuickView from "./components/products/productCardQuickView";
 import Profile from "./components/pages/Profile/Profile";
+
+import DashBoard from "./components/admin/pages/DashBoard";
+import ManageProduct from "./components/admin/pages/ManageProduct";
+import AdminLayout from "./components/admin/commons/AdminLayout";
 
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
@@ -141,6 +145,10 @@ function App() {
             />
           }
         />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<DashBoard />} />
+          <Route path="/admin/product" element={<ManageProduct />} />
+        </Route>
       </Routes>
     </Router>
   );
