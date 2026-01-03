@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import productService from "../../services/productService";
 import categoryService from "../../services/categoryService";
 import wishlistService from "../../services/wishlistService";
+import cartService from "../../services/cartService";
 import detail1 from "../../assets/imgs/details-04.png";
 import ProductTab from "./productTab";
 
@@ -16,6 +17,8 @@ export function ProductDetail() {
   const [categoryLoading, setCategoryLoading] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [cartLoading, setCartLoading] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -32,6 +35,11 @@ export function ProductDetail() {
       fetchProduct();
     }
   }, [id]);
+
+  useEffect(() => {
+    setQuantity(1);
+    setCartLoading(false);
+  }, [product?.id]);
 
   useEffect(() => {
     let isActive = true;
@@ -116,6 +124,45 @@ export function ProductDetail() {
       console.error("Failed to add to wishlist", err);
     } finally {
       setWishlistLoading(false);
+    }
+  };
+
+  const handleQuantityChange = (e) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    setQuantity(raw ? parseInt(raw, 10) : "");
+  };
+
+  const handleMinus = (e) => {
+    e.preventDefault();
+    setQuantity((prev) => {
+      const current = Number(prev) || 1;
+      return current > 1 ? current - 1 : 1;
+    });
+  };
+
+  const handlePlus = (e) => {
+    e.preventDefault();
+    setQuantity((prev) => {
+      const current = Number(prev) || 0;
+      return current ? current + 1 : 1;
+    });
+  };
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    if (!product?.id || cartLoading) return;
+
+    setCartLoading(true);
+    try {
+      await cartService.addItem(product.id, quantity || 1);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      console.error("Failed to add to cart", err);
+    } finally {
+      setCartLoading(false);
     }
   };
 
@@ -224,29 +271,43 @@ export function ProductDetail() {
                 <div className="product__quantity">
                   <div className="product-quantity-wrapper">
                     <form action="#">
-                      <button type="button" className="cart-minus">
+                      <button
+                        type="button"
+                        className="cart-minus"
+                        onClick={handleMinus}
+                      >
                         <i className="fa-light fa-minus"></i>
                       </button>
                       <input
                         className="cart-input"
                         type="text"
-                        defaultValue="1"
+                        value={quantity}
+                        onChange={handleQuantityChange}
                       />
-                      <button type="button" className="cart-plus">
+                      <button
+                        type="button"
+                        className="cart-plus"
+                        onClick={handlePlus}
+                      >
                         <i className="fa-light fa-plus"></i>
                       </button>
                     </form>
                   </div>
                 </div>
                 <div className="product__add-cart">
-                  <a href="javascript:void(0)" className="fill-btn cart-btn">
+                  <a
+                    href="javascript:void(0)"
+                    className="fill-btn cart-btn"
+                    onClick={handleAddToCart}
+                    aria-disabled={cartLoading}
+                  >
                     <span className="fill-btn-inner">
                       <span className="fill-btn-normal">
-                        Thêm vào giỏ
+                        {cartLoading ? "Đang thêm..." : "Thêm vào giỏ"}
                         <i className="fa-solid fa-basket-shopping"></i>
                       </span>
                       <span className="fill-btn-hover">
-                        Thêm vào giỏ
+                        {cartLoading ? "Đang thêm..." : "Thêm vào giỏ"}
                         <i className="fa-solid fa-basket-shopping"></i>
                       </span>
                     </span>

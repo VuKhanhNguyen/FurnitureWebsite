@@ -3,11 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import product1 from "../../assets/imgs/product1.png";
 import ProductCardQuickView from "./productCardQuickView";
 import wishlistService from "../../services/wishlistService";
+import cartService from "../../services/cartService";
 
 export function ProductCards({ product }) {
   const [showQuickView, setShowQuickView] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
   const navigate = useNavigate();
 
   const ratingValue = Number(product?.average_rating ?? 0);
@@ -46,6 +48,24 @@ export function ProductCards({ product }) {
 
   const handleCloseQuickView = () => {
     setShowQuickView(false);
+  };
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    if (!product?.id || cartLoading) return;
+
+    setCartLoading(true);
+    try {
+      await cartService.addItem(product.id, 1);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      console.error("Failed to add to cart", err);
+    } finally {
+      setCartLoading(false);
+    }
   };
 
   const handleAddToWishlist = async (e) => {
@@ -94,7 +114,12 @@ export function ProductCards({ product }) {
           </Link>
         </div>
         <div className="product-action-item">
-          <button type="button" className="product-action-btn">
+          <button
+            type="button"
+            className="product-action-btn"
+            onClick={handleAddToCart}
+            disabled={cartLoading}
+          >
             <svg
               width="20"
               height="22"
@@ -110,7 +135,9 @@ export function ProductCards({ product }) {
                 strokeLinejoin="round"
               />
             </svg>
-            <span className="product-tooltip">Thêm vào giỏ</span>
+            <span className="product-tooltip">
+              {cartLoading ? "Đang thêm..." : "Thêm vào giỏ"}
+            </span>
           </button>
           <button
             type="button"

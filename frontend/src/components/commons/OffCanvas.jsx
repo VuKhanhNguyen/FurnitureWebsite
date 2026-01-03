@@ -39,6 +39,9 @@ function Offcanvas({ show, onClose }) {
       localStorage.removeItem("user");
       wishlistService.clearLocalWishlist();
       wishlistService.notifyAuthChanged();
+      if (typeof window !== "undefined" && window?.dispatchEvent) {
+        window.dispatchEvent(new Event("cart:updated"));
+      }
       setUser(null);
       navigate("/");
       if (onClose) onClose();

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import wishlistService from "../../services/wishlistService";
+import cartService from "../../services/cartService";
 
 export const ProductCardQuickView = ({ product, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [wishlisted, setWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
   const navigate = useNavigate();
 
   // Reset quantity when product changes
@@ -16,6 +18,7 @@ export const ProductCardQuickView = ({ product, onClose }) => {
       product?.id ? wishlistService.isWishlisted(product.id) : false
     );
     setWishlistLoading(false);
+    setCartLoading(false);
   }, [product]);
 
   useEffect(() => {
@@ -70,6 +73,24 @@ export const ProductCardQuickView = ({ product, onClose }) => {
   const handlePlus = (e) => {
     e.preventDefault();
     setQuantity((prev) => (prev ? prev + 1 : 1));
+  };
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    if (!product?.id || cartLoading) return;
+
+    setCartLoading(true);
+    try {
+      await cartService.addItem(product.id, quantity || 1);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      console.error("Failed to add to cart", err);
+    } finally {
+      setCartLoading(false);
+    }
   };
 
   if (!product) return null;
@@ -230,14 +251,20 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                             <a
                               href="javascript:void(0)"
                               className="fill-btn cart-btn"
+                              onClick={handleAddToCart}
+                              aria-disabled={cartLoading}
                             >
                               <span className="fill-btn-inner">
                                 <span className="fill-btn-normal">
-                                  Thêm vào giỏ
+                                  {cartLoading
+                                    ? "Đang thêm..."
+                                    : "Thêm vào giỏ"}
                                   <i className="fa-solid fa-basket-shopping"></i>
                                 </span>
                                 <span className="fill-btn-hover">
-                                  Thêm vào giỏ
+                                  {cartLoading
+                                    ? "Đang thêm..."
+                                    : "Thêm vào giỏ"}
                                   <i className="fa-solid fa-basket-shopping"></i>
                                 </span>
                               </span>

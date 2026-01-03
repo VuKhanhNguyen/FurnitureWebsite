@@ -1,31 +1,117 @@
-import React, { useEffect } from "react";
-import detail1 from "../../assets/imgs/details-04.png";
-import detail2 from "../../assets/imgs/details-05.png";
-import detail3 from "../../assets/imgs/details-06.png";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import cartService from "../../services/cartService";
 export function Cart() {
-  useEffect(() => {
-    // Gắn lại sự kiện jQuery cho nút tăng/giảm số lượng
-    if (window.$) {
-      // Xóa sự kiện cũ để tránh gắn nhiều lần
-      window.$(".cart-minus").off("click");
-      window.$(".cart-plus").off("click");
-      // Gắn lại sự kiện như trong main.js
-      window.$(".cart-minus").click(function () {
-        var $input = window.$(this).parent().find("input");
-        var count = parseInt($input.val()) - 1;
-        count = count < 1 ? 1 : count;
-        $input.val(count);
-        $input.change();
-        return false;
-      });
-      window.$(".cart-plus").click(function () {
-        var $input = window.$(this).parent().find("input");
-        $input.val(parseInt($input.val()) + 1);
-        $input.change();
-        return false;
-      });
+  const navigate = useNavigate();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [busyItemId, setBusyItemId] = useState(null);
+
+  const normalizeImageUrl = (image) => {
+    if (!image) return "";
+    if (typeof image !== "string") return "";
+    if (/^https?:\/\//i.test(image)) return image;
+    if (image.startsWith("/")) return image;
+    return `/uploads/products/${image}`;
+  };
+
+  const getUnitPrice = (product) => {
+    const price = Number(product?.price || 0);
+    const sale = Number(product?.sale_price || 0);
+    return sale > 0 ? sale : price;
+  };
+
+  const formatVnd = (val) => `${Number(val || 0).toLocaleString("vi-VN")}₫`;
+
+  const loadCart = useCallback(async () => {
+    if (!cartService.isAuthenticated()) {
+      setItems([]);
+      setLoading(false);
+      return;
     }
-  });
+
+    setLoading(true);
+    try {
+      const res = await cartService.getCart();
+      const cart = res?.data;
+      setItems(Array.isArray(cart?.items) ? cart.items : []);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        setItems([]);
+        return;
+      }
+      console.error("Failed to load cart", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCart();
+  }, [loadCart]);
+
+  useEffect(() => {
+    const refresh = () => loadCart();
+    window.addEventListener("cart:updated", refresh);
+    window.addEventListener("auth:changed", refresh);
+    return () => {
+      window.removeEventListener("cart:updated", refresh);
+      window.removeEventListener("auth:changed", refresh);
+    };
+  }, [loadCart]);
+
+  const totals = useMemo(() => {
+    const subtotal = (items || []).reduce((sum, item) => {
+      const unit = getUnitPrice(item?.product);
+      const qty = Number(item?.quantity || 0);
+      return sum + unit * qty;
+    }, 0);
+    return { subtotal, total: subtotal };
+  }, [items]);
+
+  const updateQuantity = async (itemId, quantity) => {
+    if (!itemId) return;
+    setBusyItemId(itemId);
+    try {
+      await cartService.updateItemQuantity(itemId, quantity);
+      // cart:updated event will refresh items
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      console.error("Failed to update quantity", err);
+    } finally {
+      setBusyItemId(null);
+    }
+  };
+
+  const handleMinus = (item) => {
+    const next = Math.max(1, Number(item?.quantity || 1) - 1);
+    updateQuantity(item?.id, next);
+  };
+
+  const handlePlus = (item) => {
+    const next = Math.max(1, Number(item?.quantity || 1) + 1);
+    updateQuantity(item?.id, next);
+  };
+
+  const handleRemove = async (itemId) => {
+    if (!itemId) return;
+    setBusyItemId(itemId);
+    try {
+      await cartService.removeItem(itemId);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      console.error("Failed to remove item", err);
+    } finally {
+      setBusyItemId(null);
+    }
+  };
+
   return (
     <div className="cart-area section-space">
       <div className="container">
@@ -44,126 +130,136 @@ export function Cart() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td className="product-thumbnail">
-                      <a href="product-details.html">
-                        <img src={detail1} alt="img" />
-                      </a>
-                    </td>
-                    <td className="product-name">
-                      <a href="product-details.html">Alexander Sofa</a>
-                    </td>
-                    <td className="product-price">
-                      <span className="amount">24.000₫</span>
-                    </td>
-                    <td className="product-quantity text-center">
-                      <div className="product-quantity mt-10 mb-10">
-                        <div className="product-quantity-form">
-                          <form action="#">
-                            <button className="cart-minus">
-                              <i className="far fa-minus"></i>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={6} className="text-center">
+                        Đang tải giỏ hàng...
+                      </td>
+                    </tr>
+                  ) : !cartService.isAuthenticated() ? (
+                    <tr>
+                      <td colSpan={6} className="text-center">
+                        Bạn cần đăng nhập để xem giỏ hàng.{" "}
+                        <button
+                          type="button"
+                          className="fill-btn"
+                          onClick={() => navigate("/login")}
+                        >
+                          <span className="fill-btn-inner">
+                            <span className="fill-btn-normal">Đăng nhập</span>
+                            <span className="fill-btn-hover">Đăng nhập</span>
+                          </span>
+                        </button>
+                      </td>
+                    </tr>
+                  ) : items.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center">
+                        Giỏ hàng đang trống.
+                      </td>
+                    </tr>
+                  ) : (
+                    items.map((item) => {
+                      const product = item?.product;
+                      const unit = getUnitPrice(product);
+                      const qty = Number(item?.quantity || 0);
+                      const lineTotal = unit * qty;
+                      const imageUrl = normalizeImageUrl(product?.image);
+
+                      return (
+                        <tr key={item?.id}>
+                          <td className="product-thumbnail">
+                            <Link to={`/productDetail/${product?.id || ""}`}>
+                              {imageUrl ? (
+                                <img src={imageUrl} alt={product?.name || ""} />
+                              ) : (
+                                <span>—</span>
+                              )}
+                            </Link>
+                          </td>
+                          <td className="product-name">
+                            <Link to={`/productDetail/${product?.id || ""}`}>
+                              {product?.name || ""}
+                            </Link>
+                          </td>
+                          <td className="product-price">
+                            <span className="amount">{formatVnd(unit)}</span>
+                          </td>
+                          <td className="product-quantity text-center">
+                            <div className="product-quantity mt-10 mb-10">
+                              <div className="product-quantity-form">
+                                <form action="#">
+                                  <button
+                                    type="button"
+                                    className="cart-minus"
+                                    onClick={() => handleMinus(item)}
+                                    disabled={busyItemId === item?.id}
+                                  >
+                                    <i className="far fa-minus"></i>
+                                  </button>
+                                  <input
+                                    className="cart-input"
+                                    type="text"
+                                    value={qty}
+                                    onChange={(e) => {
+                                      const raw = e.target.value.replace(
+                                        /\D/g,
+                                        ""
+                                      );
+                                      const nextQty = raw
+                                        ? Math.max(1, parseInt(raw, 10))
+                                        : 1;
+                                      setItems((prev) =>
+                                        prev.map((x) =>
+                                          x?.id === item?.id
+                                            ? { ...x, quantity: nextQty }
+                                            : x
+                                        )
+                                      );
+                                    }}
+                                    onBlur={(e) => {
+                                      const raw = e.target.value.replace(
+                                        /\D/g,
+                                        ""
+                                      );
+                                      const nextQty = raw
+                                        ? Math.max(1, parseInt(raw, 10))
+                                        : 1;
+                                      updateQuantity(item?.id, nextQty);
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="cart-plus"
+                                    onClick={() => handlePlus(item)}
+                                    disabled={busyItemId === item?.id}
+                                  >
+                                    <i className="far fa-plus"></i>
+                                  </button>
+                                </form>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="product-subtotal">
+                            <span className="amount">
+                              {formatVnd(lineTotal)}
+                            </span>
+                          </td>
+                          <td className="product-remove">
+                            <button
+                              type="button"
+                              onClick={() => handleRemove(item?.id)}
+                              disabled={busyItemId === item?.id}
+                              style={{ background: "transparent", border: 0 }}
+                              aria-label="Remove"
+                            >
+                              <i className="fa fa-times"></i>
                             </button>
-                            <input
-                              className="cart-input"
-                              type="text"
-                              defaultValue="1"
-                            />
-                            <button className="cart-plus">
-                              <i className="far fa-plus"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="product-subtotal">
-                      <span className="amount">24.000₫</span>
-                    </td>
-                    <td className="product-remove">
-                      <a href="#">
-                        <i className="fa fa-times"></i>
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="product-thumbnail">
-                      <a href="product-details.html">
-                        <img src={detail2} alt="img" />
-                      </a>
-                    </td>
-                    <td className="product-name">
-                      <a href="product-details.html">Curaskin Lipgel</a>
-                    </td>
-                    <td className="product-price">
-                      <span className="amount">12.000₫</span>
-                    </td>
-                    <td className="product-quantity text-center">
-                      <div className="product-quantity mt-10 mb-10">
-                        <div className="product-quantity-form">
-                          <form action="#">
-                            <button className="cart-minus">
-                              <i className="far fa-minus"></i>
-                            </button>
-                            <input
-                              className="cart-input"
-                              type="text"
-                              defaultValue="1"
-                            />
-                            <button className="cart-plus">
-                              <i className="far fa-plus"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="product-subtotal">
-                      <span className="amount">12.000₫</span>
-                    </td>
-                    <td className="product-remove">
-                      <a href="#">
-                        <i className="fa fa-times"></i>
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="product-thumbnail">
-                      <a href="product-details.html">
-                        <img src={detail3} alt="img" />
-                      </a>
-                    </td>
-                    <td className="product-name">
-                      <a href="product-details.html">Leather Chair</a>
-                    </td>
-                    <td className="product-price">
-                      <span className="amount">42.000₫</span>
-                    </td>
-                    <td className="product-quantity text-center">
-                      <div className="product-quantity mt-10 mb-10">
-                        <div className="product-quantity-form">
-                          <form action="#">
-                            <button className="cart-minus">
-                              <i className="far fa-minus"></i>
-                            </button>
-                            <input
-                              className="cart-input"
-                              type="text"
-                              defaultValue="1"
-                            />
-                            <button className="cart-plus">
-                              <i className="far fa-plus"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="product-subtotal">
-                      <span className="amount">42.000₫</span>
-                    </td>
-                    <td className="product-remove">
-                      <a href="#">
-                        <i className="fa fa-times"></i>
-                      </a>
-                    </td>
-                  </tr>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
@@ -193,7 +289,7 @@ export function Cart() {
                   </div>
                   <div className="coupon2">
                     <button
-                      onClick={() => window.location.reload()}
+                      onClick={() => loadCart()}
                       className="fill-btn"
                       type="submit"
                     >
@@ -216,10 +312,10 @@ export function Cart() {
                   <h2>Tổng giỏ hàng</h2>
                   <ul className="mb-20">
                     <li>
-                      Tổng phụ <span>78.000₫</span>
+                      Tổng phụ <span>{formatVnd(totals.subtotal)}</span>
                     </li>
                     <li>
-                      Tổng cộng <span>78.000₫</span>
+                      Tổng cộng <span>{formatVnd(totals.total)}</span>
                     </li>
                   </ul>
                   <a className="fill-btn" href="checkout.html">

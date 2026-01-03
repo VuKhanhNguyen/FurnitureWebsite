@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import logo from "../../assets/imgs/logo.png";
 import { useNavigate } from "react-router-dom";
 import wishlistService from "../../services/wishlistService";
+import cartService from "../../services/cartService";
 
 export function Header({ onOpenOffcanvas }) {
   const navigate = useNavigate();
   const [wishlistCount, setWishlistCount] = useState(
     wishlistService.getWishlistCount()
   );
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     const refresh = () => setWishlistCount(wishlistService.getWishlistCount());
@@ -20,6 +22,44 @@ export function Header({ onOpenOffcanvas }) {
       window.removeEventListener("wishlist:updated", refresh);
       window.removeEventListener("auth:changed", refresh);
       window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const refreshCart = async () => {
+      if (!cartService.isAuthenticated()) {
+        if (isActive) setCartCount(0);
+        return;
+      }
+
+      try {
+        const res = await cartService.getCart();
+        const items = res?.data?.items || [];
+        const count = Array.isArray(items)
+          ? items.reduce((sum, it) => sum + Number(it?.quantity || 0), 0)
+          : 0;
+        if (isActive) setCartCount(count);
+      } catch (err) {
+        if (err?.code === "NOT_AUTHENTICATED") {
+          if (isActive) setCartCount(0);
+          return;
+        }
+        console.error("Failed to load cart count", err);
+      }
+    };
+
+    refreshCart();
+
+    window.addEventListener("cart:updated", refreshCart);
+    window.addEventListener("auth:changed", refreshCart);
+    window.addEventListener("storage", refreshCart);
+    return () => {
+      isActive = false;
+      window.removeEventListener("cart:updated", refreshCart);
+      window.removeEventListener("auth:changed", refreshCart);
+      window.removeEventListener("storage", refreshCart);
     };
   }, []);
 
@@ -230,7 +270,7 @@ export function Header({ onOpenOffcanvas }) {
                             />
                           </svg>
                           <span className="header-action-badge bg-furniture">
-                            12
+                            {cartCount}
                           </span>
                         </a>
                       </div>
