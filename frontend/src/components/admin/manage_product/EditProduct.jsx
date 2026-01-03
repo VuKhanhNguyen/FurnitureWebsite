@@ -48,6 +48,18 @@ const EditProduct = ({ productId, onSubmit, onCancel }) => {
         tags: data.tags || "",
         category_id: data.category_id || "",
       });
+
+      if (data?.image) {
+        const url =
+          typeof data.image === "string" && data.image.startsWith("http")
+            ? data.image
+            : typeof data.image === "string" && data.image.startsWith("/")
+            ? data.image
+            : `/uploads/products/${data.image}`;
+        setImagePreview(url);
+      } else {
+        setImagePreview(null);
+      }
     } catch (error) {
       console.error("Lỗi khi lấy sản phẩm:", error);
     } finally {

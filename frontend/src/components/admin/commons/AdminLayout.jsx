@@ -3,6 +3,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { Outlet } from "react-router";
 import AppSidebar from "./Sidebar";
+import "./adminLayout.css";
 
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -17,16 +18,16 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="admin-layout">
       <Header />
-      <div className="flex flex-1">
+      <div className="admin-layout-body">
         <AppSidebar
           collapsed={collapsed}
           toggled={toggled}
           handleCollapsedChange={handleCollapsedChange}
           handleToggleSidebar={handleToggleSidebar}
         />
-        <div className="flex-1 bg-gray-100">
+        <div className="admin-layout-content">
           <Outlet />
         </div>
       </div>

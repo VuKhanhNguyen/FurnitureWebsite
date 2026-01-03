@@ -4,6 +4,7 @@ import SocialLoginRegister from "./socialLoginRegister";
 import "../../assets/css/auth.css";
 import { useNavigate } from "react-router-dom";
 import bg from "../../assets/imgs/bg.jpg";
+import wishlistService from "../../services/wishlistService";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,35 +14,67 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const redirectAfterLogin = (user) => {
+    if (user?.role === "admin") {
+      navigate("/admin");
+      return;
+    }
+    navigate("/");
+  };
+
+  const storeUserAndRedirect = async ({ token, username }) => {
+    // Prefer authoritative user info from /api/me so we can route by role.
+    try {
+      const res = await fetch("/api/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (data?.code === "200" && data?.data) {
+        const mergedUser = {
+          username: data.data.username || username,
+          token,
+          ...data.data,
+        };
+        localStorage.setItem("user", JSON.stringify(mergedUser));
+
+        // Refresh any auth-aware UI (wishlist badge/state, etc.)
+        wishlistService.notifyAuthChanged();
+        try {
+          await wishlistService.syncWishlistIdsFromApi();
+        } catch {
+          // ignore
+        }
+
+        redirectAfterLogin(mergedUser);
+        return;
+      }
+    } catch {
+      // ignore and fall back
+    }
+
+    // Fallback if /api/me fails
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        username,
+        token,
+      })
+    );
+    wishlistService.notifyAuthChanged();
+    redirectAfterLogin({ role: undefined });
+  };
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const token = params.get("token");
     if (token) {
-      // Fetch user info with token
-      fetch("/api/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.code === "200") {
-            localStorage.setItem(
-              "user",
-              JSON.stringify({
-                username: data.data.username,
-                token: token,
-                ...data.data,
-              })
-            );
-            navigate("/");
-          } else {
-            setError("Lỗi đăng nhập social");
-          }
-        })
-        .catch(() => setError("Lỗi kết nối máy chủ"));
+      storeUserAndRedirect({ token, username: "" }).catch(() => {
+        setError("Lỗi kết nối máy chủ");
+      });
     }
-  }, [location, navigate]);
+  }, [location]);
 
   const handleRegisterClick = (e) => {
     e.preventDefault();
@@ -67,15 +100,10 @@ const Login = () => {
       });
       const data = await res.json();
       if (data.code === "200" && data.data && data.data.access_token) {
-        // Lưu user vào localStorage
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            username: form.username,
-            token: data.data.access_token,
-          })
-        );
-        navigate("/");
+        await storeUserAndRedirect({
+          token: data.data.access_token,
+          username: form.username,
+        });
       } else {
         setError(data.message || "Đăng nhập thất bại");
       }
