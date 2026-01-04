@@ -23,3 +23,4 @@ class Product(BaseModel):
     reviews = relationship("Review", back_populates="product")
     wishlist = relationship("Wishlist", back_populates="product")
     cart_items = relationship("CartItem", back_populates="product")
+    order_items = relationship("OrderItem", back_populates="product")

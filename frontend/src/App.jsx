@@ -7,6 +7,7 @@ import ProductDetailPage from "./components/pages/productDetailPage";
 import WishListPage from "./components/pages/wishListPage";
 import CartPage from "./components/pages/cartPage";
 import CheckoutPage from "./components/pages/checkoutPage";
+import OrderSuccessPage from "./components/pages/orderSuccessPage";
 import ContactPage from "./components/pages/contactPage";
 import BlogListPage from "./components/pages/blogListPage";
 import BlogDetailPage from "./components/pages/blogDetailPage";
@@ -76,6 +77,15 @@ function App() {
           path="/checkout"
           element={
             <CheckoutPage
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
+        <Route
+          path="/order-success"
+          element={
+            <OrderSuccessPage
               showOffcanvas={showOffcanvas}
               setShowOffcanvas={setShowOffcanvas}
             />

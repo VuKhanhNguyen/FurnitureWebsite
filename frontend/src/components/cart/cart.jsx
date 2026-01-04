@@ -434,7 +434,34 @@ export function Cart() {
                       Tổng cộng <span>{formatVnd(totals.total)}</span>
                     </li>
                   </ul>
-                  <a className="fill-btn" href="checkout.html">
+                  <button
+                    type="button"
+                    className="fill-btn"
+                    disabled={
+                      loading ||
+                      !cartService.isAuthenticated() ||
+                      (items?.length || 0) === 0
+                    }
+                    onClick={() => {
+                      if (!cartService.isAuthenticated()) {
+                        navigate("/login");
+                        return;
+                      }
+                      try {
+                        const code = String(
+                          appliedCoupon?.code || couponCode || ""
+                        ).trim();
+                        if (code) {
+                          sessionStorage.setItem("checkout:couponCode", code);
+                        } else {
+                          sessionStorage.removeItem("checkout:couponCode");
+                        }
+                      } catch {
+                        // ignore
+                      }
+                      navigate("/checkout");
+                    }}
+                  >
                     <span className="fill-btn-inner">
                       <span className="fill-btn-normal">
                         Tiến hành thanh toán
@@ -443,7 +470,7 @@ export function Cart() {
                         Tiến hành thanh toán
                       </span>
                     </span>
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
