@@ -6,4 +6,5 @@ from app.models.review_model import Review
 from app.models.wishlist_model import Wishlist
 from app.models.cart_model import Cart
 from app.models.cart_item_model import CartItem
+from app.models.coupon_model import Coupon
 

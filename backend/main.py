@@ -16,6 +16,7 @@ from app.routers.category_router import router as category_router
 from app.routers.review_router import router as review_router
 from app.routers.wishlist_router import router as wishlist_router
 from app.routers.cart_router import router as cart_router
+from app.routers.coupon_router import router as coupon_router
 import os
 
 
@@ -45,6 +46,7 @@ app.include_router(contact_router, prefix="/api")
 app.include_router(review_router, prefix="/api")
 app.include_router(wishlist_router, prefix="/api")
 app.include_router(cart_router, prefix="/api")
+app.include_router(coupon_router, prefix="/api")
 
 # Phục vụ file tĩnh
 if not os.path.exists("uploads"):

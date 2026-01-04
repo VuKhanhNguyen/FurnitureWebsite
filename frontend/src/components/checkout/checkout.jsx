@@ -297,13 +297,16 @@ export function Checkout() {
                             <li>
                               <input type="radio" />
                               <label>
-                                Phí cố định:{" "}
-                                <span className="amount">7.000₫</span>
+                                Vận chuyển nhanh:{" "}
+                                <span className="amount">50.000₫</span>
                               </label>
                             </li>
                             <li>
                               <input type="radio" />
-                              <label>Miễn phí vận chuyển:</label>
+                              <label>Vận chuyển hỏa tốc:
+                                <span className="amount">70.000₫</span>
+                              </label>
+
                             </li>
                           </ul>
                         </td>

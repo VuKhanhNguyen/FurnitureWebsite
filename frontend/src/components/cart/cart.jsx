@@ -1,11 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import cartService from "../../services/cartService";
+import couponService from "../../services/couponService";
 export function Cart() {
   const navigate = useNavigate();
+  const SHIPPING_FEE = 50000;
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busyItemId, setBusyItemId] = useState(null);
+
+  const [couponCode, setCouponCode] = useState("");
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   const normalizeImageUrl = (image) => {
     if (!image) return "";
@@ -66,8 +73,72 @@ export function Cart() {
       const qty = Number(item?.quantity || 0);
       return sum + unit * qty;
     }, 0);
-    return { subtotal, total: subtotal };
-  }, [items]);
+    const discountAmount = Number(appliedCoupon?.discount_amount || 0);
+    const finalAmount =
+      appliedCoupon && typeof appliedCoupon?.final_amount === "number"
+        ? Number(appliedCoupon.final_amount)
+        : Math.max(0, subtotal - discountAmount);
+
+    const shippingFee = subtotal > 0 ? SHIPPING_FEE : 0;
+    const grandTotal = finalAmount + shippingFee;
+
+    return {
+      subtotal,
+      discountAmount,
+      shippingFee,
+      total: grandTotal,
+    };
+  }, [items, appliedCoupon]);
+
+  const applyCoupon = useCallback(
+    async (code, orderAmount, { silent } = { silent: false }) => {
+      const normalized = String(code || "").trim();
+      if (!normalized) {
+        setAppliedCoupon(null);
+        setCouponError("");
+        return;
+      }
+
+      if (!cartService.isAuthenticated()) {
+        if (!silent) navigate("/login");
+        return;
+      }
+
+      setApplyingCoupon(true);
+      if (!silent) setCouponError("");
+      try {
+        const res = await couponService.applyCoupon({
+          code: normalized,
+          orderAmount,
+        });
+        const data = res?.data;
+        setAppliedCoupon(data || null);
+        setCouponError("");
+      } catch (err) {
+        if (err?.code === "NOT_AUTHENTICATED") {
+          if (!silent) navigate("/login");
+          return;
+        }
+        const msg =
+          err?.response?.data?.detail ||
+          err?.response?.data?.message ||
+          "Không áp dụng được mã giảm giá";
+        setAppliedCoupon(null);
+        if (!silent) setCouponError(String(msg));
+      } finally {
+        setApplyingCoupon(false);
+      }
+    },
+    [navigate]
+  );
+
+  useEffect(() => {
+    // If cart changes, try to re-apply existing coupon to the new subtotal.
+    if (appliedCoupon?.code) {
+      applyCoupon(appliedCoupon.code, totals.subtotal, { silent: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totals.subtotal]);
 
   const updateQuantity = async (itemId, quantity) => {
     if (!itemId) return;
@@ -273,20 +344,55 @@ export function Cart() {
                       name="coupon_code"
                       placeholder="Nhập mã giảm giá"
                       type="text"
+                      value={couponCode}
+                      onChange={(e) => {
+                        setCouponCode(e.target.value);
+                        setCouponError("");
+                      }}
                     />
                     <button
-                      onClick={() => window.location.reload()}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        const normalized = String(couponCode || "").trim();
+                        if (!normalized) {
+                          // Clear applied coupon and reset totals
+                          setAppliedCoupon(null);
+                          setCouponError("");
+                          return;
+                        }
+                        applyCoupon(normalized, totals.subtotal);
+                      }}
                       className="fill-btn"
                       type="submit"
+                      disabled={
+                        applyingCoupon ||
+                        totals.subtotal <= 0 ||
+                        !cartService.isAuthenticated() ||
+                        (!couponCode.trim() && !appliedCoupon?.code)
+                      }
                     >
                       <span className="fill-btn-inner">
                         <span className="fill-btn-normal">
-                          nhập mã giảm giá
+                          {applyingCoupon
+                            ? "Đang áp dụng..."
+                            : !couponCode.trim() && appliedCoupon?.code
+                            ? "Hủy mã giảm giá"
+                            : "nhập mã giảm giá"}
                         </span>
                         <span className="fill-btn-hover">nhập mã giảm giá</span>
                       </span>
                     </button>
                   </div>
+                  {couponError ? (
+                    <div style={{ marginTop: 8, color: "#d9534f" }}>
+                      {couponError}
+                    </div>
+                  ) : null}
+                  {appliedCoupon?.code ? (
+                    <div style={{ marginTop: 8 }}>
+                      Đã áp dụng mã: <b>{appliedCoupon.code}</b>
+                    </div>
+                  ) : null}
                   <div className="coupon2">
                     <button
                       onClick={() => loadCart()}
@@ -313,6 +419,16 @@ export function Cart() {
                   <ul className="mb-20">
                     <li>
                       Tổng phụ <span>{formatVnd(totals.subtotal)}</span>
+                    </li>
+                    {appliedCoupon?.code ? (
+                      <li>
+                        Giảm giá ({appliedCoupon.code}){" "}
+                        <span>-{formatVnd(totals.discountAmount)}</span>
+                      </li>
+                    ) : null}
+                    <li>
+                      Phí vận chuyển{" "}
+                      <span>{formatVnd(totals.shippingFee)}</span>
                     </li>
                     <li>
                       Tổng cộng <span>{formatVnd(totals.total)}</span>
