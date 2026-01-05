@@ -21,6 +21,8 @@ import Profile from "./components/pages/Profile/Profile";
 import DashBoard from "./components/admin/pages/DashBoard";
 import ManageProduct from "./components/admin/pages/ManageProduct";
 import AdminLayout from "./components/admin/commons/AdminLayout";
+import BuyingHistoryPage from "./components/BuyingHistory/BuyingHistoryPage";
+import OrderDetail from "./components/BuyingHistory/OrderDetail";
 
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
@@ -150,6 +152,24 @@ function App() {
           path="/profile"
           element={
             <Profile
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
+        <Route
+          path="/buying-history"
+          element={
+            <BuyingHistoryPage
+              showOffcanvas={showOffcanvas}
+              setShowOffcanvas={setShowOffcanvas}
+            />
+          }
+        />
+        <Route
+          path="/order-detail/:id"
+          element={
+            <OrderDetail
               showOffcanvas={showOffcanvas}
               setShowOffcanvas={setShowOffcanvas}
             />

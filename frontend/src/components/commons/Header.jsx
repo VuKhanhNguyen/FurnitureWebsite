@@ -73,9 +73,9 @@ export function Header({ onOpenOffcanvas }) {
     navigate("/productsList");
   };
 
-  const handleProductDetailClick = (e) => {
+  const handleBuyingHistoryClick = (e) => {
     e.preventDefault();
-    navigate("/productDetail");
+    navigate("/buying-history");
   };
 
   const handleWishListClick = (e) => {
@@ -148,9 +148,9 @@ export function Header({ onOpenOffcanvas }) {
                                 <li>
                                   <a
                                     href="#"
-                                    onClick={handleProductDetailClick}
+                                    onClick={handleBuyingHistoryClick}
                                   >
-                                    Chi tiết sản phẩm
+                                    Đơn hàng của tôi
                                   </a>
                                 </li>
                                 <li>
@@ -163,29 +163,9 @@ export function Header({ onOpenOffcanvas }) {
                                     Giỏ hàng
                                   </a>
                                 </li>
-                                <li>
-                                  <a href="#" onClick={handleCheckoutClick}>
-                                    Thanh toán
-                                  </a>
-                                </li>
                               </ul>
                             </li>
 
-                            <li className="has-dropdown">
-                              <a href="blog.html">Blog</a>
-                              <ul className="submenu">
-                                <li>
-                                  <a href="#" onClick={handleBlogListClick}>
-                                    Danh sách Blog
-                                  </a>
-                                </li>
-                                <li>
-                                  <a href="#" onClick={handleBlogDetailClick}>
-                                    Chi tiết blog
-                                  </a>
-                                </li>
-                              </ul>
-                            </li>
                             <li>
                               <a href="#" onClick={handleContactClick}>
                                 Liên hệ

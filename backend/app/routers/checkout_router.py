@@ -106,3 +106,43 @@ def create_order(payload: CreateOrderRequest, db: Session = Depends(get_db), cur
     db.refresh(order)
 
     return DataResponse(code="200", message="Order created", data=OrderResponse.model_validate(order))
+
+
+@router.get("/orders", response_model=DataResponse[list[OrderResponse]])
+def get_user_orders(
+    status: str = None,
+    db: Session = Depends(get_db),
+    current_user=Depends(authenticate),
+):
+    query = db.query(Order).filter(Order.user_id == current_user.id)
+    
+    if status:
+        if status == 'history':
+             query = query.filter(Order.status.in_(['delivered', 'cancelled', 'shipped']))
+        elif status == 'status':
+             query = query.filter(Order.status.in_(['pending', 'processing']))
+        # else: ignore or exact match? adhering to current logic
+        
+    orders = query.order_by(Order.order_date.desc()).all()
+    return DataResponse(
+        code="200", 
+        message="Orders fetched successfully", 
+        data=[OrderResponse.model_validate(o) for o in orders]
+    )
+
+
+@router.get("/orders/{order_id}", response_model=DataResponse[OrderResponse])
+def get_order_detail(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(authenticate),
+):
+    order = db.query(Order).filter(Order.id == order_id, Order.user_id == current_user.id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Đơn hàng không tồn tại")
+        
+    return DataResponse(
+        code="200", 
+        message="Order detail fetched successfully", 
+        data=OrderResponse.model_validate(order)
+    )

@@ -1,13 +1,14 @@
 from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
-
+from app.schemas.products_schema import ProductSchema
 
 class OrderItemResponse(BaseModel):
     id: int
     product_id: int
     quantity: int
     price: float
+    product: Optional[ProductSchema] = None
 
     class Config:
         from_attributes = True
