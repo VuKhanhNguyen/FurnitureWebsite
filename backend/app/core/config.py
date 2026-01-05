@@ -16,6 +16,8 @@ class Settings:
     GITHUB_CLIENT_SECRET: str = os.getenv("GITHUB_CLIENT_SECRET")
     FACEBOOK_CLIENT_ID: str = os.getenv("FACEBOOK_CLIENT_ID")
     FACEBOOK_CLIENT_SECRET: str = os.getenv("FACEBOOK_CLIENT_SECRET")
+    GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET")
 
     # Frontend base URL (used for payment return/cancel redirects)
     FRONTEND_BASE_URL: str = os.getenv("FRONTEND_BASE_URL", "http://localhost:5173")

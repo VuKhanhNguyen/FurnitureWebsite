@@ -8,6 +8,7 @@ from app.models.user_model import User
 from app.core.security import create_access_token
 from datetime import datetime
 import uuid
+import urllib.parse
 
 router = APIRouter()
 
@@ -141,6 +142,83 @@ async def facebook_callback(code: str, db: Session = Depends(get_db)):
             updated_at=now,
             status="active",
             avatar=user_data["picture"]["data"]["url"] if "picture" in user_data else None
+        )
+         # Handle username conflict
+        while db.query(User).filter(User.username == user.username).first():
+             user.username = f"{username}_{uuid.uuid4().hex[:4]}"
+             
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        
+    # Create JWT
+    token = create_access_token(user.id)
+    
+    # Redirect to frontend
+    return RedirectResponse(f"http://localhost:5173/login?token={token}")
+
+
+@router.get("/auth/google/login")
+async def google_login():
+    params = {
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "redirect_uri": "http://localhost:8000/api/auth/google/callback",
+        "response_type": "code",
+        "scope": "openid email profile",
+        "access_type": "offline",
+        "prompt": "consent"
+    }
+    url = f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
+    return RedirectResponse(url)
+
+@router.get("/auth/google/callback")
+async def google_callback(code: str, db: Session = Depends(get_db)):
+    async with httpx.AsyncClient() as client:
+        # Exchange code for token
+        response = await client.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "code": code,
+                "client_id": settings.GOOGLE_CLIENT_ID,
+                "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                "redirect_uri": "http://localhost:8000/api/auth/google/callback",
+                "grant_type": "authorization_code"
+            },
+        )
+        data = response.json()
+        if "error" in data:
+            raise HTTPException(status_code=400, detail=data["error_description"])
+        
+        access_token = data["access_token"]
+        
+        # Get user info
+        user_response = await client.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        user_data = user_response.json()
+        
+    email = user_data.get("email")
+    if not email:
+        raise HTTPException(status_code=400, detail="Email not provided by Google")
+        
+    # Check if user exists
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        # Create new user
+        now = datetime.utcnow()
+        username = user_data["email"].split("@")[0]
+        
+        user = User(
+            username=username,
+            email=email,
+            full_name=user_data.get("name", username),
+            password_hash=uuid.uuid4().hex,
+            role="customer",
+            created_at=now,
+            updated_at=now,
+            status="active",
+            avatar=user_data.get("picture")
         )
          # Handle username conflict
         while db.query(User).filter(User.username == user.username).first():

@@ -14,6 +14,12 @@ const Profile = ({ showOffcanvas, setShowOffcanvas }) => {
   const [msg, setMsg] = useState("");
   const [errorType, setErrorType] = useState(""); // success or error
 
+  const resolveAvatarSrc = (value) => {
+    if (!value) return null;
+    if (/^https?:\/\//i.test(value)) return value;
+    return `/uploads/avatars/${value}`;
+  };
+
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
@@ -151,7 +157,7 @@ const Profile = ({ showOffcanvas, setShowOffcanvas }) => {
                         />
                       ) : user?.avatar ? (
                         <img
-                          src={`/uploads/avatars/${user.avatar}`}
+                          src={resolveAvatarSrc(user.avatar)}
                           alt="Avatar"
                           onError={(e) => {
                             e.target.onerror = null;
