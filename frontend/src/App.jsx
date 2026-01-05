@@ -23,12 +23,14 @@ import ManageProduct from "./components/admin/pages/ManageProduct";
 import AdminLayout from "./components/admin/commons/AdminLayout";
 import BuyingHistoryPage from "./components/BuyingHistory/BuyingHistoryPage";
 import OrderDetail from "./components/BuyingHistory/OrderDetail";
+import SessionTimeoutWatcher from "./components/commons/SessionTimeoutWatcher";
 
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
 
   return (
     <Router>
+      <SessionTimeoutWatcher />
       <Routes>
         <Route
           path="/"

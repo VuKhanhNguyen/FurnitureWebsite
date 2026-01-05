@@ -91,7 +91,9 @@ export function Checkout() {
         cartService.getCart(),
       ]);
 
-      const mergedUser = me ? { ...stored, ...me, token } : stored;
+      const mergedUser = me
+        ? { ...stored, ...me, token, loginAt: stored?.loginAt }
+        : stored;
       setUser(mergedUser);
       try {
         localStorage.setItem("user", JSON.stringify(mergedUser));

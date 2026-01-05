@@ -35,6 +35,7 @@ const Login = () => {
         const mergedUser = {
           username: data.data.username || username,
           token,
+          loginAt: Date.now(),
           ...data.data,
         };
         localStorage.setItem("user", JSON.stringify(mergedUser));
@@ -60,6 +61,7 @@ const Login = () => {
       JSON.stringify({
         username,
         token,
+        loginAt: Date.now(),
       })
     );
     wishlistService.notifyAuthChanged();

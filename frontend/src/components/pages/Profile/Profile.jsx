@@ -86,7 +86,7 @@ const Profile = ({ showOffcanvas, setShowOffcanvas }) => {
       if (data.code === "200") {
         setMsg("Cập nhật thông tin thành công!");
         setErrorType("success");
-        const updatedUser = { ...user, ...data.data };
+        const updatedUser = { ...user, ...data.data, loginAt: user?.loginAt };
         setUser(updatedUser);
         localStorage.setItem("user", JSON.stringify(updatedUser));
       } else {
