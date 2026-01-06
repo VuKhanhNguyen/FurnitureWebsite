@@ -58,7 +58,9 @@ const AppSidebar = ({
           Quản lý người dùng
         </MenuItem>
 
-        <MenuItem icon={<FaHeart />}>Quản lý đơn hàng</MenuItem>
+        <MenuItem icon={<FaHeart />} component={<Link to={"/admin/order"} />}>
+          Quản lý đơn hàng
+        </MenuItem>
       </Menu>
 
       {/* FOOTER */}

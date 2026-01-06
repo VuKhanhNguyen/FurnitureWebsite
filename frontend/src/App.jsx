@@ -25,6 +25,7 @@ import AdminLayout from "./components/admin/commons/AdminLayout";
 import BuyingHistoryPage from "./components/BuyingHistory/BuyingHistoryPage";
 import OrderDetail from "./components/BuyingHistory/OrderDetail";
 import SessionTimeoutWatcher from "./components/commons/SessionTimeoutWatcher";
+import ManageOrder from "./components/admin/pages/ManageOrder";
 
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
@@ -184,6 +185,7 @@ function App() {
           <Route index element={<DashBoard />} />
           <Route path="/admin/product" element={<ManageProduct />} />
           <Route path="/admin/user" element={<ManageUser />} />
+          <Route path="/admin/order" element={<ManageOrder />} />
         </Route>
       </Routes>
     </Router>

@@ -1,49 +1,29 @@
 import axiosInstance from "./api";
 
-const getToken = () => {
-  try {
-    const direct = localStorage.getItem("token");
-    if (direct) return direct;
-    const raw = localStorage.getItem("user");
-    if (!raw) return "";
-    const user = JSON.parse(raw);
-    return user?.token || "";
-  } catch {
-    return "";
-  }
-};
-
-const authHeaders = () => {
-  const token = getToken();
-  if (!token) {
-    // Return empty or throw based on app design.
-    // For now, let's assume if it fails, the API call returns 401
-    return {};
-  }
-  return { Authorization: `Bearer ${token}` };
-};
-
 const orderService = {
-  getOrders: async (filterStatus = "all") => {
-    const headers = authHeaders();
-    const params = {};
-    if (filterStatus !== "all") {
-      params.status = filterStatus;
-    }
-
-    const response = await axiosInstance.get("/api/checkout/orders", {
-      headers,
-      params,
-    });
-    return response.data; // data field contains { code, message, data: [] }
+  // Lấy tất cả đơn hàng
+  getAllOrders: async () => {
+    const response = await axiosInstance.get("/api/orders");
+    return response.data.data;
   },
 
+  // Lấy đơn hàng theo ID
   getOrderById: async (id) => {
-    const headers = authHeaders();
-    const response = await axiosInstance.get(`/api/checkout/orders/${id}`, {
-      headers,
-    });
-    return response.data; // data field contains { code, message, data: {} }
+    const response = await axiosInstance.get(`/api/orders/${id}`);
+    return response.data.data;
+  },
+
+  // Cập nhật trạng thái đơn hàng
+  updateOrderStatus: async (id, status) => {
+    console.log(`Updating order ${id} to status ${status}`);
+    try {
+      const response = await axiosInstance.put(`/api/orders/${id}/status?status=${status}`);
+      console.log('Update response:', response.data);
+      return response.data.data;
+    } catch (error) {
+      console.error('Update order status error:', error.response?.data || error.message);
+      throw error;
+    }
   },
 };
 
