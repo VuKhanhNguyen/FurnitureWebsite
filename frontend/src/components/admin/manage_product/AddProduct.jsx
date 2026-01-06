@@ -96,21 +96,137 @@ const AddProduct = ({ onSubmit, onCancel }) => {
     }
   };
 
+  const containerStyle = {
+    background: "white",
+    borderRadius: "12px",
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+    padding: "2rem",
+    maxWidth: "900px",
+    margin: "2rem auto",
+  };
+
+  const headerStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "2rem",
+    paddingBottom: "1rem",
+    borderBottom: "2px solid #e2e8f0",
+  };
+
+  const formStyle = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1.5rem",
+  };
+
+  const formRowStyle = {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    gap: "1.5rem",
+  };
+
+  const formGroupStyle = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+  };
+
+  const inputStyle = {
+    padding: "0.625rem 0.875rem",
+    border: "2px solid #e2e8f0",
+    borderRadius: "8px",
+    fontSize: "0.9375rem",
+    background: "white",
+  };
+
+  const errorInputStyle = {
+    ...inputStyle,
+    borderColor: "#fc8181",
+  };
+
+  const errorTextStyle = {
+    fontSize: "0.875rem",
+    color: "#c53030",
+    marginTop: "0.25rem",
+  };
+
+  const formActionsStyle = {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "1rem",
+    marginTop: "1rem",
+    paddingTop: "1.5rem",
+    borderTop: "2px solid #e2e8f0",
+  };
+
+  const btnStyle = {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    padding: "0.625rem 1.25rem",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "0.9375rem",
+    fontWeight: 600,
+    cursor: "pointer",
+  };
+
   return (
-    <div className="add-product-container">
-      <div className="add-product-header">
-        <h2>Thêm Sản Phẩm Mới</h2>
-        <button className="btn-close" onClick={onCancel}>
+    <div style={containerStyle}>
+      <div style={headerStyle}>
+        <h2
+          style={{
+            fontSize: "1.5rem",
+            fontWeight: 700,
+            color: "#2d3748",
+            margin: 0,
+          }}
+        >
+          Thêm Sản Phẩm Mới
+        </h2>
+        <button
+          onClick={onCancel}
+          style={{
+            ...btnStyle,
+            width: "40px",
+            height: "40px",
+            padding: 0,
+            background: "#fed7d7",
+            color: "#742a2a",
+            fontSize: "1.2rem",
+          }}
+        >
           <FaTimes />
         </button>
       </div>
 
-      {errors.general && <div className="form-error">{errors.general}</div>}
+      {errors.general && (
+        <div
+          style={{
+            background: "#fed7d7",
+            color: "#742a2a",
+            padding: "1rem",
+            borderRadius: "8px",
+            marginBottom: "1rem",
+          }}
+        >
+          {errors.general}
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit} className="product-form">
-        <div className="form-row">
-          <div className="form-group">
-            <label>Tên sản phẩm *</label>
+      <form onSubmit={handleSubmit} style={formStyle}>
+        <div style={formRowStyle}>
+          <div style={formGroupStyle}>
+            <label
+              style={{
+                fontSize: "0.9375rem",
+                fontWeight: 600,
+                color: "#2d3748",
+              }}
+            >
+              Tên sản phẩm *
+            </label>
             <input
               type="text"
               name="name"
@@ -118,15 +234,25 @@ const AddProduct = ({ onSubmit, onCancel }) => {
               onChange={handleChange}
               required
               placeholder="Nhập tên sản phẩm"
+              style={inputStyle}
             />
           </div>
 
-          <div className="form-group">
-            <label>Danh mục</label>
+          <div style={formGroupStyle}>
+            <label
+              style={{
+                fontSize: "0.9375rem",
+                fontWeight: 600,
+                color: "#2d3748",
+              }}
+            >
+              Danh mục
+            </label>
             <select
               name="category_id"
               value={formData.category_id}
               onChange={handleChange}
+              style={inputStyle}
             >
               <option value="">Chọn danh mục</option>
               {categories.map((cat) => (
@@ -138,9 +264,13 @@ const AddProduct = ({ onSubmit, onCancel }) => {
           </div>
         </div>
 
-        <div className="form-group">
-          <label>Hình ảnh</label>
-          <div className="image-upload">
+        <div style={formGroupStyle}>
+          <label
+            style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}
+          >
+            Hình ảnh
+          </label>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <input
               type="file"
               accept="image/*"
@@ -148,17 +278,39 @@ const AddProduct = ({ onSubmit, onCancel }) => {
               id="image-input"
               style={{ display: "none" }}
             />
-            <label htmlFor="image-input" className="upload-btn">
+            <label
+              htmlFor="image-input"
+              style={{
+                ...btnStyle,
+                background: "#e2e8f0",
+                color: "#4a5568",
+                padding: "0.625rem 1.25rem",
+              }}
+            >
               <FaUpload /> Chọn ảnh
             </label>
             {imagePreview && (
-              <img src={imagePreview} alt="Preview" className="image-preview" />
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                  border: "2px solid #e2e8f0",
+                }}
+              />
             )}
           </div>
         </div>
 
-        <div className="form-group">
-          <label>Mô tả ngắn *</label>
+        <div style={formGroupStyle}>
+          <label
+            style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}
+          >
+            Mô tả ngắn *
+          </label>
           <input
             type="text"
             name="short_description"
@@ -166,11 +318,16 @@ const AddProduct = ({ onSubmit, onCancel }) => {
             onChange={handleChange}
             required
             placeholder="Mô tả ngắn gọn về sản phẩm"
+            style={inputStyle}
           />
         </div>
 
-        <div className="form-group">
-          <label>Mô tả chi tiết *</label>
+        <div style={formGroupStyle}>
+          <label
+            style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}
+          >
+            Mô tả chi tiết *
+          </label>
           <textarea
             name="description"
             value={formData.description}
@@ -178,12 +335,21 @@ const AddProduct = ({ onSubmit, onCancel }) => {
             required
             rows="4"
             placeholder="Mô tả chi tiết về sản phẩm"
+            style={{ ...inputStyle, resize: "vertical", fontFamily: "inherit" }}
           />
         </div>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label>Giá *</label>
+        <div style={formRowStyle}>
+          <div style={formGroupStyle}>
+            <label
+              style={{
+                fontSize: "0.9375rem",
+                fontWeight: 600,
+                color: "#2d3748",
+              }}
+            >
+              Giá *
+            </label>
             <input
               type="number"
               name="price"
@@ -192,11 +358,20 @@ const AddProduct = ({ onSubmit, onCancel }) => {
               required
               placeholder="0"
               min="0"
+              style={inputStyle}
             />
           </div>
 
-          <div className="form-group">
-            <label>Giá sale</label>
+          <div style={formGroupStyle}>
+            <label
+              style={{
+                fontSize: "0.9375rem",
+                fontWeight: 600,
+                color: "#2d3748",
+              }}
+            >
+              Giá sale
+            </label>
             <input
               type="number"
               name="sale_price"
@@ -204,17 +379,23 @@ const AddProduct = ({ onSubmit, onCancel }) => {
               onChange={handleChange}
               placeholder="0"
               min="0"
-              style={errors.sale_price ? { borderColor: "#fc8181" } : undefined}
+              style={errors.sale_price ? errorInputStyle : inputStyle}
             />
             {errors.sale_price && (
-              <span style={{ fontSize: 14, color: "#c53030", marginTop: 4 }}>
-                {errors.sale_price}
-              </span>
+              <span style={errorTextStyle}>{errors.sale_price}</span>
             )}
           </div>
 
-          <div className="form-group">
-            <label>Số lượng *</label>
+          <div style={formGroupStyle}>
+            <label
+              style={{
+                fontSize: "0.9375rem",
+                fontWeight: 600,
+                color: "#2d3748",
+              }}
+            >
+              Số lượng *
+            </label>
             <input
               type="number"
               name="quantity"
@@ -223,26 +404,48 @@ const AddProduct = ({ onSubmit, onCancel }) => {
               required
               placeholder="0"
               min="0"
+              style={inputStyle}
             />
           </div>
         </div>
 
-        <div className="form-group">
-          <label>Tags</label>
+        <div style={formGroupStyle}>
+          <label
+            style={{
+              fontSize: "0.9375rem",
+              fontWeight: 600,
+              color: "#2d3748",
+            }}
+          >
+            Tags
+          </label>
           <input
             type="text"
             name="tags"
             value={formData.tags}
             onChange={handleChange}
             placeholder="tag1, tag2, tag3"
+            style={inputStyle}
           />
         </div>
 
-        <div className="form-actions">
-          <button type="button" className="btn-cancel" onClick={onCancel}>
+        <div style={formActionsStyle}>
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{ ...btnStyle, background: "#e2e8f0", color: "#4a5568" }}
+          >
             <FaTimes /> Hủy
           </button>
-          <button type="submit" className="btn-submit">
+          <button
+            type="submit"
+            style={{
+              ...btnStyle,
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+            }}
+          >
             <FaSave /> Lưu sản phẩm
           </button>
         </div>

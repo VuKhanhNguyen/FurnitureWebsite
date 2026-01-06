@@ -33,6 +33,105 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
     }
   };
 
+  const containerStyle = {
+    background: "white",
+    borderRadius: "12px",
+    boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+    padding: "2rem",
+    maxWidth: "900px",
+    margin: "2rem auto",
+  };
+
+  const headerStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "2rem",
+    paddingBottom: "1rem",
+    borderBottom: "2px solid #e2e8f0",
+  };
+
+  const contentStyle = {
+    display: "grid",
+    gridTemplateColumns: "300px 1fr",
+    gap: "2rem",
+    marginBottom: "2rem",
+  };
+
+  const imageStyle = {
+    width: "100%",
+    height: "300px",
+    objectFit: "cover",
+    borderRadius: "8px",
+    border: "2px solid #e2e8f0",
+  };
+
+  const infoStyle = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  };
+
+  const fieldStyle = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+  };
+
+  const labelStyle = {
+    fontSize: "0.875rem",
+    fontWeight: 600,
+    color: "#4a5568",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+  };
+
+  const valueStyle = {
+    fontSize: "1rem",
+    color: "#2d3748",
+    fontWeight: 500,
+  };
+
+  const priceStyle = {
+    fontSize: "1.5rem",
+    fontWeight: 700,
+    color: "#667eea",
+  };
+
+  const salePriceStyle = {
+    fontSize: "1.25rem",
+    fontWeight: 600,
+    color: "#e53e3e",
+  };
+
+  const badgeStyle = {
+    display: "inline-block",
+    padding: "0.375rem 0.75rem",
+    borderRadius: "6px",
+    fontSize: "0.875rem",
+    fontWeight: 600,
+  };
+
+  const actionStyle = {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "1rem",
+    paddingTop: "1.5rem",
+    borderTop: "2px solid #e2e8f0",
+  };
+
+  const btnStyle = {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    padding: "0.625rem 1.25rem",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "0.9375rem",
+    fontWeight: 600,
+    cursor: "pointer",
+  };
+
   if (loading) {
     return (
       <div className="view-product-container">
@@ -56,19 +155,35 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
   }
 
   return (
-    <div className="view-product-container">
-      <div className="view-product-header">
-        <h2 className="view-product-title">Chi Tiết Sản Phẩm</h2>
+    <div style={containerStyle}>
+      <div style={headerStyle}>
+        <h2
+          style={{
+            fontSize: "1.5rem",
+            fontWeight: 700,
+            color: "#2d3748",
+            margin: 0,
+          }}
+        >
+          Chi Tiết Sản Phẩm
+        </h2>
         <button
           onClick={onClose}
-          className="view-product-close"
-          aria-label="Đóng"
+          style={{
+            ...btnStyle,
+            width: "40px",
+            height: "40px",
+            padding: 0,
+            background: "#fed7d7",
+            color: "#742a2a",
+            fontSize: "1.2rem",
+          }}
         >
           <FaTimes />
         </button>
       </div>
 
-      <div className="view-product-content">
+      <div style={contentStyle}>
         <div>
           {product.image ? (
             <img
@@ -83,72 +198,90 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
               className="view-product-image"
             />
           ) : (
-            <div className="view-product-image-placeholder">
+            <div
+              style={{
+                ...imageStyle,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "#f7fafc",
+                color: "#a0aec0",
+              }}
+            >
               Không có hình ảnh
             </div>
           )}
         </div>
 
-        <div className="view-product-info">
-          <div className="view-product-field">
-            <label className="view-product-label">Tên sản phẩm</label>
-            <span className="view-product-value view-product-name">
+        <div style={infoStyle}>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Tên sản phẩm</label>
+            <span
+              style={{ ...valueStyle, fontSize: "1.25rem", fontWeight: 700 }}
+            >
               {product.name}
             </span>
           </div>
 
-          <div className="view-product-field">
-            <label className="view-product-label">Mô tả ngắn</label>
-            <span className="view-product-value">
-              {product.short_description}
-            </span>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Mô tả ngắn</label>
+            <span style={valueStyle}>{product.short_description}</span>
           </div>
 
-          <div className="view-product-grid-2">
-            <div className="view-product-field">
-              <label className="view-product-label">Giá gốc</label>
-              <span className="view-product-price">
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1rem",
+            }}
+          >
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Giá gốc</label>
+              <span style={priceStyle}>
                 {product.price?.toLocaleString("vi-VN")} VNĐ
               </span>
             </div>
             {product.sale_price > 0 && (
-              <div className="view-product-field">
-                <label className="view-product-label">Giá sale</label>
-                <span className="view-product-sale-price">
+              <div style={fieldStyle}>
+                <label style={labelStyle}>Giá sale</label>
+                <span style={salePriceStyle}>
                   {product.sale_price?.toLocaleString("vi-VN")} VNĐ
                 </span>
               </div>
             )}
           </div>
 
-          <div className="view-product-grid-2">
-            <div className="view-product-field">
-              <label className="view-product-label">Số lượng</label>
-              <span className="view-product-value">{product.quantity}</span>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1rem",
+            }}
+          >
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Số lượng</label>
+              <span style={valueStyle}>{product.quantity}</span>
             </div>
-            <div className="view-product-field">
-              <label className="view-product-label">Đánh giá</label>
-              <span className="view-product-value">
-                {product.average_rating}/5 ⭐
-              </span>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Đánh giá</label>
+              <span style={valueStyle}>{product.average_rating}/5 ⭐</span>
             </div>
           </div>
 
-          <div className="view-product-field">
-            <label className="view-product-label">Danh mục</label>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Danh mục</label>
             <span
-              className="view-product-badge"
-              style={{ background: "#edf2f7", color: "#4a5568" }}
+              style={{ ...badgeStyle, background: "#edf2f7", color: "#4a5568" }}
             >
               {product.category?.name || "Chưa phân loại"}
             </span>
           </div>
 
-          <div className="view-product-field">
-            <label className="view-product-label">Trạng thái</label>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Trạng thái</label>
             <span
-              className="view-product-badge"
               style={{
+                ...badgeStyle,
                 background: product.quantity > 0 ? "#c6f6d5" : "#fed7d7",
                 color: product.quantity > 0 ? "#22543d" : "#742a2a",
               }}
@@ -158,29 +291,46 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
           </div>
 
           {product.tags && (
-            <div className="view-product-field">
-              <label className="view-product-label">Tags</label>
-              <span className="view-product-value">{product.tags}</span>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Tags</label>
+              <span style={valueStyle}>{product.tags}</span>
             </div>
           )}
         </div>
       </div>
 
-      <div className="view-product-field">
-        <label className="view-product-label">Mô tả chi tiết</label>
-        <div className="view-product-detail view-product-value">
+      <div style={fieldStyle}>
+        <label style={labelStyle}>Mô tả chi tiết</label>
+        <div
+          style={{
+            ...valueStyle,
+            background: "#f7fafc",
+            padding: "1rem",
+            borderRadius: "8px",
+            lineHeight: "1.6",
+          }}
+        >
           {product.description}
         </div>
       </div>
 
-      <div className="view-product-actions">
-        <button onClick={onClose} className="view-product-btn secondary">
+      <div style={actionStyle}>
+        <button
+          onClick={onClose}
+          style={{ ...btnStyle, background: "#e2e8f0", color: "#4a5568" }}
+        >
           <FaTimes /> Đóng
         </button>
-        <button onClick={handleEdit} className="view-product-btn edit">
+        <button
+          onClick={handleEdit}
+          style={{ ...btnStyle, background: "#feebc8", color: "#7c2d12" }}
+        >
           <FaEdit /> Sửa
         </button>
-        <button onClick={handleDelete} className="view-product-btn delete">
+        <button
+          onClick={handleDelete}
+          style={{ ...btnStyle, background: "#fed7d7", color: "#742a2a" }}
+        >
           <FaTrash /> Xóa
         </button>
       </div>
