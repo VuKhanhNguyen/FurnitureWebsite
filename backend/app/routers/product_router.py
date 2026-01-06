@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from app.db.base import get_db
 from sqlalchemy.orm import Session
+from sqlalchemy import func, desc
 from app.models.product_model import Product
+from app.models.order_item_model import OrderItem
+from app.models.order_model import Order
 from app.schemas.products_schema import CreateProductSchema, ProductSchema, UpdateProductSchema
 from app.schemas.base_schema import DataResponse
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import shutil
 from typing import Optional
@@ -25,6 +28,49 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 async def get_products(db: Session = Depends(get_db)):
     products = db.query(Product).filter(Product.deleted_at == None).all()
     return DataResponse.custom_response(code="200", message="get all products", data=products)
+
+
+@router.get(
+    "/best-sellers",
+    description="Get best-selling products (weekly or all-time)",
+    response_model=DataResponse[list[ProductSchema]],
+)
+async def get_best_sellers(period: str = "week", limit: int = 4, db: Session = Depends(get_db)):
+    if limit <= 0:
+        raise HTTPException(status_code=400, detail="limit must be > 0")
+
+    period_normalized = (period or "").strip().lower()
+    if period_normalized not in {"week", "all"}:
+        raise HTTPException(status_code=400, detail="period must be 'week' or 'all'")
+
+    query = (
+        db.query(Product)
+        .join(OrderItem, OrderItem.product_id == Product.id)
+        .join(Order, Order.id == OrderItem.order_id)
+        .filter(Product.deleted_at == None)
+        # Count real orders: exclude cancelled and failed payments
+        .filter(Order.payment_status == "paid")
+    )
+
+    if period_normalized == "week":
+        now = datetime.now()
+        start_of_week = (now - timedelta(days=now.weekday())).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        query = query.filter(Order.order_date >= start_of_week)
+
+    products = (
+        query.group_by(Product.id)
+        .order_by(desc(func.sum(OrderItem.quantity)))
+        .limit(limit)
+        .all()
+    )
+
+    return DataResponse.custom_response(
+        code="200",
+        message=f"get best sellers period={period_normalized}",
+        data=products,
+    )
 
 @router.post("/", description="Create a new product", response_model=DataResponse[ProductSchema])
 async def create_product(

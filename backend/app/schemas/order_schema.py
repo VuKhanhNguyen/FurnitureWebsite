@@ -20,6 +20,11 @@ class OrderResponse(BaseModel):
     order_date: datetime
     status: str
 
+    processing_at: Optional[datetime] = None
+    shipped_at: Optional[datetime] = None
+    delivered_at: Optional[datetime] = None
+    cancelled_at: Optional[datetime] = None
+
     subtotal_amount: float
     discount_amount: float
     shipping_fee: float

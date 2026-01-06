@@ -7,6 +7,22 @@ const productService = {
     return response.data.data;
   },
 
+  // Lấy top sản phẩm bán chạy (week = từ Thứ 2 đến hiện tại, all = mọi thời điểm)
+  getBestSellers: async ({ period = "week", limit = 4 } = {}) => {
+    const response = await axiosInstance.get("/api/products/best-sellers", {
+      params: { period, limit },
+    });
+    return response.data.data;
+  },
+
+  getBestSellersWeek: async ({ limit = 4 } = {}) => {
+    return productService.getBestSellers({ period: "week", limit });
+  },
+
+  getBestSellersAllTime: async ({ limit = 4 } = {}) => {
+    return productService.getBestSellers({ period: "all", limit });
+  },
+
   // Lấy sản phẩm theo ID
   getProductById: async (id) => {
     const response = await axiosInstance.get(`/api/products/${id}`);

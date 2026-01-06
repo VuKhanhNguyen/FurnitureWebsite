@@ -180,7 +180,7 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                           {/* <div className="product__details-tag">
                             <a href="#">Construction</a>
                           </div> */}
-                          <div className="product__details-rating">
+                          {/* <div className="product__details-rating">
                             <a href="#">
                               <i className="fa-solid fa-star"></i>
                             </a>
@@ -199,7 +199,7 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                           </div>
                           <div className="product__details-review-count">
                             <a href="#">0 Đánh giá</a>
-                          </div>
+                          </div> */}
                         </div>
                         <h3 className="product__details-title">
                           {product.name}

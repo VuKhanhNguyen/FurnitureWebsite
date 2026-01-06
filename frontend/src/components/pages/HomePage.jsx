@@ -19,10 +19,10 @@ export function HomePage({ showOffcanvas, setShowOffcanvas }) {
       <HomeBanner />
       <HomeService />
       <TopSale />
-      <TrendyCollection />
+
       <HotDeal />
       <Testimonials />
-      <BestSellers />
+      {/* <BestSellers /> */}
       <RecentBlog />
       <Footer />
     </React.Fragment>

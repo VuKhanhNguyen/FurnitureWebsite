@@ -164,6 +164,8 @@ def vnpay_confirm_payment(
         order.payment_status = "paid"
         order.paid_at = datetime.now()
         order.status = "processing"
+        if not getattr(order, "processing_at", None):
+            order.processing_at = datetime.now()
     else:
         order.payment_status = "failed"
 
@@ -214,6 +216,8 @@ def vnpay_return(request: Request, db: Session = Depends(get_db)):
                 order.paid_at = datetime.now()
                 # Keep existing behavior: move into processing
                 order.status = "processing"
+                if not getattr(order, "processing_at", None):
+                    order.processing_at = datetime.now()
             else:
                 # Payment failed (but signature valid)
                 order.payment_status = "failed"

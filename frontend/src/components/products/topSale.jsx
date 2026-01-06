@@ -1,7 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCards from "./productCards.jsx";
 import "../../assets/js/swiper.min.js";
+import productService from "../../services/productService";
 export function TopSale() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchTopSale = async () => {
+      try {
+        const data = await productService.getBestSellersAllTime({ limit: 4 });
+        if (!cancelled) setProducts(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to load top sale products", err);
+        if (!cancelled) setProducts([]);
+      }
+    };
+
+    fetchTopSale();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   useEffect(() => {
     // eslint-disable-next-line no-undef
     new Swiper(".furuniture-active", {
@@ -37,10 +59,9 @@ export function TopSale() {
               <div className="swiper furuniture-active">
                 <div className="swiper-wrapper">
                   <div className="swiper-slide">
-                    <ProductCards />
-                    <ProductCards />
-                    <ProductCards />
-                    <ProductCards />
+                    {products.slice(0, 4).map((product) => (
+                      <ProductCards key={product.id} product={product} />
+                    ))}
                   </div>
                 </div>
               </div>

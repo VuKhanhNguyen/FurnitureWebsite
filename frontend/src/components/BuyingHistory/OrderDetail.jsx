@@ -11,6 +11,22 @@ const OrderDetail = ({ showOffcanvas, setShowOffcanvas }) => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const getPaymentMethodLabel = (method) => {
+    if (!method) return "";
+    const normalized = String(method).trim().toLowerCase();
+
+    // Handle common variants/typos from backend or older data
+    if (normalized === "bank_transfer" || normalized === "bank_tranfer") {
+      return "Chuyển khoản";
+    }
+    if (normalized === "cod" || normalized === "cash_on_delivery") {
+      return "Tiền mặt";
+    }
+
+    // Fallback: show raw value
+    return method;
+  };
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -27,30 +43,85 @@ const OrderDetail = ({ showOffcanvas, setShowOffcanvas }) => {
     if (id) fetchOrder();
   }, [id]);
 
-  const getTrackingSteps = (status, date) => {
-    // Logic to generate steps based on status
+  const formatDateTimeUTC7 = (value) => {
+    if (!value) return "";
+
+    // Render consistently in UTC+7 (Asia/Ho_Chi_Minh).
+    // IMPORTANT: FastAPI often serializes naive datetimes without timezone info.
+    // In this project those values are created with server local time (UTC+7),
+    // so we must interpret naive strings as UTC+7 (not UTC) to avoid +7h shifts.
+    let raw = value;
+    if (raw instanceof Date) {
+      // OK
+    } else {
+      raw = String(raw);
+    }
+
+    const hasTzInfo =
+      typeof raw === "string" &&
+      (raw.endsWith("Z") || /[+-]\d{2}:?\d{2}$/.test(raw));
+
+    const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
+    const date =
+      raw instanceof Date
+        ? raw
+        : hasTzInfo
+        ? new Date(raw)
+        : new Date(Date.parse(`${raw}Z`) - VN_OFFSET_MS);
+
+    if (Number.isNaN(date.getTime())) return "";
+
+    return new Intl.DateTimeFormat("vi-VN", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(date);
+  };
+
+  const getTrackingSteps = (order) => {
     const steps = [
       {
         title: "Đặt hàng thành công",
         status: "pending",
-        time: new Date(date).toLocaleString("vi-VN"),
+        time: formatDateTimeUTC7(order?.order_date),
       },
-      { title: "Đang xử lý", status: "processing", time: "" },
-      { title: "Đang giao hàng", status: "shipped", time: "" },
-      { title: "Giao hàng thành công", status: "delivered", time: "" },
+      {
+        title: "Đang xử lý",
+        status: "processing",
+        time: formatDateTimeUTC7(order?.processing_at),
+      },
+      {
+        title: "Đang giao hàng",
+        status: "shipped",
+        time: formatDateTimeUTC7(order?.shipped_at),
+      },
+      {
+        title: "Giao hàng thành công",
+        status: "delivered",
+        time: formatDateTimeUTC7(order?.delivered_at),
+      },
     ];
 
     const statusOrder = ["pending", "processing", "shipped", "delivered"];
-    const currentIdx = statusOrder.indexOf(status);
+    const currentIdx = statusOrder.indexOf(order?.status);
 
-    if (status === "cancelled") {
+    if (order?.status === "cancelled") {
       return [
         {
           title: "Đặt hàng thành công",
           active: true,
-          time: new Date(date).toLocaleString("vi-VN"),
+          time: formatDateTimeUTC7(order?.order_date),
         },
-        { title: "Đã hủy", active: true, isFail: true, time: "" },
+        {
+          title: "Đã hủy",
+          active: true,
+          isFail: true,
+          time: formatDateTimeUTC7(order?.cancelled_at),
+        },
       ];
     }
 
@@ -58,7 +129,7 @@ const OrderDetail = ({ showOffcanvas, setShowOffcanvas }) => {
       return {
         ...step,
         active: idx <= currentIdx,
-        time: idx <= currentIdx && idx === 0 ? step.time : "", // Only show time for first step for now, or real timestamps if backend provided them
+        time: idx <= currentIdx ? step.time : "",
       };
     });
   };
@@ -83,7 +154,7 @@ const OrderDetail = ({ showOffcanvas, setShowOffcanvas }) => {
       <div className="container py-5 text-center">Đơn hàng không tồn tại</div>
     );
 
-  const trackingSteps = getTrackingSteps(order.status, order.order_date);
+  const trackingSteps = getTrackingSteps(order);
 
   return (
     <>
@@ -208,7 +279,7 @@ const OrderDetail = ({ showOffcanvas, setShowOffcanvas }) => {
                       <div className="col-md-6 mb-3">
                         <p className="mb-1 text-muted">Ngày đặt hàng</p>
                         <p className="fw-bold">
-                          {new Date(order.order_date).toLocaleString("vi-VN")}
+                          {formatDateTimeUTC7(order.order_date)}
                         </p>
                       </div>
                       <div className="col-md-6 mb-3">
@@ -226,7 +297,7 @@ const OrderDetail = ({ showOffcanvas, setShowOffcanvas }) => {
                           Phương thức thanh toán
                         </p>
                         <p className="fw-bold text-uppercase">
-                          {order.payment_method}
+                          {getPaymentMethodLabel(order.payment_method)}
                         </p>
                       </div>
                       <div className="col-md-6 mb-3">
