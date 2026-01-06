@@ -2,6 +2,15 @@ import React from "react";
 import { FaEye, FaEdit, FaTrash, FaUser } from "react-icons/fa";
 
 const UserTable = ({ users, onView, onEdit, onDelete }) => {
+  const resolveAvatarSrc = (value) => {
+    if (!value) return null;
+    if (typeof value !== "string") return null;
+    const v = value.trim();
+    if (!v) return null;
+    if (/^https?:\/\//i.test(v)) return v;
+    return `/uploads/avatars/${v}`;
+  };
+
   const tableStyle = {
     background: "white",
     borderRadius: "12px",
@@ -62,9 +71,14 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               <td style={{ padding: "0.875rem", fontSize: "0.875rem", color: "#4a5568" }}>
                 {user.avatar ? (
                   <img 
-                    src={`/uploads/avatars/${user.avatar}`} 
+                    src={resolveAvatarSrc(user.avatar)}
                     alt={user.username}
                     style={{ width: "40px", height: "40px", objectFit: "cover", borderRadius: "50%", border: "2px solid #e2e8f0" }}
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      // Show fallback icon if external image fails.
+                      e.currentTarget.style.display = "none";
+                    }}
                   />
                 ) : (
                   <div style={{ width: "40px", height: "40px", background: "#e2e8f0", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>

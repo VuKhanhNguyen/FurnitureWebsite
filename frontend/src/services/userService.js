@@ -1,6 +1,25 @@
 import axiosInstance from "./api";
+import { getToken } from "./authStorage";
+
+const authHeaders = () => {
+  const token = getToken();
+  if (!token) {
+    const err = new Error("NOT_AUTHENTICATED");
+    err.code = "NOT_AUTHENTICATED";
+    throw err;
+  }
+  return { Authorization: `Bearer ${token}` };
+};
 
 const userService = {
+  // Lấy thông tin user hiện tại (từ DB) theo token
+  getCurrentUser: async () => {
+    const response = await axiosInstance.get("/api/me", {
+      headers: authHeaders(),
+    });
+    return response.data.data;
+  },
+
   // Lấy tất cả người dùng
   getAllUsers: async () => {
     const response = await axiosInstance.get("/api/users");
@@ -15,28 +34,28 @@ const userService = {
 
   // Tạo người dùng mới
   createUser: async (userData, avatarFile) => {
-    console.log('Creating user with data:', userData);
+    console.log("Creating user with data:", userData);
     const formData = new FormData();
-    formData.append('username', userData.username);
-    formData.append('password', userData.password);
-    formData.append('email', userData.email);
-    formData.append('full_name', userData.full_name || '');
-    formData.append('phone', userData.phone || '');
-    formData.append('role', userData.role);
-    
+    formData.append("username", userData.username);
+    formData.append("password", userData.password);
+    formData.append("email", userData.email);
+    formData.append("full_name", userData.full_name || "");
+    formData.append("phone", userData.phone || "");
+    formData.append("role", userData.role);
+
     if (avatarFile) {
-      formData.append('file', avatarFile);
+      formData.append("file", avatarFile);
     }
-    
-    console.log('Sending FormData to API...');
+
+    console.log("Sending FormData to API...");
     try {
       const response = await axiosInstance.post("/api/users", formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log('API Response:', response.data);
+      console.log("API Response:", response.data);
       return response.data.data;
     } catch (error) {
-      console.error('API Error:', error.response?.data || error.message);
+      console.error("API Error:", error.response?.data || error.message);
       throw error;
     }
   },
@@ -44,19 +63,23 @@ const userService = {
   // Cập nhật người dùng
   updateUser: async (id, userData, avatarFile) => {
     const formData = new FormData();
-    
-    Object.keys(userData).forEach(key => {
-      if (userData[key] !== null && userData[key] !== undefined && userData[key] !== "") {
+
+    Object.keys(userData).forEach((key) => {
+      if (
+        userData[key] !== null &&
+        userData[key] !== undefined &&
+        userData[key] !== ""
+      ) {
         formData.append(key, userData[key]);
       }
     });
-    
+
     if (avatarFile) {
-      formData.append('file', avatarFile);
+      formData.append("file", avatarFile);
     }
-    
+
     const response = await axiosInstance.put(`/api/users/${id}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return response.data.data;
   },

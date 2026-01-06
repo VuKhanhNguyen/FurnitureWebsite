@@ -6,6 +6,15 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const resolveAvatarSrc = (value) => {
+    if (!value) return null;
+    if (typeof value !== "string") return null;
+    const v = value.trim();
+    if (!v) return null;
+    if (/^https?:\/\//i.test(v)) return v;
+    return `/uploads/avatars/${v}`;
+  };
+
   useEffect(() => {
     fetchUser();
   }, [userId]);
@@ -129,9 +138,10 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
         <div style={{ display: "flex", justifyContent: "center" }}>
           {user.avatar ? (
             <img
-              src={`/uploads/avatars/${user.avatar}`}
+              src={resolveAvatarSrc(user.avatar)}
               alt={user.username}
               style={{ width: "150px", height: "150px", objectFit: "cover", borderRadius: "50%", border: "4px solid #e2e8f0" }}
+              referrerPolicy="no-referrer"
             />
           ) : (
             <div style={{ width: "150px", height: "150px", background: "#f7fafc", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "4px solid #e2e8f0" }}>

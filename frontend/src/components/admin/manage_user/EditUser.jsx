@@ -16,6 +16,15 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const resolveAvatarSrc = (value) => {
+    if (!value) return null;
+    if (typeof value !== "string") return null;
+    const v = value.trim();
+    if (!v) return null;
+    if (/^https?:\/\//i.test(v)) return v;
+    return `/uploads/avatars/${v}`;
+  };
+
   useEffect(() => {
     fetchUser();
   }, [userId]);
@@ -33,7 +42,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
         status: user.status || "active",
       });
       if (user.avatar) {
-        setAvatarPreview(`/uploads/avatars/${user.avatar}`);
+        setAvatarPreview(resolveAvatarSrc(user.avatar));
       }
     } catch (error) {
       console.error("Lỗi khi lấy thông tin người dùng:", error);
