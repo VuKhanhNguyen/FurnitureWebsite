@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import Header from "../../commons/Header";
 import Footer from "../../commons/Footer";
 import Offcanvas from "../../commons/OffCanvas";
+import {
+  getAuthSnapshot,
+  getLoginAt,
+  setAuth,
+} from "../../../services/authStorage";
 
 const Profile = ({ showOffcanvas, setShowOffcanvas }) => {
   const navigate = useNavigate();
@@ -21,19 +26,14 @@ const Profile = ({ showOffcanvas, setShowOffcanvas }) => {
   };
 
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      setPhone(parsedUser.phone || "");
-      if (parsedUser.token) {
-        fetchProfile(parsedUser.token);
-      } else {
-        setLoading(false);
-      }
-    } else {
+    const { token, user: storedUser } = getAuthSnapshot();
+    if (!token) {
       navigate("/login");
+      return;
     }
+    setUser({ ...(storedUser || {}), token });
+    setPhone("");
+    fetchProfile(token);
   }, []);
 
   const fetchProfile = async (token) => {
@@ -47,12 +47,8 @@ const Profile = ({ showOffcanvas, setShowOffcanvas }) => {
       if (data.code === "200") {
         setUser({ ...data.data, token });
         setPhone(data.data.phone || "");
-        // Update local storage to keep it fresh
-        const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ ...currentUser, ...data.data })
-        );
+        const loginAt = getLoginAt() || Date.now();
+        setAuth({ token, user: data.data, loginAt });
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -94,7 +90,8 @@ const Profile = ({ showOffcanvas, setShowOffcanvas }) => {
         setErrorType("success");
         const updatedUser = { ...user, ...data.data, loginAt: user?.loginAt };
         setUser(updatedUser);
-        localStorage.setItem("user", JSON.stringify(updatedUser));
+        const loginAt = getLoginAt() || updatedUser?.loginAt || Date.now();
+        setAuth({ token: user?.token, user: updatedUser, loginAt });
       } else {
         setMsg(data.message || "Cập nhật thất bại");
         setErrorType("error");

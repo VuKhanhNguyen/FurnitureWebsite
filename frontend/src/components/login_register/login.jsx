@@ -5,6 +5,7 @@ import "../../assets/css/auth.css";
 import { useNavigate } from "react-router-dom";
 import bg from "../../assets/imgs/bg.jpg";
 import wishlistService from "../../services/wishlistService";
+import { setAuth } from "../../services/authStorage";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -32,13 +33,14 @@ const Login = () => {
       });
       const data = await res.json();
       if (data?.code === "200" && data?.data) {
-        const mergedUser = {
+        const loginAt = Date.now();
+        const userForState = {
+          ...data.data,
           username: data.data.username || username,
           token,
-          loginAt: Date.now(),
-          ...data.data,
+          loginAt,
         };
-        localStorage.setItem("user", JSON.stringify(mergedUser));
+        setAuth({ token, user: userForState, loginAt });
 
         // Refresh any auth-aware UI (wishlist badge/state, etc.)
         wishlistService.notifyAuthChanged();
@@ -48,7 +50,7 @@ const Login = () => {
           // ignore
         }
 
-        redirectAfterLogin(mergedUser);
+        redirectAfterLogin(userForState);
         return;
       }
     } catch {
@@ -56,14 +58,8 @@ const Login = () => {
     }
 
     // Fallback if /api/me fails
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        username,
-        token,
-        loginAt: Date.now(),
-      })
-    );
+    const loginAt = Date.now();
+    setAuth({ token, user: { username }, loginAt });
     wishlistService.notifyAuthChanged();
     redirectAfterLogin({ role: undefined });
   };

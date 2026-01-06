@@ -3,6 +3,7 @@ import logo from "../../assets/imgs/logo-light.png";
 import Login from "../login_register/login";
 import { useNavigate } from "react-router-dom";
 import wishlistService from "../../services/wishlistService";
+import { getAuthSnapshot, clearAuthStorage } from "../../services/authStorage";
 
 function Offcanvas({ show, onClose }) {
   const navigate = useNavigate();
@@ -11,9 +12,9 @@ function Offcanvas({ show, onClose }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
+    const { token, user: storedUser } = getAuthSnapshot();
+    if (token && storedUser) {
+      setUser(storedUser);
     } else {
       setUser(null);
     }
@@ -36,7 +37,7 @@ function Offcanvas({ show, onClose }) {
       "Bạn có chắc chắn muốn đăng xuất không?"
     );
     if (confirmLogout) {
-      localStorage.removeItem("user");
+      clearAuthStorage();
       wishlistService.clearLocalWishlist();
       wishlistService.notifyAuthChanged();
       if (typeof window !== "undefined" && window?.dispatchEvent) {

@@ -4,6 +4,8 @@ const WISHLIST_STORAGE_KEY_PREFIX = "wishlist_product_ids";
 
 const getToken = () => {
   try {
+    const direct = localStorage.getItem("token");
+    if (direct) return direct;
     const raw = localStorage.getItem("user");
     if (!raw) return "";
     const user = JSON.parse(raw);

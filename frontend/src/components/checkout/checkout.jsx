@@ -10,15 +10,12 @@ import cartService from "../../services/cartService";
 import checkoutService from "../../services/checkoutService";
 import couponService from "../../services/couponService";
 import paymentService from "../../services/paymentService";
+import { getAuthSnapshot, setAuth } from "../../services/authStorage";
 
-const getStoredUser = () => {
-  try {
-    const raw = localStorage.getItem("user");
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+const getStoredAuthForState = () => {
+  const { token, user, loginAt } = getAuthSnapshot();
+  if (!token) return null;
+  return { ...(user || {}), token, loginAt: loginAt || undefined };
 };
 
 const fetchMe = async (token) => {
@@ -45,7 +42,7 @@ export function Checkout() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const [user, setUser] = useState(getStoredUser());
+  const [user, setUser] = useState(getStoredAuthForState());
   const [items, setItems] = useState([]);
 
   const [shippingFullname, setShippingFullname] = useState("");
@@ -72,8 +69,7 @@ export function Checkout() {
   };
 
   const loadUserAndCart = useCallback(async () => {
-    const stored = getStoredUser();
-    const token = stored?.token;
+    const { token, user: storedUser, loginAt } = getAuthSnapshot();
     if (
       !token ||
       !cartService.isAuthenticated() ||
@@ -91,15 +87,15 @@ export function Checkout() {
         cartService.getCart(),
       ]);
 
-      const mergedUser = me
-        ? { ...stored, ...me, token, loginAt: stored?.loginAt }
-        : stored;
-      setUser(mergedUser);
-      try {
-        localStorage.setItem("user", JSON.stringify(mergedUser));
-      } catch {
-        // ignore
-      }
+      const stateUser = me
+        ? { ...(storedUser || {}), ...me, token, loginAt: loginAt || undefined }
+        : { ...(storedUser || {}), token, loginAt: loginAt || undefined };
+      setUser(stateUser);
+      setAuth({
+        token,
+        user: stateUser,
+        loginAt: loginAt || stateUser?.loginAt,
+      });
 
       const cart = cartRes?.data;
       const cartItems = Array.isArray(cart?.items) ? cart.items : [];

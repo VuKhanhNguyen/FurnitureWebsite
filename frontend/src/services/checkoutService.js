@@ -2,6 +2,8 @@ import axiosInstance from "./api";
 
 const getToken = () => {
   try {
+    const direct = localStorage.getItem("token");
+    if (direct) return direct;
     const raw = localStorage.getItem("user");
     if (!raw) return "";
     const user = JSON.parse(raw);
