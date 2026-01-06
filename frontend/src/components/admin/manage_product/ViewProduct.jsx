@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes, FaEdit, FaTrash } from "react-icons/fa";
 import productService from "../../../services/productService";
-import "./ViewProduct.css";
 
 const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
   const [product, setProduct] = useState(null);
@@ -134,7 +133,7 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
 
   if (loading) {
     return (
-      <div className="view-product-container">
+      <div style={containerStyle}>
         <div style={{ textAlign: "center", padding: "3rem" }}>
           <p style={{ fontSize: "1.2rem", color: "#667eea" }}>Đang tải...</p>
         </div>
@@ -144,7 +143,7 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
 
   if (!product) {
     return (
-      <div className="view-product-container">
+      <div style={containerStyle}>
         <div style={{ textAlign: "center", padding: "3rem" }}>
           <p style={{ fontSize: "1.2rem", color: "#e53e3e" }}>
             Không tìm thấy sản phẩm
@@ -157,14 +156,7 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
   return (
     <div style={containerStyle}>
       <div style={headerStyle}>
-        <h2
-          style={{
-            fontSize: "1.5rem",
-            fontWeight: 700,
-            color: "#2d3748",
-            margin: 0,
-          }}
-        >
+        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
           Chi Tiết Sản Phẩm
         </h2>
         <button
@@ -187,38 +179,33 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
         <div>
           {product.image ? (
             <img
-              src={
-                product.image.startsWith("http")
-                  ? product.image
-                  : product.image.startsWith("/")
-                  ? product.image
-                  : `/uploads/products/${product.image}`
-              }
+              src={`/uploads/products/${product.image}`}
               alt={product.name}
-              className="view-product-image"
-            />
-          ) : (
-            <div
-              style={{
-                ...imageStyle,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "#f7fafc",
-                color: "#a0aec0",
+              style={imageStyle}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
               }}
-            >
-              Không có hình ảnh
-            </div>
-          )}
+            />
+          ) : null}
+          <div
+            style={{
+              ...imageStyle,
+              display: product.image ? "none" : "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f7fafc",
+              color: "#a0aec0",
+            }}
+          >
+            Không có hình ảnh
+          </div>
         </div>
 
         <div style={infoStyle}>
           <div style={fieldStyle}>
             <label style={labelStyle}>Tên sản phẩm</label>
-            <span
-              style={{ ...valueStyle, fontSize: "1.25rem", fontWeight: 700 }}
-            >
+            <span style={{ ...valueStyle, fontSize: "1.25rem", fontWeight: 700 }}>
               {product.name}
             </span>
           </div>
@@ -228,13 +215,7 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
             <span style={valueStyle}>{product.short_description}</span>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "1rem",
-            }}
-          >
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>Giá gốc</label>
               <span style={priceStyle}>
@@ -251,13 +232,7 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
             )}
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "1rem",
-            }}
-          >
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>Số lượng</label>
               <span style={valueStyle}>{product.quantity}</span>
@@ -270,9 +245,7 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
 
           <div style={fieldStyle}>
             <label style={labelStyle}>Danh mục</label>
-            <span
-              style={{ ...badgeStyle, background: "#edf2f7", color: "#4a5568" }}
-            >
+            <span style={{ ...badgeStyle, background: "#edf2f7", color: "#4a5568" }}>
               {product.category?.name || "Chưa phân loại"}
             </span>
           </div>
