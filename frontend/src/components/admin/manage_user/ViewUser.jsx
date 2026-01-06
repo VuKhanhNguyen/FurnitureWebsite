@@ -114,8 +114,24 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
 
   return (
     <div style={containerStyle}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", paddingBottom: "1rem", borderBottom: "2px solid #e2e8f0" }}>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "2rem",
+          paddingBottom: "1rem",
+          borderBottom: "2px solid #e2e8f0",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "1.5rem",
+            fontWeight: 700,
+            color: "#2d3748",
+            margin: 0,
+          }}
+        >
           Chi Tiết Người Dùng
         </h2>
         <button
@@ -134,26 +150,54 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "2rem", marginBottom: "2rem" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "200px 1fr",
+          gap: "2rem",
+          marginBottom: "2rem",
+        }}
+      >
         <div style={{ display: "flex", justifyContent: "center" }}>
           {user.avatar ? (
             <img
               src={resolveAvatarSrc(user.avatar)}
               alt={user.username}
-              style={{ width: "150px", height: "150px", objectFit: "cover", borderRadius: "50%", border: "4px solid #e2e8f0" }}
+              style={{
+                width: "150px",
+                height: "150px",
+                objectFit: "cover",
+                borderRadius: "50%",
+                border: "4px solid #e2e8f0",
+              }}
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div style={{ width: "150px", height: "150px", background: "#f7fafc", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "4px solid #e2e8f0" }}>
+            <div
+              style={{
+                width: "150px",
+                height: "150px",
+                background: "#f7fafc",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "4px solid #e2e8f0",
+              }}
+            >
               <FaUser style={{ fontSize: "4rem", color: "#a0aec0" }} />
             </div>
           )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+        >
           <div style={fieldStyle}>
             <label style={labelStyle}>Tên đăng nhập</label>
-            <span style={{ ...valueStyle, fontSize: "1.25rem", fontWeight: 700 }}>
+            <span
+              style={{ ...valueStyle, fontSize: "1.25rem", fontWeight: 700 }}
+            >
               {user.username}
             </span>
           </div>
@@ -163,10 +207,18 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
             <span style={valueStyle}>{user.email}</span>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1rem",
+            }}
+          >
             <div style={fieldStyle}>
               <label style={labelStyle}>Họ tên</label>
-              <span style={valueStyle}>{user.full_name || "Chưa cập nhật"}</span>
+              <span style={valueStyle}>
+                {user.full_name || "Chưa cập nhật"}
+              </span>
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>Số điện thoại</label>
@@ -174,24 +226,34 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1rem",
+            }}
+          >
             <div style={fieldStyle}>
               <label style={labelStyle}>Vai trò</label>
-              <span style={{
-                ...badgeStyle,
-                background: user.role === "admin" ? "#feebc8" : "#e2e8f0",
-                color: user.role === "admin" ? "#7c2d12" : "#4a5568",
-              }}>
+              <span
+                style={{
+                  ...badgeStyle,
+                  background: user.role === "admin" ? "#feebc8" : "#e2e8f0",
+                  color: user.role === "admin" ? "#7c2d12" : "#4a5568",
+                }}
+              >
                 {user.role === "admin" ? "Quản trị viên" : "Khách hàng"}
               </span>
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>Trạng thái</label>
-              <span style={{
-                ...badgeStyle,
-                background: user.status === "active" ? "#c6f6d5" : "#fed7d7",
-                color: user.status === "active" ? "#22543d" : "#742a2a",
-              }}>
+              <span
+                style={{
+                  ...badgeStyle,
+                  background: user.status === "active" ? "#c6f6d5" : "#fed7d7",
+                  color: user.status === "active" ? "#22543d" : "#742a2a",
+                }}
+              >
                 {user.status === "active" ? "Hoạt động" : "Bị cấm"}
               </span>
             </div>
@@ -200,13 +262,21 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
           <div style={fieldStyle}>
             <label style={labelStyle}>Ngày tạo</label>
             <span style={valueStyle}>
-              {new Date(user.created_at).toLocaleDateString('vi-VN')}
+              {new Date(user.created_at).toLocaleDateString("vi-VN")}
             </span>
           </div>
         </div>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem", paddingTop: "1.5rem", borderTop: "2px solid #e2e8f0" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "1rem",
+          paddingTop: "1.5rem",
+          borderTop: "2px solid #e2e8f0",
+        }}
+      >
         <button
           onClick={onClose}
           style={{ ...btnStyle, background: "#e2e8f0", color: "#4a5568" }}
