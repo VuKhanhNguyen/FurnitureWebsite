@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import ProductHeader from "../manage_product/ProductHeader";
 import ProductControls from "../manage_product/ProductControls";
 import ProductTable from "../manage_product/ProductTable";
@@ -7,12 +7,10 @@ import AddProduct from "../manage_product/AddProduct";
 import EditProduct from "../manage_product/EditProduct";
 import ViewProduct from "../manage_product/ViewProduct";
 import productService from "../../../services/productService";
-import categoryService from "../../../services/categoryService";
 import "./ManageProduct.css";
 
 const ManageProduct = () => {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -22,10 +20,11 @@ const ManageProduct = () => {
   const [editingProductId, setEditingProductId] = useState(null);
   const [viewingProductId, setViewingProductId] = useState(null);
 
+  const ITEMS_PER_PAGE = 5;
+
   // Lấy dữ liệu từ API
   useEffect(() => {
     fetchProducts();
-    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -38,16 +37,6 @@ const ManageProduct = () => {
       setProducts([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const data = await categoryService.getAllCategories();
-      setCategories(data || []);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh mục:", error);
-      setCategories([]);
     }
   };
 
@@ -84,9 +73,9 @@ const ManageProduct = () => {
     setEditingProductId(id);
   };
 
-  const handleSubmitEdit = async (productData) => {
+  const handleSubmitEdit = async (productData, imageFile) => {
     try {
-      await productService.updateProduct(editingProductId, productData);
+      await productService.updateProduct(editingProductId, productData, imageFile);
       setEditingProductId(null);
       fetchProducts();
       alert("Cập nhật sản phẩm thành công!");
@@ -112,68 +101,29 @@ const ManageProduct = () => {
     }
   };
 
-  const normalizeText = (value) => {
-    return String(value || "")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/đ/g, "d")
-      .replace(/Đ/g, "d")
-      .toLowerCase()
-      .trim();
-  };
+  const filteredProducts = products.filter((product) => {
+    const matchSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchCategory = !categoryFilter || product.category === categoryFilter;
+    const matchStatus = !statusFilter || product.status === statusFilter;
+    return matchSearch && matchCategory && matchStatus;
+  });
 
-  const pageSize = 7;
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
-  const filteredProducts = useMemo(() => {
-    return (products || []).filter((product) => {
-      const matchSearch = normalizeText(product?.name).includes(
-        normalizeText(searchTerm)
-      );
-      const selectedCategoryId = categoryFilter ? Number(categoryFilter) : null;
-      const productCategoryId =
-        product?.category_id ?? product?.category?.id ?? null;
-      const matchCategory =
-        !selectedCategoryId || productCategoryId === selectedCategoryId;
-
-      const qty = Number(product?.quantity ?? 0);
-      const matchStatus =
-        !statusFilter ||
-        (statusFilter === "in_stock"
-          ? qty > 0
-          : statusFilter === "out_of_stock"
-          ? qty <= 0
-          : true);
-      return matchSearch && matchCategory && matchStatus;
-    });
-  }, [products, searchTerm, categoryFilter, statusFilter]);
-
-  const totalPages = useMemo(() => {
-    return Math.max(1, Math.ceil(filteredProducts.length / pageSize));
-  }, [filteredProducts.length]);
-
+  // Reset to page 1 when filters change
   useEffect(() => {
-    // Reset to first page when filters/search change
     setCurrentPage(1);
   }, [searchTerm, categoryFilter, statusFilter]);
-
-  useEffect(() => {
-    // Clamp currentPage when data shrinks
-    setCurrentPage((p) => Math.min(Math.max(1, p), totalPages));
-  }, [totalPages]);
-
-  const pagedProducts = useMemo(() => {
-    const safePage = Math.min(Math.max(1, currentPage), totalPages);
-    const start = (safePage - 1) * pageSize;
-    return filteredProducts.slice(start, start + pageSize);
-  }, [filteredProducts, currentPage, totalPages]);
 
   if (loading) {
     return (
       <div className="manage-product">
         <div style={{ textAlign: "center", padding: "3rem" }}>
-          <p style={{ fontSize: "1.2rem", color: "#667eea" }}>
-            Đang tải dữ liệu...
-          </p>
+          <p style={{ fontSize: "1.2rem", color: "#667eea" }}>Đang tải dữ liệu...</p>
         </div>
       </div>
     );
@@ -190,8 +140,8 @@ const ManageProduct = () => {
   if (viewingProductId) {
     return (
       <div className="manage-product">
-        <ViewProduct
-          productId={viewingProductId}
+        <ViewProduct 
+          productId={viewingProductId} 
           onClose={handleCloseView}
           onEdit={handleEditProduct}
           onDelete={handleDeleteProduct}
@@ -218,23 +168,22 @@ const ManageProduct = () => {
       <ProductControls
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        categories={categories}
-        categoryFilter={categoryFilter}
         onCategoryChange={setCategoryFilter}
-        statusFilter={statusFilter}
         onStatusChange={setStatusFilter}
       />
       <ProductTable
-        products={pagedProducts}
+        products={currentProducts}
         onView={handleViewProduct}
         onEdit={handleEditProduct}
         onDelete={handleDeleteProduct}
       />
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

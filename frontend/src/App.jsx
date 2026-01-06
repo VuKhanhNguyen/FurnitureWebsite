@@ -20,6 +20,7 @@ import Profile from "./components/pages/Profile/Profile";
 
 import DashBoard from "./components/admin/pages/DashBoard";
 import ManageProduct from "./components/admin/pages/ManageProduct";
+import ManageUser from "./components/admin/pages/ManageUser";
 import AdminLayout from "./components/admin/commons/AdminLayout";
 import BuyingHistoryPage from "./components/BuyingHistory/BuyingHistoryPage";
 import OrderDetail from "./components/BuyingHistory/OrderDetail";
@@ -182,6 +183,7 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashBoard />} />
           <Route path="/admin/product" element={<ManageProduct />} />
+          <Route path="/admin/user" element={<ManageUser />} />
         </Route>
       </Routes>
     </Router>
