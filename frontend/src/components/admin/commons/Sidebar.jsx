@@ -34,7 +34,7 @@ const AppSidebar = ({
           icon={collapsed ? <FaAngleDoubleRight /> : <FaAngleDoubleLeft />}
           onClick={handleCollapsedChange}
         >
-          {!collapsed && <strong>Pro Sidebar</strong>}
+          {!collapsed && <strong>Admin Panel</strong>}
         </MenuItem>
       </Menu>
 
@@ -51,17 +51,9 @@ const AppSidebar = ({
           Quản lý sản phẩm
         </MenuItem>
 
-        <SubMenu label="With Suffix" icon={<FaRegLaughWink />}>
-          <MenuItem component={<Link to="/sub1" />}>Submenu 1</MenuItem>
-          <MenuItem component={<Link to="/sub2" />}>Submenu 2</MenuItem>
-          <MenuItem component={<Link to="/sub3" />}>Submenu 3</MenuItem>
-        </SubMenu>
+        <MenuItem icon={<FaRegLaughWink />}>Quản lý người dùng</MenuItem>
 
-        <SubMenu label="With Prefix" icon={<FaHeart />}>
-          <MenuItem component={<Link to="/pre1" />}>Submenu 1</MenuItem>
-          <MenuItem component={<Link to="/pre2" />}>Submenu 2</MenuItem>
-          <MenuItem component={<Link to="/pre3" />}>Submenu 3</MenuItem>
-        </SubMenu>
+        <MenuItem icon={<FaHeart />}>Quản lý đơn hàng</MenuItem>
       </Menu>
 
       {/* FOOTER */}

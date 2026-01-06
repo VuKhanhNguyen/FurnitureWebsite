@@ -17,7 +17,7 @@
 
 .footer-copyright {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #e2e8f0;
   display: flex;
   align-items: center;
@@ -36,7 +36,7 @@
 }
 
 .footer-link {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #cbd5e0;
   text-decoration: none;
   font-weight: 500;
@@ -70,7 +70,7 @@
   color: #e2e8f0;
   transition: all 0.3s ease;
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 }
 
 .footer-social-link:hover {

@@ -47,11 +47,9 @@ async def create_product(
         image_path = None
         if file and file.filename:
             filename = f"{datetime.now().timestamp()}_{file.filename}"
-            # filepath = os.path.join(UPLOAD_DIR, filename)
             filepath = UPLOAD_DIR / filename
             with open(filepath, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
-#  image_path = f"uploads/products/{filename}"
             image_path = filename
         
         db_product = Product(
@@ -91,14 +89,55 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
     return DataResponse.custom_response(code="200", message="Delete product by id", data=None)
 
 @router.put("/{product_id}", description="Update a product by id", response_model=DataResponse[ProductSchema])
-def update_product(product_id: int, data: UpdateProductSchema, db: Session = Depends(get_db)):
-    product = db.query(Product).filter(Product.id == product_id).first()
-    if not product:
-        return DataResponse.custom_response(code="404", message="Product not found", data=None)
-    
-    update_data = data.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(product, key, value)
-    db.commit()
-    db.refresh(product)
-    return DataResponse.custom_response(code="200", message="Update product by id", data=product)
+async def update_product(
+    product_id: int,
+    name: str = Form(None),
+    description: str = Form(None),
+    short_description: str = Form(None),
+    price: float = Form(None),
+    sale_price: float = Form(None),
+    quantity: int = Form(None),
+    tags: str = Form(None),
+    category_id: Optional[int] = Form(None),
+    file: UploadFile = File(None),
+    db: Session = Depends(get_db)
+):
+    try:
+        product = db.query(Product).filter(Product.id == product_id).first()
+        if not product:
+            return DataResponse.custom_response(code="404", message="Product not found", data=None)
+        
+        # Update fields if provided
+        if name is not None:
+            product.name = name
+        if description is not None:
+            product.description = description
+        if short_description is not None:
+            product.short_description = short_description
+        if price is not None:
+            product.price = price
+        if sale_price is not None:
+            if sale_price > 0 and price and sale_price >= price:
+                raise HTTPException(status_code=400, detail="Giá sale phải nhỏ hơn giá gốc")
+            product.sale_price = sale_price
+        if quantity is not None:
+            product.quantity = quantity
+        if tags is not None:
+            product.tags = tags
+        if category_id is not None:
+            product.category_id = category_id
+        
+        # Handle image upload
+        if file and file.filename:
+            filename = f"{datetime.now().timestamp()}_{file.filename}"
+            filepath = UPLOAD_DIR / filename
+            with open(filepath, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            product.image = filename
+        
+        db.commit()
+        db.refresh(product)
+        return DataResponse.custom_response(code="200", message="Update product by id", data=product)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
