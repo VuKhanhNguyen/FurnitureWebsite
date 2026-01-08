@@ -16,6 +16,10 @@ from pathlib import Path
 
 router = APIRouter()
 
+
+def require_authenticated_user(current_user: User = Depends(authenticate)) -> User:
+    return current_user
+
 # Lưu avatar vào thư mục static của frontend
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 UPLOAD_DIR = PROJECT_ROOT / "frontend" / "public" / "uploads" / "avatars"
@@ -23,7 +27,10 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 # Admin CRUD operations
 @router.get("/users", tags=["users"], description="Get all users", response_model=DataResponse[list[UserSchema]])
-async def get_users(db: Session = Depends(get_db)):
+async def get_users(
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_authenticated_user),
+):
     users = db.query(User).filter(User.deleted_at == None).all()
     return DataResponse.custom_response(code="200", message="get all users", data=users)
 
@@ -36,7 +43,8 @@ async def create_user(
     phone: str = Form(""),
     role: str = Form("customer"),
     file: UploadFile = File(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_authenticated_user),
 ):
     try:
         # Check if user exists
@@ -87,7 +95,11 @@ async def create_user(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/users/{user_id}", tags=["users"], description="Get user by id", response_model=DataResponse[UserSchema])
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_authenticated_user),
+):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return DataResponse.custom_response(code="404", message="User not found", data=None)
@@ -103,7 +115,8 @@ async def update_user(
     role: str = Form(None),
     status: str = Form(None),
     file: UploadFile = File(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_authenticated_user),
 ):
     try:
         user = db.query(User).filter(User.id == user_id).first()
@@ -144,7 +157,11 @@ async def update_user(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.delete("/users/{user_id}", tags=["users"], description="Delete user by id", response_model=DataResponse[UserSchema])
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    _current_user: User = Depends(require_authenticated_user),
+):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return DataResponse.custom_response(code="404", message="User not found", data=None)
