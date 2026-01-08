@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from datetime import date
+from datetime import date, datetime
 
 from app.db.base import get_db
 from app.middleware.authenticate import authenticate
@@ -117,10 +117,12 @@ def get_user_orders(
     query = db.query(Order).filter(Order.user_id == current_user.id)
     
     if status:
-        if status == 'history':
-             query = query.filter(Order.status.in_(['delivered', 'cancelled', 'shipped']))
-        elif status == 'status':
-             query = query.filter(Order.status.in_(['pending', 'processing']))
+        if status == "history":
+            # Only show completed purchases in history
+            query = query.filter(Order.status == "delivered", Order.payment_status == "paid")
+        elif status == "status":
+            # Everything else stays in the status tab (including shipped/cancelled)
+            query = query.filter(~((Order.status == "delivered") & (Order.payment_status == "paid")))
         # else: ignore or exact match? adhering to current logic
         
     orders = query.order_by(Order.order_date.desc()).all()
@@ -145,4 +147,34 @@ def get_order_detail(
         code="200", 
         message="Order detail fetched successfully", 
         data=OrderResponse.model_validate(order)
+    )
+
+
+@router.put("/orders/{order_id}/cancel", response_model=DataResponse)
+def cancel_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(authenticate),
+):
+    order = (
+        db.query(Order)
+        .filter(Order.id == order_id, Order.user_id == current_user.id)
+        .first()
+    )
+    if not order:
+        raise HTTPException(status_code=404, detail="Đơn hàng không tồn tại")
+
+    if order.status not in ["pending", "processing"]:
+        raise HTTPException(status_code=400, detail="Đơn hàng không thể hủy ở trạng thái hiện tại")
+
+    order.status = "cancelled"
+    order.cancelled_at = datetime.now()
+
+    db.commit()
+    db.refresh(order)
+
+    return DataResponse(
+        code="200",
+        message="Order cancelled successfully",
+        data=OrderResponse.model_validate(order),
     )

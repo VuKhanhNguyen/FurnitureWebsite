@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../assets/css/auth.css";
 import bg from "../../assets/imgs/bg.jpg";
@@ -18,6 +18,43 @@ const ForgotPassword = () => {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
+  const OTP_TTL_MS = 10 * 60 * 1000;
+  const [otpExpiresAt, setOtpExpiresAt] = useState(null);
+  const [remainingMs, setRemainingMs] = useState(OTP_TTL_MS);
+
+  const isOtpExpired = useMemo(() => {
+    return step === 2 && remainingMs <= 0;
+  }, [step, remainingMs]);
+
+  const formatRemaining = (ms) => {
+    const clamped = Math.max(0, ms);
+    const totalSeconds = Math.floor(clamped / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const mm = String(minutes).padStart(2, "0");
+    const ss = String(seconds).padStart(2, "0");
+    return `${mm}:${ss}`;
+  };
+
+  useEffect(() => {
+    if (step !== 2 || !otpExpiresAt) return;
+
+    const tick = () => {
+      const next = Math.max(0, otpExpiresAt - Date.now());
+      setRemainingMs(next);
+      if (next <= 0) {
+        setError("Mã xác nhận đã hết hạn. Vui lòng gửi lại mã mới.");
+        setMessage("");
+        setStep(1);
+        setOtpExpiresAt(null);
+      }
+    };
+
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [step, otpExpiresAt]);
+
   const handleSendCode = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -33,6 +70,8 @@ const ForgotPassword = () => {
       if (data.code === "200") {
         setMessage("Mã xác nhận đã được gửi! Vui lòng kiểm tra email.");
         setStep(2);
+        setOtpExpiresAt(Date.now() + OTP_TTL_MS);
+        setRemainingMs(OTP_TTL_MS);
       } else {
         setError(data.message || "Có lỗi xảy ra.");
       }
@@ -45,6 +84,10 @@ const ForgotPassword = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
+    if (isOtpExpired) {
+      setError("Mã xác nhận đã hết hạn. Vui lòng gửi lại mã mới.");
+      return;
+    }
     setPasswordError("");
     setConfirmPasswordError("");
     if (newPassword.length < 8) {
@@ -110,6 +153,11 @@ const ForgotPassword = () => {
       <div className="form-group">
         <label className="form-label" htmlFor="code">
           Mã xác nhận (OTP)
+          {otpExpiresAt && (
+            <span style={{ marginLeft: 10, fontSize: 13, color: "#555" }}>
+              Còn lại: {formatRemaining(remainingMs)}
+            </span>
+          )}
         </label>
         <input
           type="text"
@@ -181,7 +229,11 @@ const ForgotPassword = () => {
         )}
       </div>
 
-      <button type="submit" className="auth-button" disabled={loading}>
+      <button
+        type="submit"
+        className="auth-button"
+        disabled={loading || isOtpExpired}
+      >
         {loading ? "Đang xử lý..." : "Đặt lại mật khẩu"}
       </button>
     </form>

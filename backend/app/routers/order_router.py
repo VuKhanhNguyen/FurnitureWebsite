@@ -131,10 +131,20 @@ async def update_order_status(
             return DataResponse.custom_response(code="404", message="Order not found", data=None)
         
         print(f"Updating order {order_id} status from {order.status} to {status}")
-        
+
+        now = datetime.now()
         order.status = status
-        if status == "delivered":
+
+        # Record timestamps per status (overwrite with latest transition time)
+        if status == "processing":
+            order.processing_at = now
+        elif status == "shipped":
+            order.shipped_at = now
+        elif status == "delivered":
+            order.delivered_at = now
             order.payment_status = "paid"
+        elif status == "cancelled":
+            order.cancelled_at = now
         
         db.commit()
         db.refresh(order)
@@ -146,6 +156,47 @@ async def update_order_status(
         })
     except Exception as e:
         print(f"Error updating order status: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put(
+    "/orders/{order_id}/payment-status",
+    tags=["orders"],
+    description="Update payment status",
+)
+async def update_payment_status(
+    order_id: int,
+    payment_status: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        order = db.query(Order).filter(Order.id == order_id).first()
+        if not order:
+            return DataResponse.custom_response(code="404", message="Order not found", data=None)
+
+        now = datetime.now()
+        order.payment_status = payment_status
+        if payment_status == "paid":
+            order.paid_at = now
+        else:
+            order.paid_at = None
+
+        db.commit()
+        db.refresh(order)
+
+        return DataResponse.custom_response(
+            code="200",
+            message="Update payment status",
+            data={
+                "id": order.id,
+                "payment_status": order.payment_status,
+                "paid_at": order.paid_at,
+            },
+        )
+    except Exception as e:
+        print(f"Error updating payment status: {str(e)}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

@@ -25,6 +25,11 @@ class Order(BaseModel):
         nullable=False,
     )
 
+    processing_at = Column(DateTime, nullable=True)
+    shipped_at = Column(DateTime, nullable=True)
+    delivered_at = Column(DateTime, nullable=True)
+    cancelled_at = Column(DateTime, nullable=True)
+
     subtotal_amount = Column(Float, default=0.0, nullable=False)
     discount_amount = Column(Float, default=0.0, nullable=False)
     shipping_fee = Column(Float, default=0.0, nullable=False)

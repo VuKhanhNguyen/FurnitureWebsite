@@ -30,12 +30,11 @@ const OrderDetail = ({ showOffcanvas, setShowOffcanvas }) => {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await orderService.getOrderById(id);
-        if (res && res.data) {
-          setOrder(res.data);
-        }
+        const data = await orderService.getMyOrderById(id);
+        setOrder(data || null);
       } catch (error) {
         console.error("Failed to fetch order", error);
+        setOrder(null);
       } finally {
         setLoading(false);
       }

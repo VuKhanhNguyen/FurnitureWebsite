@@ -11,24 +11,32 @@ const BuyingHistoryPage = ({ showOffcanvas, setShowOffcanvas }) => {
   const [activeTab, setActiveTab] = useState("status"); // 'status' or 'history'
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     fetchOrders();
   }, [activeTab]);
 
+  useEffect(() => {
+    setStatusFilter("");
+  }, [activeTab]);
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await orderService.getOrders(activeTab);
-      if (res && res.data) {
-        setOrders(res.data);
-      }
+      const data = await orderService.getOrders(activeTab);
+      setOrders(data || []);
     } catch (error) {
       console.error("Failed to fetch orders", error);
+      setOrders([]);
     } finally {
       setLoading(false);
     }
   };
+
+  const displayedOrders = statusFilter
+    ? (orders || []).filter((o) => String(o?.status || "") === statusFilter)
+    : orders;
 
   return (
     <>
@@ -107,6 +115,22 @@ const BuyingHistoryPage = ({ showOffcanvas, setShowOffcanvas }) => {
                   </ul>
                 </div>
 
+                <div className="d-flex justify-content-end mb-3">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="form-select fs-4"
+                    style={{ maxWidth: 260 }}
+                  >
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="pending">Chờ xử lý</option>
+                    <option value="processing">Đang xử lý</option>
+                    <option value="shipped">Đang giao</option>
+                    <option value="delivered">Hoàn thành</option>
+                    <option value="cancelled">Đã hủy</option>
+                  </select>
+                </div>
+
                 <div className="tab-content">
                   {loading ? (
                     <div className="text-center py-5">
@@ -118,7 +142,11 @@ const BuyingHistoryPage = ({ showOffcanvas, setShowOffcanvas }) => {
                       </div>
                     </div>
                   ) : (
-                    <OrderList orders={orders} type={activeTab} />
+                    <OrderList
+                      orders={displayedOrders}
+                      type={activeTab}
+                      onChanged={fetchOrders}
+                    />
                   )}
                 </div>
               </div>

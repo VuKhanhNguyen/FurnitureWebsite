@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import orderService from "../../services/orderService";
 
-const OrderList = ({ orders, type }) => {
+const OrderList = ({ orders, type, onChanged }) => {
   if (!orders || orders.length === 0) {
     return (
       <div className="text-center py-5">
@@ -21,18 +22,20 @@ const OrderList = ({ orders, type }) => {
     switch (status) {
       case "delivered":
       case "completed":
-        return <span className="badge bg-success">Hoàn thành</span>;
+        return <span className="badge bg-success fs-4">Hoàn thành</span>;
       case "pending":
       case "unpaid":
-        return <span className="badge bg-warning text-dark">Chờ xử lý</span>;
+        return (
+          <span className="badge bg-warning text-dark fs-4">Chờ xử lý</span>
+        );
       case "processing":
-        return <span className="badge bg-primary">Đang xử lý</span>;
+        return <span className="badge bg-primary fs-4">Đang xử lý</span>;
       case "shipped":
-        return <span className="badge bg-info text-dark">Đang giao</span>;
+        return <span className="badge bg-info text-dark fs-4">Đang giao</span>;
       case "cancelled":
-        return <span className="badge bg-danger">Đã hủy</span>;
+        return <span className="badge bg-danger fs-4">Đã hủy</span>;
       default:
-        return <span className="badge bg-secondary">{status}</span>;
+        return <span className="badge bg-secondary fs-4">{status}</span>;
     }
   };
 
@@ -119,9 +122,34 @@ const OrderList = ({ orders, type }) => {
                 </span>
               </div>
               <div>
+                {type === "status" &&
+                  (order.status === "pending" ||
+                    order.status === "processing") && (
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger btn-sm fs-4 me-2"
+                      onClick={async () => {
+                        const ok = window.confirm(
+                          `Bạn có chắc muốn hủy đơn #${order.id} không?`
+                        );
+                        if (!ok) return;
+                        try {
+                          await orderService.cancelMyOrder(order.id);
+                          onChanged?.();
+                        } catch (error) {
+                          console.error("Failed to cancel order", error);
+                          alert(
+                            "Hủy đơn thất bại. Vui lòng thử lại hoặc kiểm tra trạng thái đơn."
+                          );
+                        }
+                      }}
+                    >
+                      Hủy đơn
+                    </button>
+                  )}
                 <Link
                   to={`/order-detail/${order.id}`}
-                  className="btn btn-outline-primary btn-sm"
+                  className="btn btn-outline-primary btn-sm fs-4"
                 >
                   Xem chi tiết
                 </Link>

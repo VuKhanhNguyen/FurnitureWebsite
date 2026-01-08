@@ -54,13 +54,27 @@ const ManageOrder = () => {
     }
   };
 
+  const handleUpdatePaymentStatus = async (orderId, paymentStatus) => {
+    try {
+      await orderService.updatePaymentStatus(orderId, paymentStatus);
+      fetchOrders();
+      alert("Cập nhật trạng thái thanh toán thành công!");
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái thanh toán:", error);
+      alert("Cập nhật trạng thái thanh toán thất bại!");
+    }
+  };
+
   const filteredOrders = orders.filter((order) => {
-    const matchSearch = 
+    const matchSearch =
       order.id.toString().includes(searchTerm) ||
-      order.shipping_fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.shipping_fullname
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       order.shipping_email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchStatus = !statusFilter || order.status === statusFilter;
-    const matchPaymentStatus = !paymentStatusFilter || order.payment_status === paymentStatusFilter;
+    const matchPaymentStatus =
+      !paymentStatusFilter || order.payment_status === paymentStatusFilter;
     return matchSearch && matchStatus && matchPaymentStatus;
   });
 
@@ -90,10 +104,7 @@ const ManageOrder = () => {
   if (viewingOrderId) {
     return (
       <div className="manage-order">
-        <ViewOrder 
-          orderId={viewingOrderId} 
-          onClose={handleCloseView}
-        />
+        <ViewOrder orderId={viewingOrderId} onClose={handleCloseView} />
       </div>
     );
   }
@@ -111,6 +122,7 @@ const ManageOrder = () => {
         orders={currentOrders}
         onView={handleViewOrder}
         onUpdateStatus={handleUpdateStatus}
+        onUpdatePaymentStatus={handleUpdatePaymentStatus}
       />
       {totalPages > 1 && (
         <Pagination
