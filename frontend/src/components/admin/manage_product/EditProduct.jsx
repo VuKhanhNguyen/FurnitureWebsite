@@ -54,8 +54,8 @@ const EditProduct = ({ productId, onSubmit, onCancel }) => {
           typeof data.image === "string" && data.image.startsWith("http")
             ? data.image
             : typeof data.image === "string" && data.image.startsWith("/")
-            ? data.image
-            : `/uploads/products/${data.image}`;
+              ? data.image
+              : `/uploads/products/${data.image}`;
         setImagePreview(url);
       } else {
         setImagePreview(null);

@@ -33,79 +33,87 @@ def _get_unit_price(product) -> float:
 
 @router.post("/", response_model=DataResponse)
 def create_order(payload: CreateOrderRequest, db: Session = Depends(get_db), current_user=Depends(authenticate)):
-    cart = db.query(Cart).filter(Cart.user_id == current_user.id).first()
-    if not cart or not cart.items or len(cart.items) == 0:
-        raise HTTPException(status_code=400, detail="Cart is empty")
+    try:
+        cart = db.query(Cart).filter(Cart.user_id == current_user.id).first()
+        if not cart or not cart.items or len(cart.items) == 0:
+            raise HTTPException(status_code=400, detail="Cart is empty")
 
-    subtotal = 0.0
-    for item in cart.items:
-        if not item.product:
-            continue
-        unit = _get_unit_price(item.product)
-        subtotal += float(unit) * int(item.quantity)
+        subtotal = 0.0
+        for item in cart.items:
+            if not item.product:
+                continue
+            unit = _get_unit_price(item.product)
+            subtotal += float(unit) * int(item.quantity)
 
-    discount_amount = 0.0
-    normalized_coupon = _normalize_code(payload.coupon_code) if payload.coupon_code else ""
-    if normalized_coupon:
-        coupon = db.query(Coupon).filter(Coupon.code == normalized_coupon).first()
-        if not coupon:
-            raise HTTPException(status_code=404, detail="Không tìm thấy mã giảm giá")
-        if _is_expired(coupon):
-            raise HTTPException(status_code=400, detail="Mã giảm giá đã hết hạn")
-        if subtotal < float(coupon.min_order_value or 0):
-            raise HTTPException(status_code=400, detail="Giá trị đơn hàng không đủ điều kiện")
+        discount_amount = 0.0
+        normalized_coupon = _normalize_code(payload.coupon_code) if payload.coupon_code else ""
+        if normalized_coupon:
+            coupon = db.query(Coupon).filter(Coupon.code == normalized_coupon).first()
+            if not coupon:
+                raise HTTPException(status_code=404, detail="Không tìm thấy mã giảm giá")
+            if _is_expired(coupon):
+                raise HTTPException(status_code=400, detail="Mã giảm giá đã hết hạn")
+            if subtotal < float(coupon.min_order_value or 0):
+                raise HTTPException(status_code=400, detail="Giá trị đơn hàng không đủ điều kiện")
 
-        if coupon.discount_type == "percent":
-            discount_amount = subtotal * (float(coupon.discount_value or 0) / 100.0)
-        elif coupon.discount_type == "fixed":
-            discount_amount = float(coupon.discount_value or 0)
+            if coupon.discount_type == "percent":
+                discount_amount = subtotal * (float(coupon.discount_value or 0) / 100.0)
+            elif coupon.discount_type == "fixed":
+                discount_amount = float(coupon.discount_value or 0)
 
-        discount_amount = max(0.0, min(discount_amount, subtotal))
+            discount_amount = max(0.0, min(discount_amount, subtotal))
 
-    shipping_fee = float(payload.shipping_fee or 0.0)
-    total_amount = max(0.0, subtotal - discount_amount) + shipping_fee
+        shipping_fee = float(payload.shipping_fee or 0.0)
+        total_amount = max(0.0, subtotal - discount_amount) + shipping_fee
 
-    order = Order(
-        user_id=current_user.id,
-        status="pending",
-        subtotal_amount=subtotal,
-        discount_amount=discount_amount,
-        shipping_fee=shipping_fee,
-        total_amount=total_amount,
-        payment_method=payload.payment_method,
-        payment_status="unpaid",
-        note=payload.note,
-        coupon_code=(normalized_coupon if normalized_coupon else None),
-        shipping_fullname=payload.shipping_fullname,
-        shipping_phone=payload.shipping_phone,
-        shipping_address=payload.shipping_address,
-        shipping_city=payload.shipping_city,
-        shipping_email=payload.shipping_email,
-    )
-
-    db.add(order)
-    db.flush()  # ensures order.id
-
-    for item in cart.items:
-        if not item.product:
-            continue
-        db.add(
-            OrderItem(
-                order_id=order.id,
-                product_id=item.product_id,
-                quantity=item.quantity,
-                price=float(_get_unit_price(item.product)),
-            )
+        order = Order(
+            user_id=current_user.id,
+            status="pending",
+            subtotal_amount=subtotal,
+            discount_amount=discount_amount,
+            shipping_fee=shipping_fee,
+            total_amount=total_amount,
+            payment_method=payload.payment_method,
+            payment_status="unpaid",
+            note=payload.note,
+            coupon_code=(normalized_coupon if normalized_coupon else None),
+            shipping_fullname=payload.shipping_fullname,
+            shipping_phone=payload.shipping_phone,
+            shipping_address=payload.shipping_address,
+            shipping_city=payload.shipping_city,
+            shipping_email=payload.shipping_email,
         )
 
-    # Clear cart
-    for item in list(cart.items):
-        db.delete(item)
+        db.add(order)
+        db.flush()  # ensures order.id
 
-    db.commit()
-    db.refresh(order)
+        for item in cart.items:
+            if not item.product:
+                continue
+            db.add(
+                OrderItem(
+                    order_id=order.id,
+                    product_id=item.product_id,
+                    quantity=item.quantity,
+                    price=float(_get_unit_price(item.product)),
+                )
+            )
 
-    return DataResponse(code="200", message="Order created", data=OrderResponse.model_validate(order))
+        # Clear cart
+        for item in list(cart.items):
+            db.delete(item)
+
+        db.commit()
+        db.refresh(order)
+
+        return DataResponse(code="200", message="Order created", data=OrderResponse.model_validate(order))
+
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        import traceback
+        print(f"Error creating order: {str(e)}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Server Error: {str(e)}")
 
 
 @router.get("/orders", response_model=DataResponse[list[OrderResponse]])

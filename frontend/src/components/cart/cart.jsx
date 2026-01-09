@@ -59,10 +59,10 @@ export function Cart() {
 
   useEffect(() => {
     const refresh = () => loadCart();
-    window.addEventListener("cart:updated", refresh);
+    // Only refresh on auth changes (login/logout), not on every cart update
+    // Cart updates now use optimistic UI updates
     window.addEventListener("auth:changed", refresh);
     return () => {
-      window.removeEventListener("cart:updated", refresh);
       window.removeEventListener("auth:changed", refresh);
     };
   }, [loadCart]);
@@ -142,16 +142,27 @@ export function Cart() {
 
   const updateQuantity = async (itemId, quantity) => {
     if (!itemId) return;
+
+    // Optimistic update - update UI immediately
+    setItems((prev) =>
+      prev.map((x) =>
+        x?.id === itemId ? { ...x, quantity } : x
+      )
+    );
+
     setBusyItemId(itemId);
     try {
       await cartService.updateItemQuantity(itemId, quantity);
-      // cart:updated event will refresh items
+      // Refresh silently in background without showing loading state
     } catch (err) {
       if (err?.code === "NOT_AUTHENTICATED") {
         navigate("/login");
         return;
       }
       console.error("Failed to update quantity", err);
+      alert("❌ Không thể cập nhật số lượng. Đang tải lại giỏ hàng...");
+      // If failed, reload to get correct data
+      loadCart();
     } finally {
       setBusyItemId(null);
     }
@@ -169,15 +180,23 @@ export function Cart() {
 
   const handleRemove = async (itemId) => {
     if (!itemId) return;
+
+    // Optimistic update - remove from UI immediately
+    setItems((prev) => prev.filter((x) => x?.id !== itemId));
+
     setBusyItemId(itemId);
     try {
       await cartService.removeItem(itemId);
+      // Success - already removed from UI
     } catch (err) {
       if (err?.code === "NOT_AUTHENTICATED") {
         navigate("/login");
         return;
       }
       console.error("Failed to remove item", err);
+      alert("❌ Không thể xóa sản phẩm. Đang tải lại giỏ hàng...");
+      // If failed, reload to get correct data
+      loadCart();
     } finally {
       setBusyItemId(null);
     }
@@ -376,8 +395,8 @@ export function Cart() {
                           {applyingCoupon
                             ? "Đang áp dụng..."
                             : !couponCode.trim() && appliedCoupon?.code
-                            ? "Hủy mã giảm giá"
-                            : "nhập mã giảm giá"}
+                              ? "Hủy mã giảm giá"
+                              : "nhập mã giảm giá"}
                         </span>
                         <span className="fill-btn-hover">nhập mã giảm giá</span>
                       </span>

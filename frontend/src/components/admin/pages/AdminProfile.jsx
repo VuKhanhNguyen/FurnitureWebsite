@@ -157,9 +157,8 @@ const AdminProfile = () => {
 
                 {msg && (
                   <div
-                    className={`alert ${
-                      errorType === "success" ? "alert-success" : "alert-danger"
-                    } text-center mb-4`}
+                    className={`alert ${errorType === "success" ? "alert-success" : "alert-danger"
+                      } text-center mb-4`}
                     role="alert"
                   >
                     {msg}

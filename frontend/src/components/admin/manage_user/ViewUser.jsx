@@ -144,6 +144,7 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
             background: "#fed7d7",
             color: "#742a2a",
             fontSize: "1.2rem",
+            justifyContent: "center",
           }}
         >
           <FaTimes />

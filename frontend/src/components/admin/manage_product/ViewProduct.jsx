@@ -169,6 +169,9 @@ const ViewProduct = ({ productId, onClose, onEdit, onDelete }) => {
             background: "#fed7d7",
             color: "#742a2a",
             fontSize: "1.2rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <FaTimes />

@@ -5,9 +5,9 @@ import ProductCardQuickView from "./productCardQuickView";
 import wishlistService from "../../services/wishlistService";
 import cartService from "../../services/cartService";
 
-export function ProductCards({ product }) {
+export function ProductCards({ product, initialWishlisted }) {
   const [showQuickView, setShowQuickView] = useState(false);
-  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlisted, setWishlisted] = useState(!!initialWishlisted);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [cartLoading, setCartLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,12 +18,14 @@ export function ProductCards({ product }) {
   );
 
   useEffect(() => {
-    if (product?.id) {
+    if (initialWishlisted !== undefined) {
+      setWishlisted(initialWishlisted);
+    } else if (product?.id) {
       setWishlisted(wishlistService.isWishlisted(product.id));
     } else {
       setWishlisted(false);
     }
-  }, [product?.id]);
+  }, [product?.id, initialWishlisted]);
 
   useEffect(() => {
     const refresh = () => {
@@ -57,12 +59,14 @@ export function ProductCards({ product }) {
     setCartLoading(true);
     try {
       await cartService.addItem(product.id, 1);
+      alert("✅ Đã thêm sản phẩm vào giỏ hàng!");
     } catch (err) {
       if (err?.code === "NOT_AUTHENTICATED") {
         navigate("/login");
         return;
       }
       console.error("Failed to add to cart", err);
+      alert("❌ Không thể thêm vào giỏ hàng. Vui lòng thử lại!");
     } finally {
       setCartLoading(false);
     }
@@ -70,24 +74,42 @@ export function ProductCards({ product }) {
 
   const handleAddToWishlist = async (e) => {
     e.preventDefault();
-    if (!product?.id || wishlistLoading || wishlisted) return;
+    if (!product?.id) return;
+    // Don't block if loading, just debounce or allow optimistic update
+    if (wishlistLoading) return;
 
+    const previousState = wishlisted;
+    // Optimistic Update
+    setWishlisted(!previousState);
     setWishlistLoading(true);
+
     try {
-      await wishlistService.addToWishlist(product.id);
-      setWishlisted(true);
+      if (previousState) {
+        // Was true, so we are removing
+        await wishlistService.removeFromWishlistByProductId(product.id);
+      } else {
+        // Was false, so we are adding
+        await wishlistService.addToWishlist(product.id);
+      }
     } catch (err) {
-      if (err?.code === "NOT_AUTHENTICATED") {
-        navigate("/login");
-        return;
+      // Revert on error, UNLESS it's a specific "already done" error
+
+      const isAlreadyAdded = !previousState && err?.response?.data?.message === "Product already in wishlist";
+      const isAlreadyRemoved = previousState && err?.response?.status === 404;
+
+      if (isAlreadyAdded || isAlreadyRemoved) {
+        // It's actually fine, state is correct now
+        if (isAlreadyAdded) wishlistService.markWishlisted(product.id);
+        if (isAlreadyRemoved) wishlistService.unmarkWishlisted(product.id);
+      } else {
+        // Real error, revert
+        console.error("Failed to toggle wishlist", err);
+        setWishlisted(previousState);
+        alert("❌ Xảy ra lỗi. Vui lòng thử lại!");
+        if (err?.code === "NOT_AUTHENTICATED") {
+          navigate("/login");
+        }
       }
-      // Backend may return 400 when item already exists; treat as wishlisted
-      if (err?.response?.data?.message === "Product already in wishlist") {
-        wishlistService.markWishlisted(product.id);
-        setWishlisted(true);
-        return;
-      }
-      console.error("Failed to add to wishlist", err);
     } finally {
       setWishlistLoading(false);
     }
@@ -173,15 +195,17 @@ export function ProductCards({ product }) {
             >
               <path
                 d="M19.2041 2.63262C18.6402 1.97669 17.932 1.44916 17.1305 1.08804C16.329 0.726918 15.4541 0.54119 14.569 0.544237C13.0545 0.500151 11.58 1.01577 10.4489 1.98501C9.31782 1.01577 7.84334 0.500151 6.32883 0.544237C5.44368 0.54119 4.56885 0.726918 3.76735 1.08804C2.96585 1.44916 2.25764 1.97669 1.69374 2.63262C0.712132 3.77732 -0.314799 5.84986 0.366045 9.22751C1.45272 14.6213 9.60121 19.0476 9.94523 19.2288C10.0986 19.311 10.2713 19.3541 10.4469 19.3541C10.6224 19.3541 10.7951 19.311 10.9485 19.2288C11.2946 19.0436 19.4431 14.6173 20.5277 9.22751C21.2126 5.84986 20.1857 3.77732 19.2041 2.63262ZM18.5099 8.85122C17.7415 12.6646 12.1567 16.2116 10.4489 17.2196C8.04279 15.8234 3.09251 12.318 2.39312 8.85122C1.86472 6.23109 2.5878 4.70912 3.28821 3.89317C3.65861 3.46353 4.12333 3.11801 4.64903 2.88141C5.17473 2.64481 5.74838 2.52299 6.32883 2.52468C6.94879 2.47998 7.57022 2.59049 8.13253 2.84542C8.69484 3.10036 9.17884 3.49102 9.53734 3.97932C9.62575 4.13571 9.75616 4.26645 9.915 4.3579C10.0738 4.44936 10.2553 4.49819 10.4404 4.4993C10.6256 4.50041 10.8076 4.45377 10.9676 4.36423C11.1276 4.27469 11.2598 4.14553 11.3502 3.99022C11.708 3.49811 12.193 3.10414 12.7575 2.84715C13.3219 2.59016 13.9463 2.47902 14.569 2.52468C15.1507 2.52196 15.7257 2.64329 16.2527 2.87993C16.7798 3.11656 17.2456 3.46262 17.6168 3.89317C18.3152 4.70912 19.0383 6.23109 18.5099 8.85122Z"
-                fill="white"
+                fill={wishlisted ? "#FF0000" : "transparent"}
+                stroke={wishlisted ? "none" : "#333333"}
+                strokeWidth="1.5"
               />
             </svg>
             <span className="product-tooltip">
               {wishlisted
                 ? "Đã thêm yêu thích"
                 : wishlistLoading
-                ? "Đang thêm..."
-                : "Thêm vào yêu thích"}
+                  ? "Đang thêm..."
+                  : "Thêm vào yêu thích"}
             </span>
           </button>
         </div>
