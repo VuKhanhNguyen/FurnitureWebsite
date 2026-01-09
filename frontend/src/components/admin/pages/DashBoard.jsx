@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUsers, FaBox, FaShoppingCart, FaTrophy } from "react-icons/fa";
+import { FaUsers, FaBox, FaShoppingCart, FaTrophy, FaDollarSign } from "react-icons/fa";
 import dashboardService from "../../../services/dashboardService";
 
 const DashBoard = () => {
@@ -7,6 +7,7 @@ const DashBoard = () => {
     total_products: 0,
     total_users: 0,
     total_orders: 0,
+    total_revenue: 0,
     top_products: []
   });
   const [loading, setLoading] = useState(true);
@@ -112,6 +113,18 @@ const DashBoard = () => {
               {stats.total_orders}
             </h3>
             <p style={{ color: "#718096", margin: 0, fontSize: "0.875rem" }}>Đơn hàng</p>
+          </div>
+        </div>
+
+        <div style={cardStyle}>
+          <div style={{ ...iconStyle, background: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" }}>
+            <FaDollarSign />
+          </div>
+          <div>
+            <h3 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
+              {formatCurrency(stats.total_revenue)}
+            </h3>
+            <p style={{ color: "#718096", margin: 0, fontSize: "0.875rem" }}>Doanh thu</p>
           </div>
         </div>
       </div>
