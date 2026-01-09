@@ -32,19 +32,19 @@ const AddUser = ({ onSubmit, onCancel }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (formData.username.length < 3) {
       newErrors.username = "Username phải có ít nhất 3 ký tự";
     }
-    
+
     if (formData.password.length < 6) {
       newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
     }
-    
+
     if (formData.password.length > 72) {
       newErrors.password = "Mật khẩu không được quá 72 ký tự";
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       newErrors.email = "Email không hợp lệ";
@@ -113,7 +113,7 @@ const AddUser = ({ onSubmit, onCancel }) => {
     <div style={containerStyle}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", paddingBottom: "1rem", borderBottom: "2px solid #e2e8f0" }}>
         <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>Thêm Người Dùng Mới</h2>
-        <button onClick={onCancel} style={{ ...btnStyle, width: "40px", height: "40px", padding: 0, background: "#fed7d7", color: "#742a2a", fontSize: "1.2rem" }}>
+        <button onClick={onCancel} style={{ ...btnStyle, width: "40px", height: "40px", padding: 0, background: "#fed7d7", color: "#742a2a", fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <FaTimes />
         </button>
       </div>

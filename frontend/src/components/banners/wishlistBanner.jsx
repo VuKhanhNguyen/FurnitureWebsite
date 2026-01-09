@@ -1,5 +1,7 @@
 import React from "react";
 import bg from "../../assets/imgs/breadcrumb-bg-furniture.jpg";
+import { Link } from "react-router-dom";
+
 export function WishListBanner() {
   return (
     <div className="breadcrumb__area theme-bg-1 p-relative z-index-11 pt-95 pb-95">
@@ -17,7 +19,7 @@ export function WishListBanner() {
                   <ul>
                     <li>
                       <span>
-                        <a href="index.html">Trang chủ</a>
+                        <Link to="/">Trang chủ</Link>
                       </span>
                     </li>
                     <li>
@@ -33,4 +35,5 @@ export function WishListBanner() {
     </div>
   );
 }
+
 export default WishListBanner;

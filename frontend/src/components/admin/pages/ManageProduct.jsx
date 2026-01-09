@@ -90,6 +90,11 @@ const ManageProduct = () => {
   };
 
   const handleDeleteProduct = async (id) => {
+    // Confirmation dialog to prevent accidental deletion
+    if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác!")) {
+      return;
+    }
+
     try {
       await productService.deleteProduct(id);
       setViewingProductId(null);
@@ -140,8 +145,8 @@ const ManageProduct = () => {
   if (viewingProductId) {
     return (
       <div className="manage-product">
-        <ViewProduct 
-          productId={viewingProductId} 
+        <ViewProduct
+          productId={viewingProductId}
           onClose={handleCloseView}
           onEdit={handleEditProduct}
           onDelete={handleDeleteProduct}

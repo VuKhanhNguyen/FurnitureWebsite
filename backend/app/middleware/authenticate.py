@@ -31,4 +31,13 @@ def authenticate(http_authorization_credentials=Depends(reusable_oauth), db: Ses
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Check if user has been soft deleted
+    if user.deleted_at is not None:
+        raise HTTPException(status_code=403, detail="Tài khoản đã bị xóa hoặc vô hiệu hóa")
+    
+    # Check if user is banned
+    if user.status == "banned":
+        raise HTTPException(status_code=403, detail="Tài khoản đã bị cấm")
+    
     return user
+

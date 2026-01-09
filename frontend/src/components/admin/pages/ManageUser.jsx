@@ -93,6 +93,11 @@ const ManageUser = () => {
   };
 
   const handleDeleteUser = async (id) => {
+    // Confirmation dialog to prevent accidental deletion
+    if (!window.confirm("Bạn có chắc chắn muốn xóa người dùng này không? Hành động này không thể hoàn tác!")) {
+      return;
+    }
+
     try {
       await userService.deleteUser(id);
       setViewingUserId(null);
@@ -148,8 +153,8 @@ const ManageUser = () => {
   if (viewingUserId) {
     return (
       <div style={{ padding: "2rem", background: "#f7fafc", minHeight: "100vh" }}>
-        <ViewUser 
-          userId={viewingUserId} 
+        <ViewUser
+          userId={viewingUserId}
           onClose={handleCloseView}
           onEdit={handleEditUser}
           onDelete={handleDeleteUser}

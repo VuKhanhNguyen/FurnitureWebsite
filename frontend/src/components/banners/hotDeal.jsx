@@ -1,8 +1,46 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import adDiscount from "../../assets/imgs/ad-discount.png";
 import adTimer from "../../assets/imgs/ad-timer.png";
 
 export function HotDeal() {
+  const [countdown, setCountdown] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  useEffect(() => {
+    const second = 1000;
+    const minute = second * 60;
+    const hour = minute * 60;
+    const day = hour * 24;
+
+    // Set target date to 7 days from now
+    const countDownDate = new Date().getTime() + (7 * day);
+
+    // Update countdown every second
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = countDownDate - now;
+
+      if (distance < 0) {
+        clearInterval(interval);
+        setCountdown({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      } else {
+        const days = Math.floor(distance / day);
+        const hours = Math.floor((distance % day) / hour);
+        const minutes = Math.floor((distance % hour) / minute);
+        const seconds = Math.floor((distance % minute) / second);
+
+        setCountdown({ days, hours, minutes, seconds });
+      }
+    }, 1000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="furniture-ad pb-100" style={{ marginTop: "0px" }}>
       <div className="container">
@@ -44,16 +82,16 @@ export function HotDeal() {
                 <div className="countdown-wrapper">
                   <ul>
                     <li>
-                      <span id="days">24</span>ngày
+                      <span id="days">{countdown.days}</span>ngày
                     </li>
                     <li>
-                      <span id="hours">1</span>giờ
+                      <span id="hours">{countdown.hours}</span>giờ
                     </li>
                     <li>
-                      <span id="minutes">7</span>phút
+                      <span id="minutes">{countdown.minutes}</span>phút
                     </li>
                     <li>
-                      <span id="seconds">43</span>giây
+                      <span id="seconds">{countdown.seconds}</span>giây
                     </li>
                   </ul>
                 </div>

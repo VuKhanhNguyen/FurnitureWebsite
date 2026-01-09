@@ -104,7 +104,10 @@ const ManageOrder = () => {
   if (viewingOrderId) {
     return (
       <div className="manage-order">
-        <ViewOrder orderId={viewingOrderId} onClose={handleCloseView} />
+        <ViewOrder
+          orderId={viewingOrderId}
+          onClose={handleCloseView}
+        />
       </div>
     );
   }

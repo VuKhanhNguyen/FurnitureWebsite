@@ -27,6 +27,7 @@ import OrderDetail from "./components/BuyingHistory/OrderDetail";
 import SessionTimeoutWatcher from "./components/commons/SessionTimeoutWatcher";
 import ManageOrder from "./components/admin/pages/ManageOrder";
 import AdminProfile from "./components/admin/pages/AdminProfile";
+import ChatWidget from "./components/chatbot/ChatWidget";
 
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
@@ -34,6 +35,7 @@ function App() {
   return (
     <Router>
       <SessionTimeoutWatcher />
+      <ChatWidget />
       <Routes>
         <Route element={<UserLayout />}>
           <Route

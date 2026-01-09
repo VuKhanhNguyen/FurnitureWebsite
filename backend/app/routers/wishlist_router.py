@@ -37,12 +37,16 @@ async def add_to_wishlist(
     db.refresh(wishlist_item)
     return DataResponse.custom_response(code="201", message="Added to wishlist", data=wishlist_item)
 
+from sqlalchemy.orm import Session, joinedload
+
+# ... imports ...
+
 @router.get("/", description="Get user wishlist", response_model=DataResponse[List[WishlistResponse]])
 async def get_wishlist(
     current_user: User = Depends(authenticate),
     db: Session = Depends(get_db)
 ):
-    items = db.query(Wishlist).filter(Wishlist.user_id == current_user.id).all()
+    items = db.query(Wishlist).options(joinedload(Wishlist.product)).filter(Wishlist.user_id == current_user.id).all()
     return DataResponse.custom_response(code="200", message="Get wishlist successfully", data=items)
 
 @router.delete("/{id}", description="Remove from wishlist", response_model=DataResponse[None])

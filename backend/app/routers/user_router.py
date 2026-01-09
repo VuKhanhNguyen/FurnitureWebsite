@@ -193,6 +193,14 @@ async def login_user(data: LoginUserSchema, db: Session = Depends(get_db)):
     if not user:
         return DataResponse.custom_response(code="401", message="Tên đăng nhập hoặc mật khẩu không đúng", data=None)
     
+    # Check if user has been soft deleted
+    if user.deleted_at is not None:
+        return DataResponse.custom_response(code="403", message="Tài khoản này đã bị xóa hoặc vô hiệu hóa", data=None)
+    
+    # Check if user is banned
+    if user.status == "banned":
+        return DataResponse.custom_response(code="403", message="Tài khoản đã bị cấm", data=None)
+    
     if not verify_password(data.password, user.password_hash):
         return DataResponse.custom_response(code="401", message="Tên đăng nhập hoặc mật khẩu không đúng", data=None)
     token = create_access_token(user.id)
