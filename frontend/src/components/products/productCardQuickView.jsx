@@ -1,11 +1,64 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import detail1 from "../../assets/imgs/details-04.png";
-import detail2 from "../../assets/imgs/details-05.png";
-import detail3 from "../../assets/imgs/details-06.png";
+import { useNavigate } from "react-router-dom";
+import wishlistService from "../../services/wishlistService";
+import cartService from "../../services/cartService";
 
 export const ProductCardQuickView = ({ product, onClose }) => {
-  const [quantity, setQuantity] = React.useState(1);
+  const [quantity, setQuantity] = useState(1);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [cartLoading, setCartLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // Reset quantity when product changes
+  useEffect(() => {
+    setQuantity(1);
+    setWishlisted(
+      product?.id ? wishlistService.isWishlisted(product.id) : false
+    );
+    setWishlistLoading(false);
+    setCartLoading(false);
+  }, [product]);
+
+  useEffect(() => {
+    const refresh = () => {
+      setWishlisted(
+        product?.id ? wishlistService.isWishlisted(product.id) : false
+      );
+    };
+
+    window.addEventListener("wishlist:updated", refresh);
+    window.addEventListener("auth:changed", refresh);
+    return () => {
+      window.removeEventListener("wishlist:updated", refresh);
+      window.removeEventListener("auth:changed", refresh);
+    };
+  }, [product?.id]);
+
+  const handleAddToWishlist = async (e) => {
+    e.preventDefault();
+    if (!product?.id || wishlistLoading || wishlisted) return;
+
+    setWishlistLoading(true);
+    try {
+      await wishlistService.addToWishlist(product.id);
+      setWishlisted(true);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      if (err?.response?.data?.message === "Product already in wishlist") {
+        wishlistService.markWishlisted(product.id);
+        setWishlisted(true);
+        return;
+      }
+      console.error("Failed to add to wishlist", err);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   const handleQuantityChange = (e) => {
     const val = e.target.value.replace(/\D/g, "");
@@ -21,6 +74,37 @@ export const ProductCardQuickView = ({ product, onClose }) => {
     e.preventDefault();
     setQuantity((prev) => (prev ? prev + 1 : 1));
   };
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    if (!product?.id || cartLoading) return;
+
+    setCartLoading(true);
+    try {
+      await cartService.addItem(product.id, quantity || 1);
+      alert(`✅ Đã thêm ${quantity || 1} sản phẩm vào giỏ hàng!`);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      console.error("Failed to add to cart", err);
+      alert("❌ Không thể thêm vào giỏ hàng. Vui lòng thử lại!");
+    } finally {
+      setCartLoading(false);
+    }
+  };
+
+  if (!product) return null;
+
+  // Calculate discount
+  const hasDiscount =
+    product.sale_price > 0 && product.sale_price < product.price;
+
+  // Image path
+  const imageUrl = product.image
+    ? `/uploads/products/${product.image}`
+    : "assets/imgs/product1.png";
 
   return createPortal(
     <div
@@ -53,6 +137,7 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                   <div className="row">
                     <div className="col-xxl-6 col-lg-6">
                       <div className="product__details-thumb-wrapper d-sm-flex align-items-start">
+                        {/* Thumbnail tabs removed as we only have 1 image for now */}
                         <div className="product__details-thumb-tab mr-20">
                           <nav>
                             <div
@@ -70,31 +155,7 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                                 aria-controls="img-1"
                                 aria-selected="true"
                               >
-                                <img src={detail1} alt="product-sm-thumb" />
-                              </button>
-                              <button
-                                className="nav-link"
-                                id="img-2-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#img-2"
-                                type="button"
-                                role="tab"
-                                aria-controls="img-3"
-                                aria-selected="false"
-                              >
-                                <img src={detail2} alt="product-sm-thumb" />
-                              </button>
-                              <button
-                                className="nav-link"
-                                id="img-3-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#img-3"
-                                type="button"
-                                role="tab"
-                                aria-controls="img-3"
-                                aria-selected="false"
-                              >
-                                <img src={detail3} alt="product-sm-thumb" />
+                                <img src={imageUrl} alt={product.name} />
                               </button>
                             </div>
                           </nav>
@@ -108,27 +169,7 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                               aria-labelledby="img-1-tab"
                             >
                               <div className="product__details-thumb-big w-img">
-                                <img src={detail1} alt="" />
-                              </div>
-                            </div>
-                            <div
-                              className="tab-pane fade"
-                              id="img-2"
-                              role="tabpanel"
-                              aria-labelledby="img-2-tab"
-                            >
-                              <div className="product__details-thumb-big w-img">
-                                <img src={detail2} alt="" />
-                              </div>
-                            </div>
-                            <div
-                              className="tab-pane fade"
-                              id="img-3"
-                              role="tabpanel"
-                              aria-labelledby="img-3-tab"
-                            >
-                              <div className="product__details-thumb-big w-img">
-                                <img src={detail3} alt="" />
+                                <img src={imageUrl} alt={product.name} />
                               </div>
                             </div>
                           </div>
@@ -138,10 +179,10 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                     <div className="col-xxl-6 col-lg-6">
                       <div className="product__details-content">
                         <div className="product__details-top d-flex flex-wrap gap-3 align-items-center mb-15">
-                          <div className="product__details-tag">
+                          {/* <div className="product__details-tag">
                             <a href="#">Construction</a>
-                          </div>
-                          <div className="product__details-rating">
+                          </div> */}
+                          {/* <div className="product__details-rating">
                             <a href="#">
                               <i className="fa-solid fa-star"></i>
                             </a>
@@ -149,31 +190,38 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                               <i className="fa-solid fa-star"></i>
                             </a>
                             <a href="#">
-                              <i className="fa-regular fa-star"></i>
+                              <i className="fa-solid fa-star"></i>
                             </a>
                             <a href="#">
-                              <i className="fa-regular fa-star"></i>
+                              <i className="fa-solid fa-star"></i>
                             </a>
                             <a href="#">
-                              <i className="fa-regular fa-star"></i>
+                              <i className="fa-solid fa-star"></i>
                             </a>
                           </div>
                           <div className="product__details-review-count">
-                            <a href="#">10 Đánh giá</a>
-                          </div>
+                            <a href="#">0 Đánh giá</a>
+                          </div> */}
                         </div>
                         <h3 className="product__details-title">
-                          Disposable Surgical Face Mask
+                          {product.name}
                         </h3>
                         <div className="product__details-price">
-                          <span className="old-price">30.000₫</span>
-                          <span className="new-price">19.000₫</span>
+                          {hasDiscount && (
+                            <span className="old-price">
+                              {product.price.toLocaleString("vi-VN")}₫
+                            </span>
+                          )}
+                          <span className="new-price">
+                            {(hasDiscount
+                              ? product.sale_price
+                              : product.price
+                            ).toLocaleString("vi-VN")}
+                            ₫
+                          </span>
                         </div>
                         <p>
-                          Priyoshop has brought to you the Hijab 3 Pieces Combo
-                          Pack PS23. It is a completely modern design and you
-                          feel comfortable to put on this hijab. Buy it at the
-                          best price.
+                          {product.short_description || product.description}
                         </p>
 
                         <div className="product__details-action mb-35">
@@ -205,37 +253,60 @@ export const ProductCardQuickView = ({ product, onClose }) => {
                             <a
                               href="javascript:void(0)"
                               className="fill-btn cart-btn"
+                              onClick={handleAddToCart}
+                              aria-disabled={cartLoading}
                             >
                               <span className="fill-btn-inner">
                                 <span className="fill-btn-normal">
-                                  Thêm vào giỏ
+                                  {cartLoading
+                                    ? "Đang thêm..."
+                                    : "Thêm vào giỏ"}
                                   <i className="fa-solid fa-basket-shopping"></i>
                                 </span>
                                 <span className="fill-btn-hover">
-                                  Thêm vào giỏ
+                                  {cartLoading
+                                    ? "Đang thêm..."
+                                    : "Thêm vào giỏ"}
                                   <i className="fa-solid fa-basket-shopping"></i>
                                 </span>
                               </span>
                             </a>
                           </div>
                           <div className="product__add-wish">
-                            <a href="#" className="product__add-wish-btn">
-                              <i className="fa-solid fa-heart"></i>
+                            <a
+                              href="#"
+                              className="product__add-wish-btn"
+                              onClick={handleAddToWishlist}
+                              aria-disabled={wishlistLoading}
+                              title={
+                                wishlisted
+                                  ? "Đã thêm yêu thích"
+                                  : wishlistLoading
+                                    ? "Đang thêm..."
+                                    : "Thêm vào yêu thích"
+                              }
+                            >
+                              <i
+                                className={
+                                  wishlisted
+                                    ? "fa-solid fa-heart"
+                                    : "fa-regular fa-heart"
+                                }
+                              ></i>
                             </a>
                           </div>
                         </div>
                         <div className="product__details-meta">
-                          <div className="sku">
+                          {/* <div className="sku">
                             <span>SKU:</span>
                             <a href="#">BO1D0MX8SJ</a>
-                          </div>
-                          <div className="categories">
+                          </div> */}
+                          {/* <div className="categories">
                             <span>Danh mục:</span> <a href="#">Milk,</a>
                             <a href="#">Cream,</a> <a href="#">Fermented.</a>
-                          </div>
+                          </div> */}
                           <div className="tag">
-                            <span>Tags:</span> <a href="#"> Cheese,</a>
-                            <a href="#">Custard,</a> <a href="#">Frozen</a>
+                            <span>Tags:</span> <span>{product.tags}</span>
                           </div>
                         </div>
                       </div>

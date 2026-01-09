@@ -3490,6 +3490,15 @@ PAGINATION CSS START
   height: 49px;
   width: 49px;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+}
+
+.header-search button svg {
+  display: block;
 }
 
 .header-area.sticky .main-menu-2 ul li a {
@@ -9667,6 +9676,109 @@ div[class*="col"]:last-child .counter-item-2::after {
   width: 100%;
 }
 
+/* Product list: fill image into the thumb frame */
+.bd-product__area .product-item .product-thumb {
+  padding: 0;
+  max-width: none;
+  height: 280px;
+}
+.bd-product__area .product-item .product-thumb a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.bd-product__area .product-item .product-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Product list: keep product cards same height */
+.bd-product__area .product-item {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.bd-product__area .product-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.bd-product__area .product-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.bd-product__area .product-price {
+  margin-top: auto;
+}
+
+/* Home sections (BestSellers, TopSale): keep product cards same height */
+.furniture-seller .product-item,
+.discount-area .product-item {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TopSale swiper: keep cards same width (2 columns) */
+.discount-area .furuniture-active .swiper-slide {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+}
+@media (max-width: 575px) {
+  .discount-area .furuniture-active .swiper-slide {
+    grid-template-columns: 1fr;
+  }
+}
+
+.furniture-seller .product-thumb,
+.discount-area .product-thumb {
+  height: 280px;
+  padding: 0;
+  max-width: none;
+  margin: 0;
+  background-color: transparent;
+}
+
+.furniture-seller .product-thumb a,
+.discount-area .product-thumb a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.furniture-seller .product-thumb img,
+.discount-area .product-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.furniture-seller .product-content,
+.discount-area .product-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.furniture-seller .product-title,
+.discount-area .product-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.furniture-seller .product-price,
+.discount-area .product-price {
+  margin-top: auto;
+}
+
 .product-action-item {
   display: flex;
   gap: 10px;
@@ -9727,10 +9839,12 @@ div[class*="col"]:last-child .counter-item-2::after {
 
 .product-action-btn {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 42px;
   height: 42px;
-  line-height: 42px;
+  line-height: 1;
   text-align: center;
   font-size: 18px;
   color: var(--clr-common-black);
@@ -9738,6 +9852,12 @@ div[class*="col"]:last-child .counter-item-2::after {
   border-bottom: 0;
   box-shadow: 0px 1px 2px rgba(1, 15, 28, 0.2);
   border-radius: 50%;
+  padding: 0;
+  border: 0;
+}
+
+.product-action-btn svg {
+  display: block;
 }
 .product-action-btn:hover .product-tooltip {
   visibility: visible;
@@ -13940,4 +14060,4 @@ p.checkout-coupon input[type="text"]:focus {
   .footer-widget-5-4 {
     width: 100%;
   }
-} /*# sourceMappingURL=main.css.map */
+}

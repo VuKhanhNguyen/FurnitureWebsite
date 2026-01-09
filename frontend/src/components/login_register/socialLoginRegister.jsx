@@ -4,7 +4,11 @@ import "../../assets/css/auth.css";
 const SocialLoginRegister = () => {
   return (
     <div className="social-login-container">
-      <button className="social-btn" aria-label="Login with Google">
+      <button
+        className="social-btn"
+        aria-label="Login with Google"
+        onClick={() => (window.location.href = "/api/auth/google/login")}
+      >
         <svg
           className="social-icon"
           viewBox="0 0 24 24"
@@ -29,7 +33,11 @@ const SocialLoginRegister = () => {
         </svg>
       </button>
 
-      <button className="social-btn" aria-label="Login with Facebook">
+      <button
+        className="social-btn"
+        aria-label="Login with Facebook"
+        onClick={() => (window.location.href = "/api/auth/facebook/login")}
+      >
         <svg
           className="social-icon"
           viewBox="0 0 24 24"
@@ -42,7 +50,11 @@ const SocialLoginRegister = () => {
         </svg>
       </button>
 
-      <button className="social-btn" aria-label="Login with GitHub">
+      <button
+        className="social-btn"
+        aria-label="Login with GitHub"
+        onClick={() => (window.location.href = "/api/auth/github/login")}
+      >
         <svg
           className="social-icon"
           viewBox="0 0 24 24"

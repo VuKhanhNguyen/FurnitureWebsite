@@ -1,6 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 
 export function Contact() {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          phone,
+          email,
+          message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message || "Gửi liên hệ thành công!");
+        // Reset form
+        setName("");
+        setPhone("");
+        setEmail("");
+        setMessage("");
+      } else {
+        alert(data.message || "Có lỗi xảy ra, vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      alert("Lỗi kết nối đến server.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="contact-area section-space">
       <div className="container">
@@ -70,47 +113,66 @@ export function Contact() {
             </div>
             <div className="col-xxl-6 col-xl-6">
               <div className="contact-from">
-                <form action="#">
+                <form onSubmit={handleSubmit}>
                   <div className="row">
                     <div className="col-lg-6">
                       <div className="contact__from-input">
-                        <input type="text" placeholder="Họ và Tên*" />
+                        <input
+                          type="text"
+                          placeholder="Họ và Tên"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                        />
                       </div>
                     </div>
                     <div className="col-lg-6">
                       <div className="contact__from-input">
-                        <input type="text" placeholder="Địa chỉ Email*" />
+                        <input
+                          type="tel"
+                          placeholder="Số điện thoại"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          required
+                        />
                       </div>
                     </div>
-                    <div className="col-lg-6">
+                    <div className="col-lg-12">
                       <div className="contact__from-input">
-                        <input type="tel" placeholder="Số điện thoại" />
+                        <input
+                          type="email"
+                          placeholder="Địa chỉ Email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                        />
                       </div>
                     </div>
-                    <div className="col-lg-6">
-                      <div className="contact__from-input">
-                        <input type="date" />
-                      </div>
-                    </div>
-
                     <div className="col-lg-12">
                       <div className="contact__from-input">
                         <textarea
                           name="Message"
                           placeholder="Nội dung liên hệ"
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          required
                         ></textarea>
                       </div>
                     </div>
                     <div className="col-12">
                       <div className="appointment__btn">
-                        <button className="fill-btn" type="submit">
+                        <button
+                          className="fill-btn"
+                          type="submit"
+                          disabled={loading}
+                        >
                           <span className="fill-btn-inner">
                             <span className="fill-btn-normal">
-                              Gửi ngay
+                              {loading ? "Đang gửi..." : "Gửi ngay"}
                               <i className="fa-regular fa-angle-right"></i>
                             </span>
                             <span className="fill-btn-hover">
-                              Gửi ngay
+                              {loading ? "Đang gửi..." : "Gửi ngay"}
                               <i className="fa-regular fa-angle-right"></i>
                             </span>
                           </span>

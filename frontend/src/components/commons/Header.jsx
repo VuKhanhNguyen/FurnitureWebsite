@@ -1,9 +1,67 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../assets/imgs/logo.png";
 import { useNavigate } from "react-router-dom";
+import wishlistService from "../../services/wishlistService";
+import cartService from "../../services/cartService";
 
 export function Header({ onOpenOffcanvas }) {
   const navigate = useNavigate();
+  const [wishlistCount, setWishlistCount] = useState(
+    wishlistService.getWishlistCount()
+  );
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const refresh = () => setWishlistCount(wishlistService.getWishlistCount());
+    refresh();
+
+    window.addEventListener("wishlist:updated", refresh);
+    window.addEventListener("auth:changed", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("wishlist:updated", refresh);
+      window.removeEventListener("auth:changed", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const refreshCart = async () => {
+      if (!cartService.isAuthenticated()) {
+        if (isActive) setCartCount(0);
+        return;
+      }
+
+      try {
+        const res = await cartService.getCart();
+        const items = res?.data?.items || [];
+        const count = Array.isArray(items)
+          ? items.reduce((sum, it) => sum + Number(it?.quantity || 0), 0)
+          : 0;
+        if (isActive) setCartCount(count);
+      } catch (err) {
+        if (err?.code === "NOT_AUTHENTICATED") {
+          if (isActive) setCartCount(0);
+          return;
+        }
+        console.error("Failed to load cart count", err);
+      }
+    };
+
+    refreshCart();
+
+    window.addEventListener("cart:updated", refreshCart);
+    window.addEventListener("auth:changed", refreshCart);
+    window.addEventListener("storage", refreshCart);
+    return () => {
+      isActive = false;
+      window.removeEventListener("cart:updated", refreshCart);
+      window.removeEventListener("auth:changed", refreshCart);
+      window.removeEventListener("storage", refreshCart);
+    };
+  }, []);
 
   const handleHomeClick = (e) => {
     e.preventDefault();
@@ -15,9 +73,9 @@ export function Header({ onOpenOffcanvas }) {
     navigate("/productsList");
   };
 
-  const handleProductDetailClick = (e) => {
+  const handleBuyingHistoryClick = (e) => {
     e.preventDefault();
-    navigate("/productDetail");
+    navigate("/buying-history");
   };
 
   const handleWishListClick = (e) => {
@@ -90,9 +148,9 @@ export function Header({ onOpenOffcanvas }) {
                                 <li>
                                   <a
                                     href="#"
-                                    onClick={handleProductDetailClick}
+                                    onClick={handleBuyingHistoryClick}
                                   >
-                                    Chi tiết sản phẩm
+                                    Đơn hàng của tôi
                                   </a>
                                 </li>
                                 <li>
@@ -105,29 +163,9 @@ export function Header({ onOpenOffcanvas }) {
                                     Giỏ hàng
                                   </a>
                                 </li>
-                                <li>
-                                  <a href="#" onClick={handleCheckoutClick}>
-                                    Thanh toán
-                                  </a>
-                                </li>
                               </ul>
                             </li>
 
-                            <li className="has-dropdown">
-                              <a href="blog.html">Blog</a>
-                              <ul className="submenu">
-                                <li>
-                                  <a href="#" onClick={handleBlogListClick}>
-                                    Danh sách Blog
-                                  </a>
-                                </li>
-                                <li>
-                                  <a href="#" onClick={handleBlogDetailClick}>
-                                    Chi tiết blog
-                                  </a>
-                                </li>
-                              </ul>
-                            </li>
                             <li>
                               <a href="#" onClick={handleContactClick}>
                                 Liên hệ
@@ -186,7 +224,7 @@ export function Header({ onOpenOffcanvas }) {
                             />
                           </svg>
                           <span className="header-action-badge bg-furniture">
-                            3
+                            {wishlistCount}
                           </span>
                         </a>
                       </div>
@@ -212,7 +250,7 @@ export function Header({ onOpenOffcanvas }) {
                             />
                           </svg>
                           <span className="header-action-badge bg-furniture">
-                            12
+                            {cartCount}
                           </span>
                         </a>
                       </div>

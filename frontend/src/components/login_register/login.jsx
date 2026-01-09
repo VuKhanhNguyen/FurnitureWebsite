@@ -1,17 +1,115 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import SocialLoginRegister from "./socialLoginRegister";
 import "../../assets/css/auth.css";
 import { useNavigate } from "react-router-dom";
 import bg from "../../assets/imgs/bg.jpg";
+import wishlistService from "../../services/wishlistService";
+import { setAuth } from "../../services/authStorage";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
+  const [form, setForm] = useState({ username: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const redirectAfterLogin = (user) => {
+    if (user?.role === "admin") {
+      navigate("/admin");
+      return;
+    }
+    navigate("/");
+  };
+
+  const storeUserAndRedirect = async ({ token, username }) => {
+    // Prefer authoritative user info from /api/me so we can route by role.
+    try {
+      const res = await fetch("/api/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (data?.code === "200" && data?.data) {
+        const loginAt = Date.now();
+        const userForState = {
+          ...data.data,
+          username: data.data.username || username,
+          token,
+          loginAt,
+        };
+        setAuth({ token, user: userForState, loginAt });
+
+        // Refresh any auth-aware UI (wishlist badge/state, etc.)
+        wishlistService.notifyAuthChanged();
+        try {
+          await wishlistService.syncWishlistIdsFromApi();
+        } catch {
+          // ignore
+        }
+
+        redirectAfterLogin(userForState);
+        return;
+      }
+    } catch {
+      // ignore and fall back
+    }
+
+    // Fallback if /api/me fails
+    const loginAt = Date.now();
+    setAuth({ token, user: { username }, loginAt });
+    wishlistService.notifyAuthChanged();
+    redirectAfterLogin({ role: undefined });
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    if (token) {
+      storeUserAndRedirect({ token, username: "" }).catch(() => {
+        setError("Lỗi kết nối máy chủ");
+      });
+    }
+  }, [location]);
 
   const handleRegisterClick = (e) => {
     e.preventDefault();
     navigate("/register");
+  };
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: form.username,
+          password: form.password,
+        }),
+      });
+      const data = await res.json();
+      if (data.code === "200" && data.data && data.data.access_token) {
+        await storeUserAndRedirect({
+          token: data.data.access_token,
+          username: form.username,
+        });
+      } else {
+        setError(data.message || "Đăng nhập thất bại");
+      }
+    } catch (err) {
+      setError("Lỗi kết nối máy chủ");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,18 +133,20 @@ const Login = () => {
           </p>
         </div>
 
-        <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
+        <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="userName">
+            <label className="form-label" htmlFor="username">
               Tên đăng nhập
             </label>
             <input
               type="text"
-              id="userName"
-              name="userName"
+              id="username"
+              name="username"
               className="form-input"
               placeholder="Enter your username"
               required
+              value={form.username}
+              onChange={handleChange}
             />
           </div>
 
@@ -63,6 +163,8 @@ const Login = () => {
                 style={{ width: "100%" }}
                 placeholder="••••••••"
                 required
+                value={form.password}
+                onChange={handleChange}
               />
               <button
                 type="button"
@@ -104,6 +206,9 @@ const Login = () => {
               </button>
             </div>
           </div>
+          {error && (
+            <div style={{ color: "red", marginBottom: 8 }}>{error}</div>
+          )}
 
           <div
             style={{
@@ -139,8 +244,8 @@ const Login = () => {
             </Link>
           </div>
 
-          <button type="submit" className="auth-button">
-            Đăng nhập
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>
         </form>
 

@@ -40,7 +40,7 @@ export function Footer() {
                 <div className="footer-widget-title">
                   <h4>Dịch vụ</h4>
                 </div>
-                <div className="footer-link">
+                <div className="footer-link" style={{ fontSize: "16px" }}>
                   <ul>
                     <li>
                       <a href="error.html">Đăng nhập</a>
@@ -64,7 +64,7 @@ export function Footer() {
                 <div className="footer-widget-title">
                   <h4>Công ty</h4>
                 </div>
-                <div className="footer-link">
+                <div className="footer-link" style={{ fontSize: "16px" }}>
                   <ul>
                     <li>
                       <a href="index.html">Trang chủ</a>
@@ -75,9 +75,7 @@ export function Footer() {
                     <li>
                       <a href="about.html">Trang</a>
                     </li>
-                    <li>
-                      <a href="blog.html">Blog</a>
-                    </li>
+
                     <li>
                       <a href="contact.html">Liên hệ</a>
                     </li>
@@ -89,9 +87,6 @@ export function Footer() {
                   <h4>Liên hệ</h4>
                 </div>
                 <div className="footer-info mb-35">
-                  <p className="w-75">
-                    48 Cao Thắng, Hải Châu, Đà Nẵng, Việt Nam
-                  </p>
                   <div className="footer-info-item d-flex align-items-start pb-15 pt-15">
                     <div className="footer-info-icon mr-20">
                       <span>
@@ -105,7 +100,7 @@ export function Footer() {
                         target="_blank"
                         href="https://maps.app.goo.gl/5hrtE6C6XX5fqrnV9"
                       >
-                        Sư phạm Kỹ thuật, Đại học Đà Nẵng
+                        48 Cao Thắng, Hải Châu, Đà Nẵng, Việt Nam
                       </a>
                     </div>
                   </div>
@@ -136,9 +131,9 @@ export function Footer() {
           <div className="footer-copyright-wrapper">
             <div className="footer-copyright-text">
               <p className="mb-0">
-                © All Copyright 2024 by{" "}
+                © All Copyright 2025 by{" "}
                 <a target="_blank" className="furniture-clr-hover" href="#">
-                  Addina
+                  FurniDev
                 </a>
               </p>
             </div>

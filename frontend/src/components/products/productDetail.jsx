@@ -1,10 +1,173 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import productService from "../../services/productService";
+import categoryService from "../../services/categoryService";
+import wishlistService from "../../services/wishlistService";
+import cartService from "../../services/cartService";
 import detail1 from "../../assets/imgs/details-04.png";
-import detail2 from "../../assets/imgs/details-05.png";
-import detail3 from "../../assets/imgs/details-06.png";
 import ProductTab from "./productTab";
 
 export function ProductDetail() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryLoading, setCategoryLoading] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [cartLoading, setCartLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const data = await productService.getProductById(id);
+        setProduct(data);
+      } catch (error) {
+        console.error("Failed to fetch product", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    setQuantity(1);
+    setCartLoading(false);
+  }, [product?.id]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const fetchCategoryName = async (categoryId) => {
+      setCategoryLoading(true);
+      try {
+        const category = await categoryService.getCategoryById(categoryId);
+        if (isActive) {
+          setCategoryName(category?.name || "");
+        }
+      } catch (error) {
+        console.error("Failed to fetch category", error);
+        if (isActive) {
+          setCategoryName("");
+        }
+      } finally {
+        if (isActive) {
+          setCategoryLoading(false);
+        }
+      }
+    };
+
+    if (product?.category_id) {
+      fetchCategoryName(product.category_id);
+    } else {
+      setCategoryName("");
+      setCategoryLoading(false);
+    }
+
+    return () => {
+      isActive = false;
+    };
+  }, [product?.category_id]);
+
+  useEffect(() => {
+    if (product?.id) {
+      setWishlisted(wishlistService.isWishlisted(product.id));
+    } else {
+      setWishlisted(false);
+    }
+  }, [product?.id]);
+
+  useEffect(() => {
+    const refresh = () => {
+      if (product?.id) {
+        setWishlisted(wishlistService.isWishlisted(product.id));
+      } else {
+        setWishlisted(false);
+      }
+    };
+
+    window.addEventListener("wishlist:updated", refresh);
+    window.addEventListener("auth:changed", refresh);
+    return () => {
+      window.removeEventListener("wishlist:updated", refresh);
+      window.removeEventListener("auth:changed", refresh);
+    };
+  }, [product?.id]);
+
+  if (loading) return <div>Loading...</div>;
+  if (!product) return <div>Product not found</div>;
+
+  const handleAddToWishlist = async (e) => {
+    e.preventDefault();
+    if (!product?.id || wishlistLoading || wishlisted) return;
+
+    setWishlistLoading(true);
+    try {
+      await wishlistService.addToWishlist(product.id);
+      setWishlisted(true);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      if (err?.response?.data?.message === "Product already in wishlist") {
+        wishlistService.markWishlisted(product.id);
+        setWishlisted(true);
+        return;
+      }
+      console.error("Failed to add to wishlist", err);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
+  const handleQuantityChange = (e) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    setQuantity(raw ? parseInt(raw, 10) : "");
+  };
+
+  const handleMinus = (e) => {
+    e.preventDefault();
+    setQuantity((prev) => {
+      const current = Number(prev) || 1;
+      return current > 1 ? current - 1 : 1;
+    });
+  };
+
+  const handlePlus = (e) => {
+    e.preventDefault();
+    setQuantity((prev) => {
+      const current = Number(prev) || 0;
+      return current ? current + 1 : 1;
+    });
+  };
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    if (!product?.id || cartLoading) return;
+
+    setCartLoading(true);
+    try {
+      await cartService.addItem(product.id, quantity || 1);
+      alert(`✅ Đã thêm ${quantity || 1} sản phẩm vào giỏ hàng!`);
+    } catch (err) {
+      if (err?.code === "NOT_AUTHENTICATED") {
+        navigate("/login");
+        return;
+      }
+      console.error("Failed to add to cart", err);
+      alert("❌ Không thể thêm vào giỏ hàng. Vui lòng thử lại!");
+    } finally {
+      setCartLoading(false);
+    }
+  };
+
   return (
     <div className="product__details-area section-space-medium">
       <div className="container">
@@ -28,31 +191,14 @@ export function ProductDetail() {
                       aria-controls="img-1"
                       aria-selected="true"
                     >
-                      <img src={detail1} alt="product-sm-thumb" />
-                    </button>
-                    <button
-                      className="nav-link"
-                      id="img-2-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#img-2"
-                      type="button"
-                      role="tab"
-                      aria-controls="img-3"
-                      aria-selected="false"
-                    >
-                      <img src={detail2} alt="product-sm-thumb" />
-                    </button>
-                    <button
-                      className="nav-link"
-                      id="img-3-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#img-3"
-                      type="button"
-                      role="tab"
-                      aria-controls="img-3"
-                      aria-selected="false"
-                    >
-                      <img src={detail3} alt="product-sm-thumb" />
+                      <img
+                        src={
+                          product?.image
+                            ? `/uploads/products/${product.image}`
+                            : detail1
+                        }
+                        alt="product-sm-thumb"
+                      />
                     </button>
                   </div>
                 </nav>
@@ -66,27 +212,14 @@ export function ProductDetail() {
                     aria-labelledby="img-1-tab"
                   >
                     <div className="product__details-thumb-big w-img">
-                      <img src={detail1} alt="" />
-                    </div>
-                  </div>
-                  <div
-                    className="tab-pane fade"
-                    id="img-2"
-                    role="tabpanel"
-                    aria-labelledby="img-2-tab"
-                  >
-                    <div className="product__details-thumb-big w-img">
-                      <img src={detail2} alt="" />
-                    </div>
-                  </div>
-                  <div
-                    className="tab-pane fade"
-                    id="img-3"
-                    role="tabpanel"
-                    aria-labelledby="img-3-tab"
-                  >
-                    <div className="product__details-thumb-big w-img">
-                      <img src={detail3} alt="" />
+                      <img
+                        src={
+                          product?.image
+                            ? `/uploads/products/${product.image}`
+                            : detail1
+                        }
+                        alt=""
+                      />
                     </div>
                   </div>
                 </div>
@@ -96,10 +229,10 @@ export function ProductDetail() {
           <div className="col-xxl-6 col-lg-6">
             <div className="product__details-content pr-80">
               <div className="product__details-top d-sm-flex align-items-center mb-15">
-                <div className="product__details-tag mr-10">
+                {/* <div className="product__details-tag mr-10">
                   <a href="#">Construction</a>
-                </div>
-                <div className="product__details-rating mr-10">
+                </div> */}
+                {/* <div className="product__details-rating mr-10">
                   <a href="#">
                     <i className="fa-solid fa-star"></i>
                   </a>
@@ -115,70 +248,112 @@ export function ProductDetail() {
                   <a href="#">
                     <i className="fa-regular fa-star"></i>
                   </a>
-                </div>
-                <div className="product__details-review-count">
+                </div> */}
+                {/* <div className="product__details-review-count">
                   <a href="#">10 Đánh giá</a>
-                </div>
+                </div> */}
               </div>
               <h3 className="product__details-title text-capitalize">
-                Alexander roll Arm sofa
+                {product?.name}
               </h3>
               <div className="product__details-price">
-                <span className="old-price">30.000₫</span>
-                <span className="new-price">19.000₫</span>
+                <span className="old-price">
+                  {product?.price?.toLocaleString()}₫
+                </span>
+                <span className="new-price">
+                  {product?.sale_price > 0
+                    ? product.sale_price.toLocaleString()
+                    : product?.price?.toLocaleString()}
+                  ₫
+                </span>
               </div>
-              <p>
-                Priyoshop has brought to you the Hijab 3 Pieces Combo Pack PS23.
-                It is a completely modern design and you feel comfortable to put
-                on this hijab. Buy it at the best price.
-              </p>
+              <p>{product?.short_description || product?.description}</p>
 
               <div className="product__details-action mb-35">
                 <div className="product__quantity">
                   <div className="product-quantity-wrapper">
                     <form action="#">
-                      <button className="cart-minus">
+                      <button
+                        type="button"
+                        className="cart-minus"
+                        onClick={handleMinus}
+                      >
                         <i className="fa-light fa-minus"></i>
                       </button>
-                      <input className="cart-input" type="text" value="1" />
-                      <button className="cart-plus">
+                      <input
+                        className="cart-input"
+                        type="text"
+                        value={quantity}
+                        onChange={handleQuantityChange}
+                      />
+                      <button
+                        type="button"
+                        className="cart-plus"
+                        onClick={handlePlus}
+                      >
                         <i className="fa-light fa-plus"></i>
                       </button>
                     </form>
                   </div>
                 </div>
                 <div className="product__add-cart">
-                  <a href="javascript:void(0)" className="fill-btn cart-btn">
+                  <a
+                    href="javascript:void(0)"
+                    className="fill-btn cart-btn"
+                    onClick={handleAddToCart}
+                    aria-disabled={cartLoading}
+                  >
                     <span className="fill-btn-inner">
                       <span className="fill-btn-normal">
-                        Thêm vào giỏ
+                        {cartLoading ? "Đang thêm..." : "Thêm vào giỏ"}
                         <i className="fa-solid fa-basket-shopping"></i>
                       </span>
                       <span className="fill-btn-hover">
-                        Thêm vào giỏ
+                        {cartLoading ? "Đang thêm..." : "Thêm vào giỏ"}
                         <i className="fa-solid fa-basket-shopping"></i>
                       </span>
                     </span>
                   </a>
                 </div>
                 <div className="product__add-wish">
-                  <a href="#" className="product__add-wish-btn">
-                    <i className="fa-solid fa-heart"></i>
+                  <a
+                    href="#"
+                    className="product__add-wish-btn"
+                    onClick={handleAddToWishlist}
+                    aria-disabled={wishlistLoading}
+                    title={
+                      wishlisted
+                        ? "Đã thêm yêu thích"
+                        : wishlistLoading
+                          ? "Đang thêm..."
+                          : "Thêm vào yêu thích"
+                    }
+                  >
+                    <i
+                      className={
+                        wishlisted ? "fa-solid fa-heart" : "fa-regular fa-heart"
+                      }
+                    ></i>
                   </a>
                 </div>
               </div>
               <div className="product__details-meta mb-20">
                 <div className="sku">
                   <span>SKU:</span>
-                  <a href="#">BO1D0MX8SJ</a>
+                  <a href="#">{product?.id}</a>
                 </div>
                 <div className="categories">
-                  <span>Danh mục:</span> <a href="#">Milk,</a>
-                  <a href="#">Cream,</a> <a href="#">Fermented.</a>
+                  <span>Danh mục:</span>{" "}
+                  <a href="#">
+                    {product?.category_id
+                      ? categoryLoading
+                        ? "Loading..."
+                        : categoryName || "Chưa phân loại"
+                      : "Chưa phân loại"}
+                  </a>
                 </div>
                 <div className="tag">
-                  <span>Tags:</span> <a href="#"> Cheese,</a>
-                  <a href="#">Custard,</a> <a href="#">Frozen</a>
+                  <span>Tags:</span> <span>{product?.tags}</span>
                 </div>
               </div>
               <div className="product__details-share">
@@ -202,7 +377,11 @@ export function ProductDetail() {
             </div>
           </div>
         </div>
-        <ProductTab />
+        <ProductTab
+          description={product?.description}
+          productId={product?.id}
+          productName={product?.name}
+        />
       </div>
     </div>
   );
