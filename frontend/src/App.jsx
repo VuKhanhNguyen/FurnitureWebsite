@@ -28,6 +28,7 @@ import SessionTimeoutWatcher from "./components/commons/SessionTimeoutWatcher";
 import ManageOrder from "./components/admin/pages/ManageOrder";
 import AdminProfile from "./components/admin/pages/AdminProfile";
 import ChatWidget from "./components/chatbot/ChatWidget";
+import LiveChat from "./components/admin/pages/LiveChat";
 
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
@@ -190,6 +191,7 @@ function App() {
           <Route path="/admin/user" element={<ManageUser />} />
           <Route path="/admin/order" element={<ManageOrder />} />
           <Route path="/admin/profile" element={<AdminProfile />} />
+          <Route path="/admin/livechat" element={<LiveChat />} />
         </Route>
       </Routes>
     </Router>

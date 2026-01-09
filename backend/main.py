@@ -21,6 +21,7 @@ from app.routers.cart_router import router as cart_router
 from app.routers.coupon_router import router as coupon_router
 from app.routers.checkout_router import router as checkout_router
 from app.routers.payment_router import router as payment_router
+from app.routers.livechat_router import router as livechat_router
 import os
 
 
@@ -55,6 +56,7 @@ app.include_router(cart_router, prefix="/api")
 app.include_router(coupon_router, prefix="/api")
 app.include_router(checkout_router, prefix="/api")
 app.include_router(payment_router, prefix="/api")
+app.include_router(livechat_router, prefix="/api")
 
 # Phục vụ file tĩnh
 if not os.path.exists("uploads"):

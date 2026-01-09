@@ -11,6 +11,7 @@ import {
   FaRegLaughWink,
   FaHeart,
   FaSignOutAlt,
+  FaComments,
 } from "react-icons/fa";
 import sidebarBg from "../../../assets/imgs/ad-timer.png";
 import wishlistService from "../../../services/wishlistService";
@@ -78,6 +79,13 @@ const AppSidebar = ({
 
         <MenuItem icon={<FaHeart />} component={<Link to={"/admin/order"} />}>
           Quản lý đơn hàng
+        </MenuItem>
+
+        <MenuItem
+          icon={<FaComments />}
+          component={<Link to={"/admin/livechat"} />}
+        >
+          Live Chat (CSKH)
         </MenuItem>
       </Menu>
 
