@@ -60,7 +60,6 @@ export function WishListTable() {
         setBusyMmId(product.id);
         try {
             await cartService.addItem(product.id, 1);
-            alert("✅ Đã thêm sản phẩm vào giỏ hàng!");
             // Optional: remove from wishlist after adding to cart?
             // await handleRemove(product.id); 
         } catch (err) {
@@ -69,7 +68,6 @@ export function WishListTable() {
                 return;
             }
             console.error("Failed to add to cart", err);
-            alert("❌ Không thể thêm vào giỏ hàng. Vui lòng thử lại!");
         } finally {
             setBusyMmId(null);
         }

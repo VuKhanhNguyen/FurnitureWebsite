@@ -56,10 +56,31 @@ const productService = {
   },
 
   // Cập nhật sản phẩm
-  updateProduct: async (id, productData) => {
+  updateProduct: async (id, productData, imageFile) => {
+    const formData = new FormData();
+    formData.append("name", productData.name);
+    formData.append("description", productData.description);
+    formData.append("short_description", productData.short_description);
+    formData.append("price", productData.price);
+    formData.append("sale_price", productData.sale_price);
+    formData.append("quantity", productData.quantity);
+    formData.append("tags", productData.tags);
+
+    // Chỉ append category_id nếu có giá trị
+    if (productData.category_id && productData.category_id !== "") {
+      formData.append("category_id", productData.category_id);
+    }
+
+    if (imageFile) {
+      formData.append("file", imageFile);
+    }
+
     const response = await axiosInstance.put(
       `/api/products/${id}`,
-      productData
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
     );
     return response.data.data;
   },
