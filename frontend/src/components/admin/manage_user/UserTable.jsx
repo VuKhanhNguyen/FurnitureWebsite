@@ -2,6 +2,8 @@ import React from "react";
 import { FaEye, FaEdit, FaTrash, FaUser } from "react-icons/fa";
 
 const UserTable = ({ users, onView, onEdit, onDelete }) => {
+  const safeUsers = Array.isArray(users) ? users : [];
+
   const resolveAvatarSrc = (value) => {
     if (!value) return null;
     if (typeof value !== "string") return null;
@@ -131,7 +133,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {safeUsers.map((user) => (
             <tr
               key={user.id}
               style={{
@@ -324,6 +326,14 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
           ))}
         </tbody>
       </table>
+
+      {safeUsers.length === 0 && (
+        <div style={{ textAlign: "center", padding: "3rem", color: "#6b7280" }}>
+          <p style={{ fontSize: "1.125rem", margin: 0 }}>
+            Không có người dùng nào
+          </p>
+        </div>
+      )}
     </div>
   );
 };

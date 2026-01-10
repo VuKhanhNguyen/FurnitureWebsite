@@ -14,6 +14,10 @@ const ChatWindow = ({ onClose, conversationId }) => {
   const greetingSentRef = useRef(false);
   const wsRef = useRef(null);
 
+  const storageKey = conversationId
+    ? `livechat:messages:${conversationId}`
+    : null;
+
   const quickQuestions = chatbotService.getQuickQuestions();
 
   // Scroll to bottom when messages change
@@ -24,6 +28,47 @@ const ChatWindow = ({ onClose, conversationId }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  // Restore persisted messages (so closing widget / logout doesn't wipe history)
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return;
+      const restored = parsed
+        .filter((m) => m && typeof m.text === "string" && m.text.trim())
+        .map((m) => ({
+          id: m.id ?? Date.now() + Math.random(),
+          text: m.text,
+          sender: m.sender === "user" ? "user" : "bot",
+          timestamp: m.timestamp ? new Date(m.timestamp) : new Date(),
+        }));
+      if (restored.length) setMessages(restored);
+    } catch {
+      // ignore
+    }
+  }, [storageKey]);
+
+  // Persist messages
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      const compact = messages.slice(-200).map((m) => ({
+        id: m.id,
+        text: m.text,
+        sender: m.sender,
+        timestamp:
+          m.timestamp instanceof Date
+            ? m.timestamp.toISOString()
+            : new Date().toISOString(),
+      }));
+      localStorage.setItem(storageKey, JSON.stringify(compact));
+    } catch {
+      // ignore
+    }
+  }, [messages, storageKey]);
 
   // Send initial greeting (only once)
   useEffect(() => {
@@ -45,6 +90,10 @@ const ChatWindow = ({ onClose, conversationId }) => {
       }
     };
   }, []);
+
+  // NOTE: Previously we cleared chat messages on the global "cart:updated" event.
+  // That caused chat history to disappear on logout and even on cart updates.
+  // We intentionally keep history now; users can clear chat manually if needed.
 
   const addBotMessage = (text) => {
     setMessages((prev) => [
@@ -191,6 +240,27 @@ const ChatWindow = ({ onClose, conversationId }) => {
     }
   };
 
+  const formatMessageTime = (value) => {
+    try {
+      const d = value instanceof Date ? value : new Date(value);
+      if (Number.isNaN(d.getTime())) return "";
+      const time = d.toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      const date = d.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+
+      return `${time} (${date})`;
+    } catch {
+      return "";
+    }
+  };
+
   return (
     <div className="chat-window">
       {/* Header */}
@@ -225,7 +295,12 @@ const ChatWindow = ({ onClose, conversationId }) => {
             <div className="message-avatar">
               {msg.sender === "bot" ? "🤖" : "👤"}
             </div>
-            <div className="message-bubble">{msg.text}</div>
+            <div className="message-content">
+              <div className="message-bubble">{msg.text}</div>
+              <div className="message-time">
+                {formatMessageTime(msg.timestamp)}
+              </div>
+            </div>
           </div>
         ))}
 

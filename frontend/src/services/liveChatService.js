@@ -1,5 +1,5 @@
 import axiosInstance from "./api";
-import { getToken } from "./authStorage";
+import { getToken, getStoredUser } from "./authStorage";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -12,7 +12,13 @@ const toWsBaseUrl = (base) => {
 };
 
 export const getOrCreateConversationId = () => {
-  const key = "livechatConversationId";
+  const storedUser = getStoredUser();
+  const scope = storedUser?.id
+    ? `user:${storedUser.id}`
+    : storedUser?.username
+    ? `user:${storedUser.username}`
+    : "guest";
+  const key = `livechatConversationId:${scope}`;
   try {
     const existing = localStorage.getItem(key);
     if (existing) return existing;

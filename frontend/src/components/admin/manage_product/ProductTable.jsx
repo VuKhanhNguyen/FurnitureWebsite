@@ -2,6 +2,8 @@ import React from "react";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 
 const ProductTable = ({ products, onView, onEdit, onDelete }) => {
+  const safeProducts = Array.isArray(products) ? products : [];
+
   return (
     <div className="product-table-container">
       <table className="product-table">
@@ -18,7 +20,7 @@ const ProductTable = ({ products, onView, onEdit, onDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {safeProducts.map((product) => (
             <tr key={product.id}>
               <td>{product.id}</td>
               <td className="product-name">{product.name}</td>
@@ -31,7 +33,9 @@ const ProductTable = ({ products, onView, onEdit, onDelete }) => {
                 {product.price?.toLocaleString("vi-VN")}đ
               </td>
               <td className="product-price">
-                {product.sale_price > 0 ? `${product.sale_price?.toLocaleString("vi-VN")}đ` : "-"}
+                {product.sale_price > 0
+                  ? `${product.sale_price?.toLocaleString("vi-VN")}đ`
+                  : "-"}
               </td>
               <td className="product-stock">{product.quantity}</td>
               <td>
@@ -68,6 +72,14 @@ const ProductTable = ({ products, onView, onEdit, onDelete }) => {
           ))}
         </tbody>
       </table>
+
+      {safeProducts.length === 0 && (
+        <div style={{ textAlign: "center", padding: "3rem", color: "#6b7280" }}>
+          <p style={{ fontSize: "1.125rem", margin: 0 }}>
+            Không có sản phẩm nào
+          </p>
+        </div>
+      )}
     </div>
   );
 };

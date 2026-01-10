@@ -1,11 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ChatWindow from "./ChatWindow";
 import "../../assets/css/chatbot.css";
 import { getOrCreateConversationId } from "../../services/liveChatService";
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const conversationId = getOrCreateConversationId();
+  const [conversationId, setConversationId] = useState(() =>
+    getOrCreateConversationId()
+  );
+  // Đóng chatbot khi đăng xuất
+  useEffect(() => {
+    const handleAuthChange = () => {
+      // Close + switch to the correct scoped conversation for the new auth state.
+      setIsOpen(false);
+      setConversationId(getOrCreateConversationId());
+    };
+
+    window.addEventListener("auth:changed", handleAuthChange);
+    // Backward-compat: some flows still emit cart:updated on logout.
+    window.addEventListener("cart:updated", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("auth:changed", handleAuthChange);
+      window.removeEventListener("cart:updated", handleAuthChange);
+    };
+  }, []);
 
   return (
     <div className="chatbot-container">

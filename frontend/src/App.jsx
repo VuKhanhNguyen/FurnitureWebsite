@@ -1,5 +1,10 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import UserLayout from "./components/layouts/UserLayout";
 import HomePage from "./components/pages/HomePage";
 import ProductsListPage from "./components/pages/productListPage";
@@ -30,13 +35,46 @@ import AdminProfile from "./components/admin/pages/AdminProfile";
 import ChatWidget from "./components/chatbot/ChatWidget";
 import LiveChat from "./components/admin/pages/LiveChat";
 
-function App() {
-  const [showOffcanvas, setShowOffcanvas] = useState(false);
+import userStatusMonitor from "./services/userStatusMonitor";
+import { getToken } from "./services/authStorage";
+
+function AppContent({ showOffcanvas, setShowOffcanvas }) {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const isAuthRoute = ["/login", "/register", "/forgot-password"].includes(
+    location.pathname
+  );
+  const shouldShowChatWidget = !isAdminRoute && !isAuthRoute;
+
+  useEffect(() => {
+    // Bắt đầu monitoring nếu user đã login
+    const token = getToken();
+    if (token) {
+      userStatusMonitor.startMonitoring();
+    }
+
+    // Lắng nghe sự kiện login/logout để bật/tắt monitoring
+    const handleAuthChange = () => {
+      const currentToken = getToken();
+      if (currentToken) {
+        userStatusMonitor.startMonitoring();
+      } else {
+        userStatusMonitor.stopMonitoring();
+      }
+    };
+
+    window.addEventListener("cart:updated", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("cart:updated", handleAuthChange);
+      userStatusMonitor.stopMonitoring();
+    };
+  }, []);
 
   return (
-    <Router>
+    <>
       <SessionTimeoutWatcher />
-      <ChatWidget />
+      {shouldShowChatWidget && <ChatWidget />}
       <Routes>
         <Route element={<UserLayout />}>
           <Route
@@ -194,6 +232,19 @@ function App() {
           <Route path="/admin/livechat" element={<LiveChat />} />
         </Route>
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  const [showOffcanvas, setShowOffcanvas] = useState(false);
+
+  return (
+    <Router>
+      <AppContent
+        showOffcanvas={showOffcanvas}
+        setShowOffcanvas={setShowOffcanvas}
+      />
     </Router>
   );
 }

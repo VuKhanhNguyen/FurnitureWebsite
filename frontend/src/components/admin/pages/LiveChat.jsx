@@ -39,6 +39,26 @@ const LiveChat = () => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const formatMessageTs = (value) => {
+    try {
+      if (!value) return "";
+      const d = value instanceof Date ? value : new Date(value);
+      if (Number.isNaN(d.getTime())) return "";
+      const time = d.toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const date = d.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+      return `${time} (${date})`;
+    } catch {
+      return "";
+    }
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -238,6 +258,15 @@ const LiveChat = () => {
                 >
                   {m.text}
                 </div>
+                {!!m.ts && (
+                  <div
+                    className={`mt-1 text-xs text-gray-500 ${
+                      m.sender === "agent" ? "text-right" : "text-left"
+                    }`}
+                  >
+                    {formatMessageTs(m.ts)}
+                  </div>
+                )}
               </div>
             ))}
             <div ref={endRef} />
