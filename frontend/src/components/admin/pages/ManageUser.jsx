@@ -7,6 +7,7 @@ import AddUser from "../manage_user/AddUser";
 import EditUser from "../manage_user/EditUser";
 import ViewUser from "../manage_user/ViewUser";
 import userService from "../../../services/userService";
+import "./ManageUser.css";
 
 const ManageUser = () => {
   const [users, setUsers] = useState([]);

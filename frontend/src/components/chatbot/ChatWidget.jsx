@@ -1,9 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ChatWindow from "./ChatWindow";
 import "../../assets/css/chatbot.css";
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
+
+    // Đóng chatbot khi đăng xuất
+    useEffect(() => {
+        const handleAuthChange = () => {
+            setIsOpen(false);
+        };
+
+        window.addEventListener("cart:updated", handleAuthChange);
+
+        return () => {
+            window.removeEventListener("cart:updated", handleAuthChange);
+        };
+    }, []);
 
     return (
         <div className="chatbot-container">

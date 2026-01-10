@@ -32,7 +32,7 @@ const AdminProfile = () => {
     setUser({ ...(storedUser || {}), token });
     setPhone("");
     fetchProfile(token);
-  }, []);
+  }, [navigate]);
 
   const fetchProfile = async (token) => {
     try {
@@ -95,6 +95,7 @@ const AdminProfile = () => {
         setErrorType("error");
       }
     } catch (error) {
+      console.error("Error updating profile:", error);
       setMsg("Lỗi Server");
       setErrorType("error");
     }
