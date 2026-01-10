@@ -22,13 +22,17 @@ const userService = {
 
   // Lấy tất cả người dùng
   getAllUsers: async () => {
-    const response = await axiosInstance.get("/api/users");
+    const response = await axiosInstance.get("/api/users", {
+      headers: authHeaders(),
+    });
     return response.data.data;
   },
 
   // Lấy người dùng theo ID
   getUserById: async (id) => {
-    const response = await axiosInstance.get(`/api/users/${id}`);
+    const response = await axiosInstance.get(`/api/users/${id}`, {
+      headers: authHeaders(),
+    });
     return response.data.data;
   },
 
@@ -50,7 +54,10 @@ const userService = {
     console.log("Sending FormData to API...");
     try {
       const response = await axiosInstance.post("/api/users", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          ...authHeaders(),
+        },
       });
       console.log("API Response:", response.data);
       return response.data.data;
@@ -79,14 +86,19 @@ const userService = {
     }
 
     const response = await axiosInstance.put(`/api/users/${id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...authHeaders(),
+      },
     });
     return response.data.data;
   },
 
   // Xóa người dùng
   deleteUser: async (id) => {
-    const response = await axiosInstance.delete(`/api/users/${id}`);
+    const response = await axiosInstance.delete(`/api/users/${id}`, {
+      headers: authHeaders(),
+    });
     return response.data;
   },
 };

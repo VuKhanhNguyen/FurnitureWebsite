@@ -115,7 +115,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
     padding: "0.625rem 0.875rem",
     border: "2px solid #e2e8f0",
     borderRadius: "8px",
-    fontSize: "0.9375rem",
+    fontSize: "1.5rem",
     background: "white",
     width: "100%",
   };
@@ -132,7 +132,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
     padding: "0.625rem 1.25rem",
     border: "none",
     borderRadius: "8px",
-    fontSize: "0.9375rem",
+    fontSize: "1.5rem",
     fontWeight: 600,
     cursor: "pointer",
   };
@@ -141,7 +141,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
     return (
       <div style={containerStyle}>
         <div style={{ textAlign: "center", padding: "3rem" }}>
-          <p style={{ fontSize: "1.2rem", color: "#667eea" }}>Đang tải...</p>
+          <p style={{ fontSize: "1.5rem", color: "#667eea" }}>Đang tải...</p>
         </div>
       </div>
     );
@@ -178,7 +178,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
             padding: 0,
             background: "#fed7d7",
             color: "#742a2a",
-            fontSize: "1.2rem",
+            fontSize: "1.5rem",
             justifyContent: "center",
           }}
         >
@@ -216,7 +216,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
           >
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -235,7 +235,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
             {errors.username && (
               <span
                 style={{
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   color: "#c53030",
                   marginTop: "0.25rem",
                 }}
@@ -250,7 +250,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
           >
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -269,7 +269,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
             {errors.email && (
               <span
                 style={{
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   color: "#c53030",
                   marginTop: "0.25rem",
                 }}
@@ -292,7 +292,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
           >
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -314,7 +314,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
           >
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -344,7 +344,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
           >
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -367,7 +367,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
           >
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -390,7 +390,7 @@ const EditUser = ({ userId, onSubmit, onCancel }) => {
           style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
         >
           <label
-            style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}
+            style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}
           >
             Avatar
           </label>

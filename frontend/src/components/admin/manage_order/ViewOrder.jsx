@@ -59,7 +59,7 @@ const ViewOrder = ({ orderId, onClose }) => {
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
-        <p style={{ fontSize: "1.2rem", color: "#667eea" }}>Đang tải...</p>
+        <p style={{ fontSize: "1.5rem", color: "#667eea" }}>Đang tải...</p>
       </div>
     );
   }
@@ -67,7 +67,7 @@ const ViewOrder = ({ orderId, onClose }) => {
   if (!order) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
-        <p style={{ fontSize: "1.2rem", color: "#ef4444" }}>
+        <p style={{ fontSize: "1.5rem", color: "#ef4444" }}>
           Không tìm thấy đơn hàng
         </p>
       </div>
@@ -108,12 +108,15 @@ const ViewOrder = ({ orderId, onClose }) => {
         <button
           onClick={onClose}
           style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             width: "40px",
             height: "40px",
             padding: 0,
             background: "#fed7d7",
             color: "#742a2a",
-            fontSize: "1.2rem",
+            fontSize: "1.5rem",
             border: "none",
             borderRadius: "8px",
             cursor: "pointer",
@@ -134,7 +137,7 @@ const ViewOrder = ({ orderId, onClose }) => {
         <div>
           <h3
             style={{
-              fontSize: "1.125rem",
+              fontSize: "1.5rem",
               fontWeight: 600,
               color: "#2d3748",
               marginBottom: "1rem",
@@ -152,20 +155,20 @@ const ViewOrder = ({ orderId, onClose }) => {
               borderRadius: "8px",
             }}
           >
-            <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+            <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
               <strong>Tên:</strong> {order.shipping_fullname}
             </p>
-            <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+            <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
               <strong>Email:</strong> {order.shipping_email}
             </p>
-            <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+            <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
               <strong>Điện thoại:</strong> {order.shipping_phone}
             </p>
-            <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+            <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
               <strong>Địa chỉ:</strong> {order.shipping_address}
             </p>
             {order.shipping_city && (
-              <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+              <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
                 <strong>Thành phố:</strong> {order.shipping_city}
               </p>
             )}
@@ -175,7 +178,7 @@ const ViewOrder = ({ orderId, onClose }) => {
         <div>
           <h3
             style={{
-              fontSize: "1.125rem",
+              fontSize: "1.5rem",
               fontWeight: 600,
               color: "#2d3748",
               marginBottom: "1rem",
@@ -193,17 +196,17 @@ const ViewOrder = ({ orderId, onClose }) => {
               borderRadius: "8px",
             }}
           >
-            <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+            <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
               <strong>Ngày đặt:</strong> {formatDate(order.order_date)}
             </p>
-            <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+            <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
               <strong>Trạng thái:</strong>
               <span
                 style={{
                   marginLeft: "0.5rem",
                   padding: "0.25rem 0.5rem",
                   borderRadius: "6px",
-                  fontSize: "0.8125rem",
+                  fontSize: "1.5rem",
                   fontWeight: 500,
                   color: "white",
                   background: getStatusColor(order.status),
@@ -220,13 +223,13 @@ const ViewOrder = ({ orderId, onClose }) => {
                   : "Đã hủy"}
               </span>
             </p>
-            <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+            <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
               <strong>Phương thức thanh toán:</strong>{" "}
               {order.payment_method === "cod"
                 ? "Thanh toán khi nhận hàng"
                 : order.payment_method}
             </p>
-            <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+            <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
               <strong>Trạng thái thanh toán:</strong>{" "}
               {order.payment_status === "paid"
                 ? "Đã thanh toán"
@@ -235,7 +238,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                 : "Thất bại"}
             </p>
             {order.note && (
-              <p style={{ margin: "0.5rem 0", fontSize: "0.9375rem" }}>
+              <p style={{ margin: "0.5rem 0", fontSize: "1.5rem" }}>
                 <strong>Ghi chú:</strong> {order.note}
               </p>
             )}
@@ -246,7 +249,7 @@ const ViewOrder = ({ orderId, onClose }) => {
       <div style={{ marginBottom: "2rem" }}>
         <h3
           style={{
-            fontSize: "1.125rem",
+            fontSize: "1.5rem",
             fontWeight: 600,
             color: "#2d3748",
             marginBottom: "1rem",
@@ -268,7 +271,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                   style={{
                     padding: "0.75rem",
                     textAlign: "left",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     fontWeight: 600,
                   }}
                 >
@@ -278,7 +281,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                   style={{
                     padding: "0.75rem",
                     textAlign: "center",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     fontWeight: 600,
                   }}
                 >
@@ -288,7 +291,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                   style={{
                     padding: "0.75rem",
                     textAlign: "right",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     fontWeight: 600,
                   }}
                 >
@@ -298,7 +301,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                   style={{
                     padding: "0.75rem",
                     textAlign: "right",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     fontWeight: 600,
                   }}
                 >
@@ -317,7 +320,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                         : "none",
                   }}
                 >
-                  <td style={{ padding: "0.75rem", fontSize: "0.875rem" }}>
+                  <td style={{ padding: "0.75rem", fontSize: "1.5rem" }}>
                     <div
                       style={{
                         display: "flex",
@@ -342,7 +345,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                           {item.product?.name}
                         </div>
                         <div
-                          style={{ fontSize: "0.8125rem", color: "#6b7280" }}
+                          style={{ fontSize: "1.5rem", color: "#6b7280" }}
                         >
                           ID: {item.product_id}
                         </div>
@@ -353,7 +356,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                     style={{
                       padding: "0.75rem",
                       textAlign: "center",
-                      fontSize: "0.875rem",
+                      fontSize: "1.5rem",
                     }}
                   >
                     {item.quantity}
@@ -362,7 +365,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                     style={{
                       padding: "0.75rem",
                       textAlign: "right",
-                      fontSize: "0.875rem",
+                      fontSize: "1.5rem",
                     }}
                   >
                     {formatCurrency(item.price)}
@@ -371,7 +374,7 @@ const ViewOrder = ({ orderId, onClose }) => {
                     style={{
                       padding: "0.75rem",
                       textAlign: "right",
-                      fontSize: "0.875rem",
+                      fontSize: "1.5rem",
                       fontWeight: 600,
                     }}
                   >
@@ -399,8 +402,8 @@ const ViewOrder = ({ orderId, onClose }) => {
             marginBottom: "0.5rem",
           }}
         >
-          <span style={{ fontSize: "0.9375rem" }}>Tạm tính:</span>
-          <span style={{ fontSize: "0.9375rem" }}>
+          <span style={{ fontSize: "1.5rem" }}>Tạm tính:</span>
+          <span style={{ fontSize: "1.5rem" }}>
             {formatCurrency(order.subtotal_amount)}
           </span>
         </div>
@@ -412,8 +415,8 @@ const ViewOrder = ({ orderId, onClose }) => {
             marginBottom: "0.5rem",
           }}
         >
-          <span style={{ fontSize: "0.9375rem" }}>Phí vận chuyển:</span>
-          <span style={{ fontSize: "0.9375rem" }}>
+          <span style={{ fontSize: "1.5rem" }}>Phí vận chuyển:</span>
+          <span style={{ fontSize: "1.5rem" }}>
             {formatCurrency(order.shipping_fee)}
           </span>
         </div>
@@ -426,8 +429,8 @@ const ViewOrder = ({ orderId, onClose }) => {
               marginBottom: "0.5rem",
             }}
           >
-            <span style={{ fontSize: "0.9375rem" }}>Giảm giá:</span>
-            <span style={{ fontSize: "0.9375rem", color: "#10b981" }}>
+            <span style={{ fontSize: "1.5rem" }}>Giảm giá:</span>
+            <span style={{ fontSize: "1.5rem", color: "#10b981" }}>
               -{formatCurrency(order.discount_amount)}
             </span>
           </div>
@@ -441,11 +444,11 @@ const ViewOrder = ({ orderId, onClose }) => {
             borderTop: "2px solid #e2e8f0",
           }}
         >
-          <span style={{ fontSize: "1.125rem", fontWeight: 600 }}>
+          <span style={{ fontSize: "1.5rem", fontWeight: 600 }}>
             Tổng cộng:
           </span>
           <span
-            style={{ fontSize: "1.125rem", fontWeight: 700, color: "#667eea" }}
+            style={{ fontSize: "1.5rem", fontWeight: 700, color: "#667eea" }}
           >
             {formatCurrency(order.total_amount)}
           </span>

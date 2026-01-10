@@ -12,7 +12,7 @@ export function Footer() {
             <div className="footer-grid-3">
               <div className="footer-widget-4">
                 <div className="footer-logo mb-35">
-                  <a href="index.html">
+                  <a href="/">
                     <img src={logofooter} alt="image bnot found" />
                   </a>
                 </div>
@@ -67,7 +67,7 @@ export function Footer() {
                 <div className="footer-link" style={{ fontSize: "16px" }}>
                   <ul>
                     <li>
-                      <a href="index.html">Trang chủ</a>
+                      <a href="/">Trang chủ</a>
                     </li>
                     <li>
                       <a href="about.html">Về chúng tôi</a>

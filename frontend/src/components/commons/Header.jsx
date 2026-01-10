@@ -121,7 +121,7 @@ export function Header({ onOpenOffcanvas }) {
                 <div className="header-main-4">
                   <div className="header-left">
                     <div className="header-logo">
-                      <a href="index.html">
+                      <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
                         <img src={logo} alt="logo not found" />
                       </a>
                     </div>

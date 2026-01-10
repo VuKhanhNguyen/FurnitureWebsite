@@ -11,7 +11,7 @@ const UserHeader = ({ onAddClick }) => {
     color: "white",
     border: "none",
     borderRadius: "8px",
-    fontSize: "0.875rem",
+    fontSize: "1.5rem",
     fontWeight: 600,
     cursor: "pointer",
     transition: "all 0.3s ease",
@@ -20,7 +20,7 @@ const UserHeader = ({ onAddClick }) => {
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-      <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
+      <h1 style={{ fontSize: "2.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
         Quản Lý Người Dùng
       </h1>
       <button 

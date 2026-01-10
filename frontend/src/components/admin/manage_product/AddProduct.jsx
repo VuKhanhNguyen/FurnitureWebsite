@@ -136,7 +136,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
     padding: "0.625rem 0.875rem",
     border: "2px solid #e2e8f0",
     borderRadius: "8px",
-    fontSize: "0.9375rem",
+    fontSize: "1.5rem",
     background: "white",
   };
 
@@ -146,7 +146,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
   };
 
   const errorTextStyle = {
-    fontSize: "0.875rem",
+    fontSize: "1.5rem",
     color: "#c53030",
     marginTop: "0.25rem",
   };
@@ -167,7 +167,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
     padding: "0.625rem 1.25rem",
     border: "none",
     borderRadius: "8px",
-    fontSize: "0.9375rem",
+    fontSize: "1.5rem",
     fontWeight: 600,
     cursor: "pointer",
   };
@@ -188,13 +188,18 @@ const AddProduct = ({ onSubmit, onCancel }) => {
         <button
           onClick={onCancel}
           style={{
-            ...btnStyle,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             width: "40px",
             height: "40px",
             padding: 0,
+            border: "none",
+            borderRadius: "8px",
             background: "#fed7d7",
             color: "#742a2a",
-            fontSize: "1.2rem",
+            fontSize: "1.5rem",
+            cursor: "pointer",
           }}
         >
           <FaTimes />
@@ -220,7 +225,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
           <div style={formGroupStyle}>
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -241,7 +246,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
           <div style={formGroupStyle}>
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -266,7 +271,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
 
         <div style={formGroupStyle}>
           <label
-            style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}
+            style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}
           >
             Hình ảnh
           </label>
@@ -307,7 +312,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
 
         <div style={formGroupStyle}>
           <label
-            style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}
+            style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}
           >
             Mô tả ngắn *
           </label>
@@ -324,7 +329,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
 
         <div style={formGroupStyle}>
           <label
-            style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}
+            style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}
           >
             Mô tả chi tiết *
           </label>
@@ -343,7 +348,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
           <div style={formGroupStyle}>
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -365,7 +370,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
           <div style={formGroupStyle}>
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -389,7 +394,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
           <div style={formGroupStyle}>
             <label
               style={{
-                fontSize: "0.9375rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "#2d3748",
               }}
@@ -412,7 +417,7 @@ const AddProduct = ({ onSubmit, onCancel }) => {
         <div style={formGroupStyle}>
           <label
             style={{
-              fontSize: "0.9375rem",
+              fontSize: "1.5rem",
               fontWeight: 600,
               color: "#2d3748",
             }}

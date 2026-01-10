@@ -87,7 +87,7 @@ const AddUser = ({ onSubmit, onCancel }) => {
     padding: "0.625rem 0.875rem",
     border: "2px solid #e2e8f0",
     borderRadius: "8px",
-    fontSize: "0.9375rem",
+    fontSize: "1.5rem",
     background: "white",
     width: "100%",
   };
@@ -104,7 +104,7 @@ const AddUser = ({ onSubmit, onCancel }) => {
     padding: "0.625rem 1.25rem",
     border: "none",
     borderRadius: "8px",
-    fontSize: "0.9375rem",
+    fontSize: "1.5rem",
     fontWeight: 600,
     cursor: "pointer",
   };
@@ -113,7 +113,7 @@ const AddUser = ({ onSubmit, onCancel }) => {
     <div style={containerStyle}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", paddingBottom: "1rem", borderBottom: "2px solid #e2e8f0" }}>
         <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>Thêm Người Dùng Mới</h2>
-        <button onClick={onCancel} style={{ ...btnStyle, width: "40px", height: "40px", padding: 0, background: "#fed7d7", color: "#742a2a", fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <button onClick={onCancel} style={{ ...btnStyle, width: "40px", height: "40px", padding: 0, background: "#fed7d7", color: "#742a2a", fontSize: "1.5rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <FaTimes />
         </button>
       </div>
@@ -127,38 +127,38 @@ const AddUser = ({ onSubmit, onCancel }) => {
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "1.5rem" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <label style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}>Tên đăng nhập *</label>
-            <input type="text" name="username" value={formData.username} onChange={handleChange} required placeholder="Nhập tên đăng nhập" style={errors.username ? errorInputStyle : inputStyle} />
-            {errors.username && <span style={{ fontSize: "0.875rem", color: "#c53030", marginTop: "0.25rem" }}>{errors.username}</span>}
+            <label style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}>Tên đăng nhập *</label>
+            <input type="text" name="username" value={formData.username} onChange={handleChange} required placeholder="Nhập tên đăng nhập" autoComplete="off" style={errors.username ? errorInputStyle : inputStyle} />
+            {errors.username && <span style={{ fontSize: "1.5rem", color: "#c53030", marginTop: "0.25rem" }}>{errors.username}</span>}
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <label style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}>Mật khẩu *</label>
-            <input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="Nhập mật khẩu (6-72 ký tự)" style={errors.password ? errorInputStyle : inputStyle} />
-            {errors.password && <span style={{ fontSize: "0.875rem", color: "#c53030", marginTop: "0.25rem" }}>{errors.password}</span>}
+            <label style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}>Mật khẩu *</label>
+            <input type="password" name="password" value={formData.password} onChange={handleChange} required placeholder="Nhập mật khẩu (6-72 ký tự)" autoComplete="new-password" style={errors.password ? errorInputStyle : inputStyle} />
+            {errors.password && <span style={{ fontSize: "1.5rem", color: "#c53030", marginTop: "0.25rem" }}>{errors.password}</span>}
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <label style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}>Email *</label>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Nhập email" style={errors.email ? errorInputStyle : inputStyle} />
-          {errors.email && <span style={{ fontSize: "0.875rem", color: "#c53030", marginTop: "0.25rem" }}>{errors.email}</span>}
+          <label style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}>Email *</label>
+          <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Nhập email" autoComplete="off" style={errors.email ? errorInputStyle : inputStyle} />
+          {errors.email && <span style={{ fontSize: "1.5rem", color: "#c53030", marginTop: "0.25rem" }}>{errors.email}</span>}
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "1.5rem" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <label style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}>Họ tên</label>
+            <label style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}>Họ tên</label>
             <input type="text" name="full_name" value={formData.full_name} onChange={handleChange} placeholder="Nhập họ tên" style={inputStyle} />
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <label style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}>Số điện thoại</label>
+            <label style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}>Số điện thoại</label>
             <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Nhập số điện thoại" style={inputStyle} />
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <label style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}>Vai trò</label>
+          <label style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}>Vai trò</label>
           <select name="role" value={formData.role} onChange={handleChange} style={inputStyle}>
             <option value="customer">Khách hàng</option>
             <option value="admin">Quản trị viên</option>
@@ -166,7 +166,7 @@ const AddUser = ({ onSubmit, onCancel }) => {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <label style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748" }}>Avatar</label>
+          <label style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748" }}>Avatar</label>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <input type="file" accept="image/*" onChange={handleAvatarChange} id="avatar-input" style={{ display: "none" }} />
             <label htmlFor="avatar-input" style={{ ...btnStyle, background: "#e2e8f0", color: "#4a5568", padding: "0.625rem 1.25rem" }}>

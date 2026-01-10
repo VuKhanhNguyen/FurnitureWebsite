@@ -29,7 +29,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
     justifyContent: "center",
     cursor: "pointer",
     transition: "all 0.3s ease",
-    fontSize: "0.95rem",
+    fontSize: "1.5rem",
   };
 
   return (
@@ -41,7 +41,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               style={{
                 padding: "0.875rem",
                 textAlign: "left",
-                fontSize: "0.8125rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "white",
                 textTransform: "uppercase",
@@ -54,7 +54,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               style={{
                 padding: "0.875rem",
                 textAlign: "left",
-                fontSize: "0.8125rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "white",
                 textTransform: "uppercase",
@@ -67,7 +67,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               style={{
                 padding: "0.875rem",
                 textAlign: "left",
-                fontSize: "0.8125rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "white",
                 textTransform: "uppercase",
@@ -80,7 +80,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               style={{
                 padding: "0.875rem",
                 textAlign: "left",
-                fontSize: "0.8125rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "white",
                 textTransform: "uppercase",
@@ -93,7 +93,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               style={{
                 padding: "0.875rem",
                 textAlign: "left",
-                fontSize: "0.8125rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "white",
                 textTransform: "uppercase",
@@ -106,7 +106,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               style={{
                 padding: "0.875rem",
                 textAlign: "left",
-                fontSize: "0.8125rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "white",
                 textTransform: "uppercase",
@@ -119,7 +119,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               style={{
                 padding: "0.875rem",
                 textAlign: "left",
-                fontSize: "0.8125rem",
+                fontSize: "1.5rem",
                 fontWeight: 600,
                 color: "white",
                 textTransform: "uppercase",
@@ -148,7 +148,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               <td
                 style={{
                   padding: "0.875rem",
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   color: "#4a5568",
                 }}
               >
@@ -188,7 +188,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               <td
                 style={{
                   padding: "0.875rem",
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   color: "#2d3748",
                   fontWeight: 600,
                 }}
@@ -198,7 +198,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               <td
                 style={{
                   padding: "0.875rem",
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   color: "#4a5568",
                 }}
               >
@@ -207,7 +207,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               <td
                 style={{
                   padding: "0.875rem",
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   color: "#4a5568",
                 }}
               >
@@ -216,7 +216,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               <td
                 style={{
                   padding: "0.875rem",
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   color: "#4a5568",
                 }}
               >
@@ -227,7 +227,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
                     background: user.role === "admin" ? "#feebc8" : "#e2e8f0",
                     color: user.role === "admin" ? "#7c2d12" : "#4a5568",
                     borderRadius: "6px",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     fontWeight: 500,
                   }}
                 >
@@ -237,7 +237,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               <td
                 style={{
                   padding: "0.875rem",
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   color: "#4a5568",
                 }}
               >
@@ -249,7 +249,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
                       user.status === "active" ? "#c6f6d5" : "#fed7d7",
                     color: user.status === "active" ? "#22543d" : "#742a2a",
                     borderRadius: "6px",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     fontWeight: 600,
                   }}
                 >
@@ -259,7 +259,7 @@ const UserTable = ({ users, onView, onEdit, onDelete }) => {
               <td
                 style={{
                   padding: "0.875rem",
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   color: "#4a5568",
                 }}
               >

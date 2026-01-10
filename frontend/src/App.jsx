@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import UserLayout from "./components/layouts/UserLayout";
 import HomePage from "./components/pages/HomePage";
@@ -28,9 +28,36 @@ import SessionTimeoutWatcher from "./components/commons/SessionTimeoutWatcher";
 import ManageOrder from "./components/admin/pages/ManageOrder";
 import AdminProfile from "./components/admin/pages/AdminProfile";
 import ChatWidget from "./components/chatbot/ChatWidget";
+import userStatusMonitor from "./services/userStatusMonitor";
+import { getToken } from "./services/authStorage";
 
 function App() {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
+
+  useEffect(() => {
+    // Bắt đầu monitoring nếu user đã login
+    const token = getToken();
+    if (token) {
+      userStatusMonitor.startMonitoring();
+    }
+
+    // Lắng nghe sự kiện login/logout để bật/tắt monitoring
+    const handleAuthChange = () => {
+      const currentToken = getToken();
+      if (currentToken) {
+        userStatusMonitor.startMonitoring();
+      } else {
+        userStatusMonitor.stopMonitoring();
+      }
+    };
+
+    window.addEventListener("cart:updated", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("cart:updated", handleAuthChange);
+      userStatusMonitor.stopMonitoring();
+    };
+  }, []);
 
   return (
     <Router>

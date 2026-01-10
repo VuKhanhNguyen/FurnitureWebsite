@@ -9,13 +9,20 @@ from app.schemas.base_schema import DataResponse
 from app.schemas.order_schema import OrderResponse
 from datetime import datetime
 import pytz
+from app.middleware.authenticate import authenticate
 
 router = APIRouter()
 
 @router.get("/orders", tags=["orders"], description="Get all orders")
-async def get_orders(db: Session = Depends(get_db)):
+async def get_orders(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(authenticate),
+):
     try:
-        orders = db.query(Order).order_by(Order.id.desc()).all()
+        query = db.query(Order)
+        if getattr(current_user, "role", None) != "admin":
+            query = query.filter(Order.user_id == current_user.id)
+        orders = query.order_by(Order.id.desc()).all()
         
         # Manually load relationships
         result = []
@@ -68,9 +75,16 @@ async def get_orders(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/orders/{order_id}", tags=["orders"], description="Get order by id")
-def get_order(order_id: int, db: Session = Depends(get_db)):
+def get_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(authenticate),
+):
     try:
-        order = db.query(Order).filter(Order.id == order_id).first()
+        query = db.query(Order).filter(Order.id == order_id)
+        if getattr(current_user, "role", None) != "admin":
+            query = query.filter(Order.user_id == current_user.id)
+        order = query.first()
         if not order:
             return DataResponse.custom_response(code="404", message="Order not found", data=None)
         
@@ -123,9 +137,12 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
 async def update_order_status(
     order_id: int,
     status: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(authenticate),
 ):
     try:
+        if getattr(current_user, "role", None) != "admin":
+            raise HTTPException(status_code=403, detail="Forbidden")
         order = db.query(Order).filter(Order.id == order_id).first()
         if not order:
             return DataResponse.custom_response(code="404", message="Order not found", data=None)
@@ -170,8 +187,11 @@ async def update_payment_status(
     order_id: int,
     payment_status: str,
     db: Session = Depends(get_db),
+    current_user: User = Depends(authenticate),
 ):
     try:
+        if getattr(current_user, "role", None) != "admin":
+            raise HTTPException(status_code=403, detail="Forbidden")
         order = db.query(Order).filter(Order.id == order_id).first()
         if not order:
             return DataResponse.custom_response(code="404", message="Order not found", data=None)

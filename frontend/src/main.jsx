@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
+// CSS đã được load trực tiếp trong index.html để tránh FOUC
 // import "./assets/css/bootstrap.min.css";
 // import "./assets/css/meanmenu.min.css";
 // import "./assets/css/animate.css";

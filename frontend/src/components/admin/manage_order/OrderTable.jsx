@@ -66,7 +66,7 @@ const OrderTable = ({
     padding: "0.375rem 0.75rem",
     border: "none",
     borderRadius: "6px",
-    fontSize: "0.8125rem",
+    fontSize: "1.5rem",
     fontWeight: 500,
     cursor: "pointer",
   };
@@ -81,7 +81,7 @@ const OrderTable = ({
                 style={{
                   padding: "0.875rem",
                   textAlign: "left",
-                  fontSize: "0.8125rem",
+                  fontSize: "1.5rem",
                   fontWeight: 600,
                   color: "white",
                   textTransform: "uppercase",
@@ -94,7 +94,7 @@ const OrderTable = ({
                 style={{
                   padding: "0.875rem",
                   textAlign: "left",
-                  fontSize: "0.8125rem",
+                  fontSize: "1.5rem",
                   fontWeight: 600,
                   color: "white",
                   textTransform: "uppercase",
@@ -107,7 +107,7 @@ const OrderTable = ({
                 style={{
                   padding: "0.875rem",
                   textAlign: "left",
-                  fontSize: "0.8125rem",
+                  fontSize: "1.5rem",
                   fontWeight: 600,
                   color: "white",
                   textTransform: "uppercase",
@@ -120,7 +120,7 @@ const OrderTable = ({
                 style={{
                   padding: "0.875rem",
                   textAlign: "left",
-                  fontSize: "0.8125rem",
+                  fontSize: "1.5rem",
                   fontWeight: 600,
                   color: "white",
                   textTransform: "uppercase",
@@ -133,7 +133,7 @@ const OrderTable = ({
                 style={{
                   padding: "0.875rem",
                   textAlign: "left",
-                  fontSize: "0.8125rem",
+                  fontSize: "1.5rem",
                   fontWeight: 600,
                   color: "white",
                   textTransform: "uppercase",
@@ -146,7 +146,7 @@ const OrderTable = ({
                 style={{
                   padding: "0.875rem",
                   textAlign: "left",
-                  fontSize: "0.8125rem",
+                  fontSize: "1.5rem",
                   fontWeight: 600,
                   color: "white",
                   textTransform: "uppercase",
@@ -159,7 +159,7 @@ const OrderTable = ({
                 style={{
                   padding: "0.875rem",
                   textAlign: "center",
-                  fontSize: "0.8125rem",
+                  fontSize: "1.5rem",
                   fontWeight: 600,
                   color: "white",
                   textTransform: "uppercase",
@@ -182,7 +182,7 @@ const OrderTable = ({
                 <td
                   style={{
                     padding: "0.875rem",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     color: "#2d3748",
                     fontWeight: 600,
                   }}
@@ -192,7 +192,7 @@ const OrderTable = ({
                 <td
                   style={{
                     padding: "0.875rem",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     color: "#4a5568",
                   }}
                 >
@@ -200,7 +200,7 @@ const OrderTable = ({
                     <div style={{ fontWeight: 500 }}>
                       {order.shipping_fullname}
                     </div>
-                    <div style={{ fontSize: "0.8125rem", color: "#6b7280" }}>
+                    <div style={{ fontSize: "1.5rem", color: "#6b7280" }}>
                       {order.shipping_email}
                     </div>
                   </div>
@@ -208,7 +208,7 @@ const OrderTable = ({
                 <td
                   style={{
                     padding: "0.875rem",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     color: "#4a5568",
                   }}
                 >
@@ -217,7 +217,7 @@ const OrderTable = ({
                 <td
                   style={{
                     padding: "0.875rem",
-                    fontSize: "0.875rem",
+                    fontSize: "1.5rem",
                     color: "#4a5568",
                     fontWeight: 600,
                   }}
@@ -232,7 +232,7 @@ const OrderTable = ({
                       padding: "0.25rem 0.5rem",
                       borderRadius: "6px",
                       border: "1px solid #e2e8f0",
-                      fontSize: "0.8125rem",
+                      fontSize: "1.5rem",
                       fontWeight: 500,
                       color: getStatusColor(order.status),
                       background: "white",
@@ -267,7 +267,7 @@ const OrderTable = ({
                       padding: "0.25rem 0.5rem",
                       borderRadius: "6px",
                       border: "1px solid #e2e8f0",
-                      fontSize: "0.8125rem",
+                      fontSize: "1.5rem",
                       fontWeight: 500,
                       color: getPaymentStatusColor(order.payment_status),
                       background: "white",

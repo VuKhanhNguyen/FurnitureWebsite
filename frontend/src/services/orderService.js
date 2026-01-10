@@ -26,7 +26,9 @@ const authHeaders = () => {
 const orderService = {
   // Lấy tất cả đơn hàng
   getAllOrders: async () => {
-    const response = await axiosInstance.get("/api/orders");
+    const response = await axiosInstance.get("/api/orders", {
+      headers: authHeaders(),
+    });
     return response.data.data;
   },
 
@@ -41,7 +43,9 @@ const orderService = {
 
   // Lấy đơn hàng theo ID
   getOrderById: async (id) => {
-    const response = await axiosInstance.get(`/api/orders/${id}`);
+    const response = await axiosInstance.get(`/api/orders/${id}`, {
+      headers: authHeaders(),
+    });
     return response.data.data;
   },
 
@@ -70,7 +74,11 @@ const orderService = {
     console.log(`Updating order ${id} to status ${status}`);
     try {
       const response = await axiosInstance.put(
-        `/api/orders/${id}/status?status=${status}`
+        `/api/orders/${id}/status?status=${status}`,
+        null,
+        {
+          headers: authHeaders(),
+        }
       );
       console.log("Update response:", response.data);
       return response.data.data;
@@ -88,7 +96,11 @@ const orderService = {
     console.log(`Updating order ${id} payment_status to ${paymentStatus}`);
     try {
       const response = await axiosInstance.put(
-        `/api/orders/${id}/payment-status?payment_status=${paymentStatus}`
+        `/api/orders/${id}/payment-status?payment_status=${paymentStatus}`,
+        null,
+        {
+          headers: authHeaders(),
+        }
       );
       return response.data.data;
     } catch (error) {

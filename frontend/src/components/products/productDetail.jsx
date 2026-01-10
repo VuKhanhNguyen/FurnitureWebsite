@@ -155,14 +155,12 @@ export function ProductDetail() {
     setCartLoading(true);
     try {
       await cartService.addItem(product.id, quantity || 1);
-      alert(`✅ Đã thêm ${quantity || 1} sản phẩm vào giỏ hàng!`);
     } catch (err) {
       if (err?.code === "NOT_AUTHENTICATED") {
         navigate("/login");
         return;
       }
       console.error("Failed to add to cart", err);
-      alert("❌ Không thể thêm vào giỏ hàng. Vui lòng thử lại!");
     } finally {
       setCartLoading(false);
     }
