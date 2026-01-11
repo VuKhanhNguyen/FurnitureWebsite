@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUsers, FaBox, FaShoppingCart, FaTrophy } from "react-icons/fa";
+import { FaUsers, FaBox, FaShoppingCart, FaTrophy, FaDollarSign } from "react-icons/fa";
 import dashboardService from "../../../services/dashboardService";
 
 const DashBoard = () => {
@@ -7,6 +7,7 @@ const DashBoard = () => {
     total_products: 0,
     total_users: 0,
     total_orders: 0,
+    total_revenue: 0,
     top_products: []
   });
   const [loading, setLoading] = useState(true);
@@ -37,7 +38,7 @@ const DashBoard = () => {
     return (
       <div style={{ padding: "2rem", background: "#f7fafc", minHeight: "100vh" }}>
         <div style={{ textAlign: "center", padding: "3rem" }}>
-          <p style={{ fontSize: "1.2rem", color: "#667eea" }}>
+          <p style={{ fontSize: "1.5rem", color: "#667eea" }}>
             Đang tải dữ liệu...
           </p>
         </div>
@@ -69,10 +70,10 @@ const DashBoard = () => {
   return (
     <div style={{ padding: "2rem", background: "#f7fafc", minHeight: "100vh" }}>
       <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ fontSize: "1.75rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
+        <h1 style={{ fontSize: "2.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
           Dashboard
         </h1>
-        <p style={{ color: "#718096", margin: "0.5rem 0 0 0", fontSize: "0.9375rem" }}>
+        <p style={{ color: "#718096", margin: "0.5rem 0 0 0", fontSize: "1.5rem" }}>
           Tổng quan hệ thống quản lý
         </p>
       </div>
@@ -84,10 +85,10 @@ const DashBoard = () => {
             <FaBox />
           </div>
           <div>
-            <h3 style={{ fontSize: "2rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
+            <h3 style={{ fontSize: "2.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
               {stats.total_products}
             </h3>
-            <p style={{ color: "#718096", margin: 0, fontSize: "0.875rem" }}>Sản phẩm</p>
+            <p style={{ color: "#718096", margin: 0, fontSize: "1.5rem" }}>Sản phẩm</p>
           </div>
         </div>
 
@@ -96,10 +97,10 @@ const DashBoard = () => {
             <FaUsers />
           </div>
           <div>
-            <h3 style={{ fontSize: "2rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
+            <h3 style={{ fontSize: "2.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
               {stats.total_users}
             </h3>
-            <p style={{ color: "#718096", margin: 0, fontSize: "0.875rem" }}>Người dùng</p>
+            <p style={{ color: "#718096", margin: 0, fontSize: "1.5rem" }}>Người dùng</p>
           </div>
         </div>
 
@@ -108,10 +109,22 @@ const DashBoard = () => {
             <FaShoppingCart />
           </div>
           <div>
-            <h3 style={{ fontSize: "2rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
+            <h3 style={{ fontSize: "2.5rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
               {stats.total_orders}
             </h3>
-            <p style={{ color: "#718096", margin: 0, fontSize: "0.875rem" }}>Đơn hàng</p>
+            <p style={{ color: "#718096", margin: 0, fontSize: "1.5rem" }}>Đơn hàng</p>
+          </div>
+        </div>
+
+        <div style={cardStyle}>
+          <div style={{ ...iconStyle, background: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" }}>
+            <FaDollarSign />
+          </div>
+          <div>
+            <h3 style={{ fontSize: "2rem", fontWeight: 700, color: "#2d3748", margin: 0 }}>
+              {formatCurrency(stats.total_revenue)}
+            </h3>
+            <p style={{ color: "#718096", margin: 0, fontSize: "1.5rem" }}>Doanh thu</p>
           </div>
         </div>
       </div>
@@ -119,8 +132,8 @@ const DashBoard = () => {
       {/* Top Products */}
       <div style={{ background: "white", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)", padding: "1.5rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
-          <FaTrophy style={{ color: "#f59e0b", fontSize: "1.25rem" }} />
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 600, color: "#2d3748", margin: 0 }}>
+          <FaTrophy style={{ color: "#f59e0b", fontSize: "1.5rem" }} />
+          <h2 style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748", margin: 0 }}>
             Top 5 Sản Phẩm Bán Chạy
           </h2>
         </div>
@@ -146,7 +159,7 @@ const DashBoard = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "0.875rem",
+                  fontSize: "1.5rem",
                   fontWeight: 600
                 }}>
                   {index + 1}
@@ -161,20 +174,17 @@ const DashBoard = () => {
                 )}
                 
                 <div style={{ flex: 1 }}>
-                  <h4 style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#2d3748", margin: 0 }}>
+                  <h4 style={{ fontSize: "1.5rem", fontWeight: 600, color: "#2d3748", margin: 0 }}>
                     {product.name}
                   </h4>
-                  <p style={{ fontSize: "0.8125rem", color: "#718096", margin: "0.25rem 0 0 0" }}>
+                  <p style={{ fontSize: "1.5rem", color: "#718096", margin: "0.25rem 0 0 0" }}>
                     Giá: {formatCurrency(product.sale_price > 0 ? product.sale_price : product.price)}
                   </p>
                 </div>
                 
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: "1.125rem", fontWeight: 700, color: "#2d3748" }}>
-                    {product.total_sold}
-                  </div>
-                  <div style={{ fontSize: "0.8125rem", color: "#718096" }}>
-                    đã bán
+                  <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#2d3748" }}>
+                    {product.total_sold} <span style={{ fontWeight: 400, color: "#718096" }}>đã bán</span>
                   </div>
                 </div>
               </div>

@@ -31,6 +31,30 @@ const ChatWindow = ({ onClose }) => {
         }
     }, []);
 
+    // Reset chatbot khi đăng xuất
+    useEffect(() => {
+        const handleAuthChange = () => {
+            // Clear tất cả messages
+            setMessages([]);
+            setInputValue("");
+            setIsTyping(false);
+            greetingSentRef.current = false;
+            
+            // Gửi lại greeting message
+            setTimeout(() => {
+                greetingSentRef.current = true;
+                addBotMessage(chatbotService.getGreeting());
+            }, 500);
+        };
+
+        // Lắng nghe sự kiện cart:updated (được trigger khi logout)
+        window.addEventListener("cart:updated", handleAuthChange);
+
+        return () => {
+            window.removeEventListener("cart:updated", handleAuthChange);
+        };
+    }, []);
+
     const addBotMessage = (text) => {
         setMessages((prev) => [
             ...prev,

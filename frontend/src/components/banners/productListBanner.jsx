@@ -17,7 +17,7 @@ export function ProductListBanner() {
                   <ul>
                     <li>
                       <span>
-                        <a href="index.html">Trang chủ</a>
+                        <a href="/">Trang chủ</a>
                       </span>
                     </li>
                     <li>

@@ -27,7 +27,7 @@ const OrderControls = ({
             top: "50%",
             transform: "translateY(-50%)",
             color: "#a0aec0",
-            fontSize: "1rem",
+            fontSize: "1.5rem",
           }}
         />
         <input
@@ -40,7 +40,7 @@ const OrderControls = ({
             padding: "0.625rem 1rem 0.625rem 2.5rem",
             border: "2px solid #e2e8f0",
             borderRadius: "8px",
-            fontSize: "0.875rem",
+            fontSize: "1.5rem",
             transition: "all 0.3s ease",
           }}
           onFocus={(e) => {
@@ -61,7 +61,7 @@ const OrderControls = ({
             padding: "0.625rem 1rem",
             border: "2px solid #e2e8f0",
             borderRadius: "8px",
-            fontSize: "0.875rem",
+            fontSize: "1.5rem",
             background: "white",
             cursor: "pointer",
             transition: "all 0.3s ease",
@@ -81,7 +81,7 @@ const OrderControls = ({
             padding: "0.625rem 1rem",
             border: "2px solid #e2e8f0",
             borderRadius: "8px",
-            fontSize: "0.875rem",
+            fontSize: "1.5rem",
             background: "white",
             cursor: "pointer",
             transition: "all 0.3s ease",

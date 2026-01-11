@@ -57,7 +57,7 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
   };
 
   const labelStyle = {
-    fontSize: "0.875rem",
+    fontSize: "1.5rem",
     fontWeight: 600,
     color: "#4a5568",
     textTransform: "uppercase",
@@ -65,7 +65,7 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
   };
 
   const valueStyle = {
-    fontSize: "1rem",
+    fontSize: "1.5rem",
     color: "#2d3748",
     fontWeight: 500,
   };
@@ -74,7 +74,7 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
     display: "inline-block",
     padding: "0.375rem 0.75rem",
     borderRadius: "6px",
-    fontSize: "0.875rem",
+    fontSize: "1.5rem",
     fontWeight: 600,
   };
 
@@ -85,7 +85,7 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
     padding: "0.625rem 1.25rem",
     border: "none",
     borderRadius: "8px",
-    fontSize: "0.9375rem",
+    fontSize: "1.5rem",
     fontWeight: 600,
     cursor: "pointer",
   };
@@ -94,7 +94,7 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
     return (
       <div style={containerStyle}>
         <div style={{ textAlign: "center", padding: "3rem" }}>
-          <p style={{ fontSize: "1.2rem", color: "#667eea" }}>Đang tải...</p>
+          <p style={{ fontSize: "1.5rem", color: "#667eea" }}>Đang tải...</p>
         </div>
       </div>
     );
@@ -104,7 +104,7 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
     return (
       <div style={containerStyle}>
         <div style={{ textAlign: "center", padding: "3rem" }}>
-          <p style={{ fontSize: "1.2rem", color: "#e53e3e" }}>
+          <p style={{ fontSize: "1.5rem", color: "#e53e3e" }}>
             Không tìm thấy người dùng
           </p>
         </div>
@@ -143,7 +143,7 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
             padding: 0,
             background: "#fed7d7",
             color: "#742a2a",
-            fontSize: "1.2rem",
+            fontSize: "1.5rem",
             justifyContent: "center",
           }}
         >
@@ -197,7 +197,7 @@ const ViewUser = ({ userId, onClose, onEdit, onDelete }) => {
           <div style={fieldStyle}>
             <label style={labelStyle}>Tên đăng nhập</label>
             <span
-              style={{ ...valueStyle, fontSize: "1.25rem", fontWeight: 700 }}
+              style={{ ...valueStyle, fontSize: "1.5rem", fontWeight: 700 }}
             >
               {user.username}
             </span>
