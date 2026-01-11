@@ -7,10 +7,12 @@ import AddProduct from "../manage_product/AddProduct";
 import EditProduct from "../manage_product/EditProduct";
 import ViewProduct from "../manage_product/ViewProduct";
 import productService from "../../../services/productService";
+import categoryService from "../../../services/categoryService";
 import "./ManageProduct.css";
 
 const ManageProduct = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -25,6 +27,7 @@ const ManageProduct = () => {
   // Lấy dữ liệu từ API
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -37,6 +40,16 @@ const ManageProduct = () => {
       setProducts([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await categoryService.getAllCategories();
+      setCategories(data || []);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh mục:", error);
+      setCategories([]);
     }
   };
 
@@ -75,7 +88,11 @@ const ManageProduct = () => {
 
   const handleSubmitEdit = async (productData, imageFile) => {
     try {
-      await productService.updateProduct(editingProductId, productData, imageFile);
+      await productService.updateProduct(
+        editingProductId,
+        productData,
+        imageFile
+      );
       setEditingProductId(null);
       fetchProducts();
       alert("Cập nhật sản phẩm thành công!");
@@ -91,7 +108,11 @@ const ManageProduct = () => {
 
   const handleDeleteProduct = async (id) => {
     // Confirmation dialog to prevent accidental deletion
-    if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác!")) {
+    if (
+      !window.confirm(
+        "Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác!"
+      )
+    ) {
       return;
     }
 
@@ -107,9 +128,18 @@ const ManageProduct = () => {
   };
 
   const filteredProducts = products.filter((product) => {
-    const matchSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchCategory = !categoryFilter || product.category === categoryFilter;
-    const matchStatus = !statusFilter || product.status === statusFilter;
+    const matchSearch = product.name
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchCategory =
+      !categoryFilter || String(product.category_id) === categoryFilter;
+    // Lọc theo trạng thái dựa vào quantity
+    let matchStatus = true;
+    if (statusFilter === "in_stock") {
+      matchStatus = product.quantity > 0;
+    } else if (statusFilter === "out_of_stock") {
+      matchStatus = product.quantity === 0;
+    }
     return matchSearch && matchCategory && matchStatus;
   });
 
@@ -128,7 +158,9 @@ const ManageProduct = () => {
     return (
       <div className="manage-product">
         <div style={{ textAlign: "center", padding: "3rem" }}>
-          <p style={{ fontSize: "1.2rem", color: "#667eea" }}>Đang tải dữ liệu...</p>
+          <p style={{ fontSize: "1.2rem", color: "#667eea" }}>
+            Đang tải dữ liệu...
+          </p>
         </div>
       </div>
     );
@@ -173,7 +205,10 @@ const ManageProduct = () => {
       <ProductControls
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
+        categories={categories}
+        categoryFilter={categoryFilter}
         onCategoryChange={setCategoryFilter}
+        statusFilter={statusFilter}
         onStatusChange={setStatusFilter}
       />
       <ProductTable
