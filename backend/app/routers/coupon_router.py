@@ -4,7 +4,7 @@ from typing import List
 from datetime import date
 
 from app.db.base import get_db
-from app.middleware.authenticate import authenticate
+from app.middleware.authenticate import authenticate, require_admin
 from app.models.user_model import User
 from app.models.coupon_model import Coupon
 from app.schemas.base_schema import DataResponse
@@ -20,11 +20,6 @@ from app.schemas.coupon_schema import (
 router = APIRouter(prefix="/coupons", tags=["coupons"])
 
 
-def require_admin(user: User):
-    if user.role != "admin":
-        raise HTTPException(status_code=403, detail="Admin only")
-
-
 def normalize_code(code: str) -> str:
     return (code or "").strip().upper()
 
@@ -38,10 +33,9 @@ def is_expired(coupon: Coupon) -> bool:
 @router.post("/", response_model=DataResponse[CouponResponse], description="Create coupon (admin)")
 async def create_coupon(
     data: CouponCreate,
-    current_user: User = Depends(authenticate),
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    require_admin(current_user)
 
     code = normalize_code(data.code)
     existing = db.query(Coupon).filter(Coupon.code == code).first()
@@ -63,10 +57,9 @@ async def create_coupon(
 
 @router.get("/", response_model=DataResponse[List[CouponResponse]], description="List coupons (admin)")
 async def list_coupons(
-    current_user: User = Depends(authenticate),
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    require_admin(current_user)
     items = db.query(Coupon).order_by(Coupon.id.desc()).all()
     return DataResponse.custom_response(code="200", message="Get coupons successfully", data=items)
 
@@ -77,7 +70,6 @@ async def get_coupon(
     current_user: User = Depends(authenticate),
     db: Session = Depends(get_db),
 ):
-    require_admin(current_user)
     coupon = db.query(Coupon).filter(Coupon.id == coupon_id).first()
     if not coupon:
         return DataResponse.custom_response(code="404", message="Coupon not found", data=None)
@@ -88,10 +80,9 @@ async def get_coupon(
 async def update_coupon(
     coupon_id: int,
     data: CouponUpdate,
-    current_user: User = Depends(authenticate),
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    require_admin(current_user)
 
     coupon = db.query(Coupon).filter(Coupon.id == coupon_id).first()
     if not coupon:
@@ -121,10 +112,9 @@ async def update_coupon(
 @router.delete("/{coupon_id}", response_model=DataResponse[None], description="Delete coupon (admin)")
 async def delete_coupon(
     coupon_id: int,
-    current_user: User = Depends(authenticate),
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    require_admin(current_user)
 
     coupon = db.query(Coupon).filter(Coupon.id == coupon_id).first()
     if not coupon:

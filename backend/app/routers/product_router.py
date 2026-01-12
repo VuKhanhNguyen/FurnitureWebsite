@@ -8,6 +8,8 @@ from app.models.order_model import Order
 from app.schemas.products_schema import CreateProductSchema, ProductSchema, UpdateProductSchema
 from app.schemas.base_schema import DataResponse
 from datetime import datetime, timedelta
+from app.middleware.authenticate import require_admin
+from app.models.user_model import User
 import os
 import shutil
 from typing import Optional
@@ -83,7 +85,8 @@ async def create_product(
     tags: str = Form(...),
     category_id: Optional[int] = Form(None),
     file: UploadFile = File(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin)
 ):
     try:
         # Validate sale_price
@@ -125,7 +128,7 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
     return DataResponse.custom_response(code="200", message="Get product by id", data=product)
 
 @router.delete("/{product_id}", description="Delete a product by id", response_model=DataResponse[ProductSchema])
-def delete_product(product_id: int, db: Session = Depends(get_db)):
+def delete_product(product_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_admin)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         return DataResponse.custom_response(code="404", message="Product not found", data=None)
@@ -146,7 +149,8 @@ async def update_product(
     tags: str = Form(None),
     category_id: Optional[int] = Form(None),
     file: UploadFile = File(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin)
 ):
     try:
         product = db.query(Product).filter(Product.id == product_id).first()
