@@ -128,7 +128,9 @@ def get_product(product_id: int, db: Session = Depends(get_db)):
     return DataResponse.custom_response(code="200", message="Get product by id", data=product)
 
 @router.delete("/{product_id}", description="Delete a product by id", response_model=DataResponse[ProductSchema])
-def delete_product(product_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_admin)):
+def delete_product(product_id: int, db: Session = Depends(get_db),
+                   current_user: User = Depends(require_admin)
+                   ):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         return DataResponse.custom_response(code="404", message="Product not found", data=None)
