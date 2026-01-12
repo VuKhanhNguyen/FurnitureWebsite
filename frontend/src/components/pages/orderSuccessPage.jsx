@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Header from "../commons/Header.jsx";
 import Footer from "../commons/Footer.jsx";
 import Offcanvas from "../commons/OffCanvas.jsx";
@@ -7,10 +7,16 @@ import CheckoutBanner from "../banners/checkoutBanner.jsx";
 
 export function OrderSuccessPage({ showOffcanvas, setShowOffcanvas }) {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const params = new URLSearchParams(location.search || "");
   const method = String(params.get("method") || "").toLowerCase();
   const orderId = params.get("order_id") || "";
+
+  // Replace current history entry to prevent back to checkout
+  useEffect(() => {
+    window.history.replaceState(null, "", location.pathname + location.search);
+  }, [location.pathname, location.search]);
 
   const isVnpay = method === "vnpay";
   const title = isVnpay ? "Thanh toán thành công! 🎉" : "Đặt hàng thành công! 🎉";

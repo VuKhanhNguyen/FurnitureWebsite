@@ -57,6 +57,16 @@ def format_order_confirmation_email(order: Order) -> tuple:
         payment_status_class = "status-paid" if order.payment_status == "paid" else "status-pending"
         payment_status_text = "Đã thanh toán" if order.payment_status == "paid" else "Chưa thanh toán"
 
+        # Discount section
+        discount_row = ""
+        if order.discount_amount and order.discount_amount > 0:
+            discount_row = f"""
+                <tr>
+                    <td colspan="3" style="text-align: right; padding-right: 20px; color: #4caf50;"><strong>Giảm giá ({order.coupon_code or 'Mã giảm giá'}):</strong></td>
+                    <td style="color: #4caf50;"><strong>-{order.discount_amount:,.0f}₫</strong></td>
+                </tr>
+            """
+
         # Note section
         note_section = ""
         if order.note:
@@ -84,6 +94,7 @@ def format_order_confirmation_email(order: Order) -> tuple:
         html_content = html_content.replace("{{shipping_address}}", f"{order.shipping_address}, {order.shipping_city or ''}")
         html_content = html_content.replace("{{order_items}}", items_rows)
         html_content = html_content.replace("{{subtotal}}", f"{order.subtotal_amount:,.0f}₫")
+        html_content = html_content.replace("{{discount_row}}", discount_row)
         html_content = html_content.replace("{{shipping_fee}}", f"{order.shipping_fee:,.0f}₫")
         html_content = html_content.replace("{{total_amount}}", f"{order.total_amount:,.0f}₫")
         html_content = html_content.replace("{{note_section}}", note_section)

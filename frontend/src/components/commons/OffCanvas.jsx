@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from "react";
 import logo from "../../assets/imgs/logo-light.png";
 import Login from "../login_register/login";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import wishlistService from "../../services/wishlistService";
 import { getAuthSnapshot, clearAuthStorage } from "../../services/authStorage";
 
 function Offcanvas({ show, onClose }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Kiểm tra trạng thái đăng nhập từ localStorage
   const [user, setUser] = useState(null);
+
+  // Đóng OffCanvas khi route thay đổi
+  useEffect(() => {
+    if (show && onClose) {
+      onClose();
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const { token, user: storedUser } = getAuthSnapshot();
@@ -19,6 +27,27 @@ function Offcanvas({ show, onClose }) {
       setUser(null);
     }
   }, [show]);
+
+  // Đóng OffCanvas khi đăng nhập thành công
+  useEffect(() => {
+    const handleAuthChanged = () => {
+      const { token, user: storedUser } = getAuthSnapshot();
+      if (token && storedUser) {
+        setUser(storedUser);
+        // Đóng OffCanvas sau khi đăng nhập thành công
+        if (show && onClose) {
+          setTimeout(() => onClose(), 300); // Delay nhỏ để user thấy được thông báo thành công
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('auth:changed', handleAuthChanged);
+    return () => {
+      window.removeEventListener('auth:changed', handleAuthChanged);
+    };
+  }, [show, onClose]);
 
   // State cho form đăng nhập
   const [loginData, setLoginData] = useState({ username: "", password: "" });
