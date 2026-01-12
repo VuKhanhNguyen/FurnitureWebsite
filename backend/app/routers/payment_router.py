@@ -17,6 +17,7 @@ from app.db.base import get_db
 from app.middleware.authenticate import authenticate
 from app.models.order_model import Order
 from app.schemas.base_schema import DataResponse
+from app.utils.email_helper import send_order_confirmation_email
 
 
 router = APIRouter(prefix="/payments", tags=["Payments"])
@@ -170,6 +171,15 @@ def vnpay_confirm_payment(
         order.payment_status = "failed"
 
     db.commit()
+    db.refresh(order)
+
+    # Send order confirmation email for successful VNPay payment
+    if is_success:
+        try:
+            send_order_confirmation_email(order, db)
+        except Exception as email_error:
+            print(f"Failed to send VNPay order confirmation email: {email_error}")
+            # Don't fail the payment confirmation if email fails
 
     return DataResponse(
         code="200",
@@ -222,6 +232,15 @@ def vnpay_return(request: Request, db: Session = Depends(get_db)):
                 # Payment failed (but signature valid)
                 order.payment_status = "failed"
             db.commit()
+            db.refresh(order)
+            
+            # Send order confirmation email for successful VNPay payment
+            if is_success:
+                try:
+                    send_order_confirmation_email(order, db)
+                except Exception as email_error:
+                    print(f"Failed to send VNPay order confirmation email: {email_error}")
+                    # Don't fail the payment confirmation if email fails
 
     # Redirect user back to frontend checkout page with status.
     base = settings.FRONTEND_BASE_URL.rstrip("/")
