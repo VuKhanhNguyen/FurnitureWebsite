@@ -10,6 +10,7 @@ from app.models.order_item_model import OrderItem
 from app.models.coupon_model import Coupon
 from app.schemas.order_schema import CreateOrderRequest, OrderResponse
 from app.schemas.base_schema import DataResponse
+from app.utils.email_helper import send_order_confirmation_email
 
 
 router = APIRouter(prefix="/checkout", tags=["Checkout"])
@@ -105,6 +106,15 @@ def create_order(payload: CreateOrderRequest, db: Session = Depends(get_db), cur
 
         db.commit()
         db.refresh(order)
+
+        # Send order confirmation email for COD only
+        # For VNPay, email will be sent after payment confirmation
+        if order.payment_method == "cod":
+            try:
+                send_order_confirmation_email(order, db)
+            except Exception as email_error:
+                print(f"Failed to send order confirmation email: {email_error}")
+                # Don't fail the order creation if email fails
 
         return DataResponse(code="200", message="Order created", data=OrderResponse.model_validate(order))
 

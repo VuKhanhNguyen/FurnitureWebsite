@@ -1,5 +1,5 @@
 import axios from "axios";
-import { clearAuthStorage } from "./authStorage";
+import { clearAuthStorage,getToken } from "./authStorage";
 import wishlistService from "./wishlistService";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
@@ -10,7 +10,21 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
   },
 });
-
+// Interceptor để tự động gắn Bearer token (nếu có)
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers = config.headers || {};
+      // Không overwrite nếu caller đã set Authorization riêng
+      if (!config.headers.Authorization && !config.headers.authorization) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 // Flag để đảm bảo chỉ logout 1 lần
 let isLoggingOut = false;
 

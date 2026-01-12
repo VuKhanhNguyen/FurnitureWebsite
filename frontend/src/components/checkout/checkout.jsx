@@ -36,9 +36,18 @@ export function Checkout() {
   const didAutoApplyCouponRef = useRef(false);
   const didHandlePaymentReturnRef = useRef(false);
 
+  // Check if this is a payment return immediately
+  const params = new URLSearchParams(location.search || "");
+  const isPaymentReturn = 
+    params.get("paypal") === "1" || 
+    params.get("vnpay") === "1" ||
+    !!params.get("vnp_ResponseCode") ||
+    !!params.get("vnp_TxnRef") ||
+    !!params.get("vnp_SecureHash");
+
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
-  const [finalizingPayment, setFinalizingPayment] = useState(false);
+  const [finalizingPayment, setFinalizingPayment] = useState(isPaymentReturn); // Set true immediately if payment return
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -493,6 +502,38 @@ export function Checkout() {
       setPlacing(false);
     }
   };
+
+  // If this is a payment return, show loading screen immediately
+  if (finalizingPayment && isPaymentReturn) {
+    return (
+      <section className="checkout-area section-space">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-lg-8">
+              <div className="your-order" style={{ textAlign: "center", padding: "60px 20px" }}>
+                <div style={{ marginBottom: "30px" }}>
+                  <div className="spinner-border text-primary" role="status" style={{ width: "4rem", height: "4rem" }}>
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+                <h3 style={{ marginBottom: "15px", color: "#333" }}>
+                  Đang xác nhận thanh toán...
+                </h3>
+                <p style={{ color: "#666", fontSize: "16px" }}>
+                  Vui lòng đợi trong giây lát. Chúng tôi đang xử lý giao dịch của bạn.
+                </p>
+                {error ? (
+                  <div style={{ marginTop: "20px", padding: "15px", backgroundColor: "#f8d7da", color: "#721c24", borderRadius: "5px" }}>
+                    {error}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="checkout-area section-space">
