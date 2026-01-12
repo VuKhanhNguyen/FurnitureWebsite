@@ -5,7 +5,7 @@ from app.db.base import get_db
 from sqlalchemy.orm import Session
 from app.schemas.base_schema import DataResponse
 from app.core.security import hash_password, verify_password, create_access_token
-from app.middleware.authenticate import authenticate
+from app.middleware.authenticate import authenticate, require_admin
 from datetime import datetime
 import pytz
 from sqlalchemy.exc import IntegrityError
@@ -29,7 +29,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 @router.get("/users", tags=["users"], description="Get all users", response_model=DataResponse[list[UserSchema]])
 async def get_users(
     db: Session = Depends(get_db),
-    _current_user: User = Depends(require_authenticated_user),
+    _current_user: User = Depends(require_admin),
 ):
     users = db.query(User).filter(User.deleted_at == None).all()
     return DataResponse.custom_response(code="200", message="get all users", data=users)
@@ -44,7 +44,7 @@ async def create_user(
     role: str = Form("customer"),
     file: UploadFile = File(None),
     db: Session = Depends(get_db),
-    _current_user: User = Depends(require_authenticated_user),
+    _current_user: User = Depends(require_admin),
 ):
     try:
         # Check if user exists
@@ -160,7 +160,7 @@ async def update_user(
 def delete_user(
     user_id: int,
     db: Session = Depends(get_db),
-    _current_user: User = Depends(require_authenticated_user),
+    _current_user: User = Depends(require_admin),
 ):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:

@@ -18,6 +18,7 @@ import BlogListPage from "./components/pages/blogListPage";
 import BlogDetailPage from "./components/pages/blogDetailPage";
 import Login from "./components/login_register/login";
 import Register from "./components/login_register/register";
+import AdminRoute from './components/AdminRoute';
 
 import ForgotPassword from "./components/login_register/ForgotPassword";
 import ProductCardQuickView from "./components/products/productCardQuickView";
@@ -223,13 +224,16 @@ function AppContent({ showOffcanvas, setShowOffcanvas }) {
             }
           />
         </Route>
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<DashBoard />} />
-          <Route path="/admin/product" element={<ManageProduct />} />
-          <Route path="/admin/user" element={<ManageUser />} />
-          <Route path="/admin/order" element={<ManageOrder />} />
-          <Route path="/admin/profile" element={<AdminProfile />} />
-          <Route path="/admin/livechat" element={<LiveChat />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<DashBoard />} />
+            <Route path="product" element={<ManageProduct />} />
+            <Route path="user" element={<ManageUser />} />
+            <Route path="order" element={<ManageOrder />} />
+            <Route path="profile" element={<AdminProfile />} />
+            <Route path="livechat" element={<LiveChat />} />
+
+          </Route>
         </Route>
       </Routes>
     </>
