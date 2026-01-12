@@ -41,3 +41,11 @@ def authenticate(http_authorization_credentials=Depends(reusable_oauth), db: Ses
     
     return user
 
+def require_admin(current_user: User = Depends(authenticate)) -> User:
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Bạn không có quyền truy cập (Admin only)"
+        )
+    return current_user
+
