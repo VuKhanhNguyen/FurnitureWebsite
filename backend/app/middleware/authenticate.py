@@ -1,7 +1,7 @@
 from fastapi.security import HTTPBearer
 import jwt
 from app.core.config import settings
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from app.db.base import get_db
